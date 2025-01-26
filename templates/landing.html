@@ -1,0 +1,200 @@
+<!-- /tenismatch/templates/landing.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-20 bg-gradient-to-r from-purple-500 to-pink-500 -mt-8">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 text-white">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6">Encontre seu par perfeito através do seu estilo</h1>
+                <p class="text-xl mb-8">Já pensou que seu tênis favorito diz muito sobre você? Descubra matches compatíveis baseados no seu estilo único.</p>
+                <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100">
+                    Começar Agora - Grátis
+                </a>
+            </div>
+            <div class="md:w-1/2 mt-10 md:mt-0">
+                <img src="{% static 'img/hero-image.jpg' %}" alt="Tênis formando coração" class="rounded-lg shadow-xl">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Como Funciona -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-16">Como Funciona</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-2xl font-bold text-purple-600">1</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Escolha seu tênis favorito</h3>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-2xl font-bold text-purple-600">2</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Responda algumas perguntas rápidas</h3>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-2xl font-bold text-purple-600">3</span>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">Receba matches compatíveis</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Estatísticas -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-bold text-purple-600">10k+</div>
+                <div class="text-gray-600 mt-2">Usuários Ativos</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-purple-600">78%</div>
+                <div class="text-gray-600 mt-2">Taxa de Compatibilidade</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-purple-600">2k</div>
+                <div class="text-gray-600 mt-2">Encontros Realizados</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-purple-600">89%</div>
+                <div class="text-gray-600 mt-2">Satisfação</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-16">O que dizem nossos usuários</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-purple-50 p-6 rounded-lg shadow">
+                <p class="text-gray-600 mb-4">"Nunca imaginei que meu amor por Air Jordan me levaria ao amor da minha vida!"</p>
+                <div class="flex items-center">
+                    <img src="{% static 'img/testimonials/user1.jpg' %}" alt="Maria" class="w-10 h-10 rounded-full">
+                    <div class="ml-4">
+                        <div class="font-semibold">Maria</div>
+                        <div class="text-gray-500 text-sm">28 anos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-purple-50 p-6 rounded-lg shadow">
+                <p class="text-gray-600 mb-4">"O TenisMatch me ajudou a encontrar alguém que compartilha do mesmo estilo que eu!"</p>
+                <div class="flex items-center">
+                    <img src="{% static 'img/testimonials/user2.jpg' %}" alt="João" class="w-10 h-10 rounded-full">
+                    <div class="ml-4">
+                        <div class="font-semibold">João</div>
+                        <div class="text-gray-500 text-sm">32 anos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-purple-50 p-6 rounded-lg shadow">
+                <p class="text-gray-600 mb-4">"A melhor forma de encontrar alguém que combine com seu estilo de vida!"</p>
+                <div class="flex items-center">
+                    <img src="{% static 'img/testimonials/user3.jpg' %}" alt="Ana" class="w-10 h-10 rounded-full">
+                    <div class="ml-4">
+                        <div class="font-semibold">Ana</div>
+                        <div class="text-gray-500 text-sm">25 anos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Planos -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-center mb-16">Escolha seu Plano</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div class="bg-white p-8 rounded-lg shadow">
+                <h3 class="text-2xl font-bold">Free</h3>
+                <div class="mt-4 text-3xl font-bold">R$ 0</div>
+                <ul class="mt-6 space-y-4">
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        3 matches por semana
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Visualização básica de perfis
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Matches na mesma cidade
+                    </li>
+                </ul>
+                <a href="{% url 'users:signup' %}" class="mt-8 block text-center bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600">
+                    Começar Grátis
+                </a>
+            </div>
+            
+            <div class="bg-purple-50 p-8 rounded-lg shadow">
+                <div class="absolute -top-4 right-4 bg-purple-600 text-white px-4 py-1 rounded-full text-sm">Recomendado</div>
+                <h3 class="text-2xl font-bold">Premium</h3>
+                <div class="mt-4 text-3xl font-bold">R$ 29,90<span class="text-base font-normal">/mês</span></div>
+                <ul class="mt-6 space-y-4">
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Matches ilimitados
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Perfil detalhado dos matches
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Busca em qualquer localização
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Chat desbloqueado
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Sem anúncios
+                    </li>
+                </ul>
+                <a href="{% url 'users:signup_premium' %}" class="mt-8 block text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
+                    Assinar Premium
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+<section class="py-20 bg-purple-600 text-white">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold mb-8">Seu par perfeito está a um tênis de distância</h2>
+        <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-8 py-3 rounded-full text-lg font-semibold hover:bg-gray-100">
+            Criar Conta Grátis
+        </a>
+    </div>
+</section>
+{% endblock %}

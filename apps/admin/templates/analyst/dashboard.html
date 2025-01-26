@@ -1,0 +1,75 @@
+# /tenismatch/apps/admin/templates/analyst/dashboard.html 
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Dashboard do Analista</h1>
+        <div class="space-x-4">
+            <a href="{% url 'admin:dataset_upload' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg">
+                Upload Dataset
+            </a>
+            <a href="{% url 'admin:model_training' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+                Treinar Modelo
+            </a>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Total de Modelos</h3>
+            <p class="text-3xl font-bold">{{ models.count }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Modelos Aprovados</h3>
+            <p class="text-3xl font-bold text-green-500">
+                {{ models.approved.count }}
+            </p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Em Revisão</h3>
+            <p class="text-3xl font-bold text-yellow-500">
+                {{ models.review.count }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Lista de Modelos -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Versão</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Criado em</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for model in models %}
+                <tr>
+                    <td class="px-6 py-4">{{ model.name }}</td>
+                    <td class="px-6 py-4">v{{ model.version }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                            {% if model.status == 'approved' %}bg-green-100 text-green-800
+                            {% elif model.status == 'review' %}bg-yellow-100 text-yellow-800
+                            {% elif model.status == 'rejected' %}bg-red-100 text-red-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ model.get_status_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">{{ model.created_at|date:"d/m/Y" }}</td>
+                    <td class="px-6 py-4">
+                        <a href="#" class="text-blue-600 hover:text-blue-900">Detalhes</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

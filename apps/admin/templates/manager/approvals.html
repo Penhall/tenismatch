@@ -1,0 +1,83 @@
+# /tenismatch/apps/admin/templates/manager/approvals.html 
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Aprovação de Modelos</h1>
+
+    {% for model in pending_models %}
+    <div class="bg-white rounded-lg shadow-lg mb-6 p-6">
+        <div class="flex justify-between items-start">
+            <div>
+                <h2 class="text-xl font-semibold">{{ model.name }} v{{ model.version }}</h2>
+                <p class="text-gray-600">Enviado por {{ model.created_by.get_full_name }}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                Pendente
+            </span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 mt-6">
+            <div>
+                <h3 class="font-medium mb-2">Métricas</h3>
+                <div class="space-y-2">
+                    <p>Precisão: {{ model.metrics.precision }}%</p>
+                    <p>Recall: {{ model.metrics.recall }}%</p>
+                    <p>F1 Score: {{ model.metrics.f1_score }}%</p>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="font-medium mb-2">Dataset</h3>
+                <div class="space-y-2">
+                    <p>Nome: {{ model.dataset.name }}</p>
+                    <p>Registros: {{ model.dataset.records_count }}</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-medium mb-2">Requisitos</h3>
+                <div class="space-y-2">
+                    {% for req in model.requirements %}
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 {% if req.met %}text-green-500{% else %}text-red-500{% endif %}" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {% if req.met %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            {% else %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            {% endif %}
+                        </svg>
+                        {{ req.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'admin:model_approve' model.id %}" class="mt-6">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Notas de Revisão</label>
+                <textarea name="review_notes" class="w-full border rounded p-2" rows="3"></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <button type="submit" name="action" value="reject" 
+                        class="bg-red-500 text-white px-4 py-2 rounded">
+                    Rejeitar
+                </button>
+                <button type="submit" name="action" value="approve" 
+                        class="bg-green-500 text-white px-4 py-2 rounded">
+                    Aprovar
+                </button>
+            </div>
+        </form>
+    </div>
+    {% empty %}
+    <div class="text-center py-12 bg-white rounded-lg shadow">
+        <p class="text-gray-500">Não há modelos pendentes de aprovação</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

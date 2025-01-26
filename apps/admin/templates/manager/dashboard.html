@@ -1,0 +1,85 @@
+# /tenismatch/apps/admin/templates/manager/dashboard.html 
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Dashboard do Gerente</h1>
+        <a href="{% url 'admin:metrics' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
+            Ver Métricas
+        </a>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Modelos Pendentes</h3>
+            <p class="text-3xl font-bold text-yellow-500">{{ models.review.count }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Aprovados Hoje</h3>
+            <p class="text-3xl font-bold text-green-500">{{ models.approved_today }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Taxa de Aprovação</h3>
+            <p class="text-3xl font-bold">{{ approval_rate }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Média Precisão</h3>
+            <p class="text-3xl font-bold">{{ avg_precision }}%</p>
+        </div>
+    </div>
+
+    <!-- Modelos para Revisão -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold">Modelos Aguardando Revisão</h2>
+        </div>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Analista</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Métricas</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Enviado em</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for model in models %}
+                <tr>
+                    <td class="px-6 py-4">
+                        {{ model.name }} v{{ model.version }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ model.created_by.get_full_name }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm">
+                            Precisão: {{ model.metrics.precision }}%<br>
+                            Recall: {{ model.metrics.recall }}%
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ model.created_at|date:"d/m/Y H:i" }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <a href="{% url 'admin:model_review' model.id %}" 
+                           class="bg-blue-500 text-white px-4 py-2 rounded">
+                            Revisar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                        Não há modelos aguardando revisão
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

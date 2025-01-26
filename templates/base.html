@@ -1,0 +1,58 @@
+<!– /tenismatch/templates/base.html –>
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TenisMatch{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-purple-600 text-white">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <a href="{% url 'users:landing' %}" class="text-2xl font-bold">TenisMatch</a>
+                {% if user.is_authenticated %}
+                <div class="space-x-4">
+                    <a href="{% url 'matching:match_list' %}">Matches</a>
+                    <a href="{% url 'profiles:edit' %}">Perfil</a>
+                    <form action="{% url 'users:logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-white hover:text-gray-200 bg-transparent border-none cursor-pointer">Sair</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="space-x-4">
+                    <a href="{% url 'users:login' %}">Entrar</a>
+                    <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-4 py-2 rounded-full">Cadastre-se</a>
+                    
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% if messages %}
+        <div class="messages container mx-auto px-6 mt-8">
+            {% for message in messages %}
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-6">
+            <p class="text-center">&copy; 2025 TenisMatch. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>

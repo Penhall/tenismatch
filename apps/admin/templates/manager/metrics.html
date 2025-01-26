@@ -1,0 +1,110 @@
+# /tenismatch/apps/admin/templates/manager/metrics.html 
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div class="container mx-auto">
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-2">Modelos em Produção</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ approved_models }}</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-2">Datasets Processados</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ total_datasets }}</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-2">Precisão Média</h3>
+            <p class="text-3xl font-bold text-green-600">{{ avg_precision }}%</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-2">Taxa de Aceitação</h3>
+            <p class="text-3xl font-bold text-yellow-600">{{ approval_rate }}%</p>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Evolução da Precisão</h3>
+            <canvas id="accuracyChart"></canvas>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">Modelos por Status</h3>
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabela de Métricas -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold">Histórico de Métricas</h2>
+        </div>
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left">Modelo</th>
+                    <th class="px-6 py-3 text-left">Precisão</th>
+                    <th class="px-6 py-3 text-left">Recall</th>
+                    <th class="px-6 py-3 text-left">F1 Score</th>
+                    <th class="px-6 py-3 text-left">Data</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for metric in metrics %}
+                <tr>
+                    <td class="px-6 py-4">
+                        {{ metric.model.name }} v{{ metric.model.version }}
+                    </td>
+                    <td class="px-6 py-4">{{ metric.precision }}%</td>
+                    <td class="px-6 py-4">{{ metric.recall }}%</td>
+                    <td class="px-6 py-4">{{ metric.f1_score }}%</td>
+                    <td class="px-6 py-4">{{ metric.created_at|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Evolução da Precisão
+    const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+    new Chart(accuracyCtx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+            datasets: [{
+                label: 'Precisão',
+                data: {{ accuracy_data|safe }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        }
+    });
+
+    // Gráfico de Status
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Aprovados', 'Em Revisão', 'Rejeitados'],
+            datasets: [{
+                data: {{ status_data|safe }},
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(234, 179, 8)',
+                    'rgb(239, 68, 68)'
+                ]
+            }]
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

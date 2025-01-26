@@ -1,0 +1,98 @@
+# Estrutura do Projeto TenisMatch
+
+- **apps/**
+  - matching/
+    - migrations/
+      - __init__.py
+      - 0001_initial.py
+    - ml/
+      - dataset.py
+      - training.py  
+    - services/
+      - data_processor.py
+      - recommender.py
+    - urls/
+    - __init__.py
+    - apps.py
+    - forms.py
+    - models.py
+    - urls.py
+    - views.py
+  - profiles/
+    - migrations/
+      - __init__.py
+      - 0001_initial.py
+    - urls/
+    - __init__.py
+    - apps.py
+    - forms.py  
+    - models.py
+    - urls.py
+    - views.py
+  - users/
+    - migrations/
+      - __init__.py
+      - 0001_initial.py
+    - __init__.py
+    - apps.py
+    - forms.py
+    - middleware.py
+    - models.py
+    - serializers.py
+    - urls.py
+    - views.py
+
+- **core/**
+  - __init__.py
+  - settings.py
+  - urls.py
+  - wsgi.py
+
+- **docs/**
+  - estrutura.md
+
+- **resources/**
+  - img1.png
+  - img2.jpg
+  - img3.jpg
+
+- **scripts/**
+  - create-missing-files.bat
+  - create-structure-windows.bat
+  - create-structure.sh
+
+- **static/**
+  - css/
+    - styles.css
+  - img/
+    - default-avatar.jpeg
+    - default-avatar.jpeg.png
+    - default-avatar.png
+    - hero-image.jpg
+    - testimonials/
+      - user1.jpg
+      - user2.jpg
+      - user3.jpg
+
+- **templates/**
+  - base.html
+  - landing.html
+  - signup_premium.html
+  - matching/
+    - match_detail.html
+    - match_list.html
+    - sneaker_form.html
+  - profiles/
+    - detail.html
+    - edit.html
+    - preferences.html
+  - users/
+    - login.html
+    - profile.html
+    - signup.html
+
+- asgi.py
+- db.sqlite3
+- manage.py
+- README.md
+- requirements.txt

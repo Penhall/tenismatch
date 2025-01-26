@@ -1,0 +1,73 @@
+# /tenismatch/apps/admin/templates/admin/base_admin.html 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin TenisMatch{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 w-64 bg-gray-900">
+        <div class="flex items-center justify-center h-16 bg-gray-800">
+            <span class="text-white text-xl font-bold">TenisMatch Admin</span>
+        </div>
+        <nav class="mt-5">
+            {% if request.user.groups.all.0.name == 'Analyst' %}
+            <a href="{% url 'admin:analyst_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <span class="mx-4">Dashboard</span>
+            </a>
+            <a href="{% url 'admin:dataset_upload' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <span class="mx-4">Datasets</span>
+            </a>
+            <a href="{% url 'admin:model_training' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <span class="mx-4">Treinamento</span>
+            </a>
+            {% elif request.user.groups.all.0.name == 'Manager' %}
+            <a href="{% url 'admin:manager_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <span class="mx-4">Dashboard</span>
+            </a>
+            <a href="{% url 'admin:metrics' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <span class="mx-4">Métricas</span>
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64">
+        <!-- Top Navigation -->
+        <div class="bg-white shadow-md">
+            <div class="container mx-auto">
+                <div class="flex justify-between items-center py-4 px-6">
+                    <div>
+                        <h2 class="text-xl font-semibold">
+                            {% block header %}{% endblock %}
+                        </h2>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-gray-800 mr-4">{{ request.user.get_full_name }}</span>
+                        <a href="{% url 'users:logout' %}" class="text-red-600 hover:text-red-800">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <main class="container mx-auto px-6 py-8">
+            {% if messages %}
+            <div class="mb-8">
+                {% for message in messages %}
+                <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

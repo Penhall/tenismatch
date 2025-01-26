@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8">
+    <h2 class="text-2xl font-bold mb-6">Seu Tênis Favorito</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Marca</label>
+                {{ form.brand }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Estilo</label>
+                {{ form.style }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Cor</label>
+                {{ form.color }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Faixa de Preço</label>
+                {{ form.price_range }}
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Ocasião de Uso</label>
+                {{ form.occasion }}
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700">
+                Encontrar Matches
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

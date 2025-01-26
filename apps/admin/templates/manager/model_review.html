@@ -1,0 +1,78 @@
+# /tenismatch/apps/admin/templates/manager/model_review.html 
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">Revisão de Modelo</h1>
+        
+        <!-- Detalhes do Modelo -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">{{ model.name }} v{{ model.version }}</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-gray-600">Criado por</p>
+                    <p class="font-medium">{{ model.created_by.get_full_name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Data de Criação</p>
+                    <p class="font-medium">{{ model.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <p class="text-gray-600">Descrição</p>
+                <p class="mt-1">{{ model.description }}</p>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold mb-4">Métricas de Performance</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <p class="text-sm text-gray-600">Precisão</p>
+                    <p class="text-2xl font-bold text-green-600">{{ model.metrics.precision }}%</p>
+                </div>
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <p class="text-sm text-gray-600">Recall</p>
+                    <p class="text-2xl font-bold text-blue-600">{{ model.metrics.recall }}%</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-lg">
+                    <p class="text-sm text-gray-600">F1 Score</p>
+                    <p class="text-2xl font-bold text-purple-600">{{ model.metrics.f1_score }}%</p>
+                </div>
+                <div class="p-4 bg-yellow-50 rounded-lg">
+                    <p class="text-sm text-gray-600">Acurácia</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ model.metrics.accuracy }}%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Revisão -->
+        <form method="post" class="bg-white rounded-lg shadow-lg p-6">
+            {% csrf_token %}
+            <h3 class="text-lg font-semibold mb-4">Decisão de Aprovação</h3>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Decisão</label>
+                {{ form.decision }}
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Notas da Revisão</label>
+                {{ form.review_notes }}
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'admin:manager_dashboard' %}" 
+                   class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                    Enviar Revisão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
