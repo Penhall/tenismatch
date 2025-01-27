@@ -8,6 +8,7 @@
     <title>{% block title %}TenisMatch{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
 </head>
 <body class="bg-gray-50">
     <nav class="bg-purple-600 text-white">
@@ -15,24 +16,21 @@
             <div class="flex justify-between items-center">
                 <a href="{% url 'users:landing' %}" class="text-2xl font-bold">TenisMatch</a>
                 {% if user.is_authenticated %}
-                <div class="space-x-4">
-                    <a href="{% url 'matching:match_list' %}">Matches</a>
+                <div class="space-x-4 flex items-center">
+                    <a href="{% url 'matching:match_list' %}" class="hover:text-gray-200">Matches</a>
                     {% if user.groups.all.0.name == 'Analyst' %}
-                    <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="bg-yellow-400 text-purple-600 px-3 py-1 rounded-full">Área Reservada</a>
+                        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="bg-yellow-400 text-purple-600 px-3 py-1 rounded-full hover:bg-yellow-300">Área Reservada</a>
                     {% elif user.groups.all.0.name == 'Manager' %}
-                    <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-green-400 text-purple-600 px-3 py-1 rounded-full">Área Reservada</a>
+                        <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-green-400 text-purple-600 px-3 py-1 rounded-full hover:bg-green-300">Área Reservada</a>
                     {% endif %}
-                    <a href="{% url 'profiles:edit' %}">Perfil</a>
-                    <form action="{% url 'users:logout' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="text-white hover:text-gray-200 bg-transparent border-none cursor-pointer">Sair</button>
-                    </form>
+                    <a href="{% url 'profiles:edit' %}" class="hover:text-gray-200">Perfil</a>
+                    <a href="{% url 'users:logout' %}" class="hover:text-gray-200">Sair</a>
                 </div>
                 {% else %}
                 <div class="space-x-4">
-                    <a href="{% url 'users:login' %}">Entrar</a>
-                    <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-4 py-2 rounded-full">Cadastre-se</a>
-                    
+                    <a href="#sobre" class="hover:text-gray-200">Sobre</a>
+                    <a href="{% url 'users:login' %}" class="hover:text-gray-200">Entrar</a>
+                    <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-4 py-2 rounded-full hover:bg-gray-100">Cadastre-se</a>
                 </div>
                 {% endif %}
             </div>
@@ -56,7 +54,10 @@
 
     <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="container mx-auto px-6">
-            <p class="text-center">&copy; 2025 TenisMatch. Todos os direitos reservados.</p>
+            <p class="text-center">
+                &copy; 2025 TenisMatch. Todos os direitos reservados.
+                <a href="{% url 'users:landing' %}#sobre" class="text-purple-300 hover:underline ml-2">Sobre nós</a>
+            </p>
         </div>
     </footer>
 </body>

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-8">
+    <h1 class="text-2xl font-bold mb-4">Dashboard do Perfil</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white shadow-md rounded p-4">
+            <h2 class="text-lg font-semibold mb-2">Partidas Encontradas</h2>
+            <p class="text-3xl">{{ matches_count }}</p>
+        </div>
+        <div class="bg-white shadow-md rounded p-4">
+            <h2 class="text-lg font-semibold mb-2">Partidas Favoritas</h2>
+            <p class="text-3xl">{{ favorite_matches_count }}</p>
+        </div>
+        <div class="bg-white shadow-md rounded p-4">
+            <h2 class="text-lg font-semibold mb-2">Marcas Preferidas</h2>
+            <p class="text-3xl">{{ preferred_brands_count }}</p>
+        </div>
+        <div class="bg-white shadow-md rounded p-4">
+            <h2 class="text-lg font-semibold mb-2">Cores Preferidas</h2>
+            <p class="text-3xl">{{ preferred_colors_count }}</p>
+        </div>
+    </div>
+
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Últimas Partidas Encontradas</h2>
+        {% if latest_matches %}
+        <ul class="list-disc pl-5">
+            {% for match in latest_matches %}
+            <li>
+                <a href="{% url 'matching:match_detail' match.id %}" class="text-blue-500 hover:underline">
+                    Partida com {{ match.matched_user.username }} - {{ match.matched_at|date:"d/m/Y H:i" }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhuma partida encontrada ainda.</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h2 class="text-xl font-semibold mb-4">Partidas Favoritas Recentes</h2>
+        {% if favorite_matches %}
+        <ul class="list-disc pl-5">
+            {% for match in favorite_matches %}
+            <li>
+                <a href="{% url 'matching:match_detail' match.id %}" class="text-blue-500 hover:underline">
+                    Partida com {{ match.matched_user.username }} - {{ match.matched_at|date:"d/m/Y H:i" }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Nenhuma partida favorita ainda.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

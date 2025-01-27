@@ -14,6 +14,9 @@ from .forms import CustomUserCreationForm, UserUpdateForm
 
 def landing_page(request):
     return render(request, 'landing.html')
+    
+def about(request):
+    return render(request, 'about.html')
 
 class SignUpView(CreateView):
     model = User
