@@ -21,28 +21,6 @@
     </div>
 </section>
 
-<!-- Área Reservada -->
-<section class="py-20 bg-white">
-    <div class="container mx-auto px-6">
-        <div class="text-center max-w-2xl mx-auto">
-            <h2 class="text-3xl font-bold mb-6">Área Reservada</h2>
-            <p class="text-gray-600 mb-8 text-lg">
-                Nossa área reservada é exclusiva para analistas e gerentes do TenisMatch. 
-                Acesse ferramentas avançadas de análise e gestão para melhorar a experiência 
-                dos nossos usuários.
-            </p>
-            <div class="space-x-4">
-                <a href="{% url 'users:login' %}" class="bg-purple-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-purple-700">
-                    Acessar Área Reservada
-                </a>
-                <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-8 py-3 rounded-full text-lg font-semibold border border-purple-600 hover:bg-purple-50">
-                    Cadastre-se
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Como Funciona -->
 <section class="py-20 bg-white">
     <div class="container mx-auto px-6">
@@ -167,7 +145,6 @@
             </div>
             
             <div class="bg-purple-50 p-8 rounded-lg shadow">
-                <div class="absolute -top-4 right-4 bg-purple-600 text-white px-4 py-1 rounded-full text-sm">Recomendado</div>
                 <h3 class="text-2xl font-bold">Premium</h3>
                 <div class="mt-4 text-3xl font-bold">R$ 29,90<span class="text-base font-normal">/mês</span></div>
                 <ul class="mt-6 space-y-4">
@@ -219,4 +196,27 @@
         </a>
     </div>
 </section>
+
+<!-- Área Reservada -->
+<section class="py-12 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-4">Área Reservada</h2>
+            <p class="text-gray-600 mb-6 text-base">
+                Nossa área reservada é exclusiva para analistas e gerentes do TenisMatch. 
+                Acesse ferramentas avançadas de análise e gestão para melhorar a experiência 
+                dos nossos usuários.
+            </p>
+            <div class="space-x-4">
+                <a href="{% url 'users:login' %}" class="bg-purple-600 text-white px-6 py-2 rounded-full text-base font-semibold hover:bg-purple-700">
+                    Acessar Área Reservada
+                </a>
+                <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-6 py-2 rounded-full text-base font-semibold border border-purple-600 hover:bg-purple-50">
+                    Cadastre-se
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

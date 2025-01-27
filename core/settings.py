@@ -84,7 +84,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Autenticação
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'tenis_admin:analyst_dashboard'
+LOGIN_REDIRECT_URL = 'matching:match_list'
 LOGOUT_REDIRECT_URL = 'users:landing'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

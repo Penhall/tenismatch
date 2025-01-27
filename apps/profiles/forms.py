@@ -1,6 +1,16 @@
 from django import forms
 from .models import Profile
 
+class TennisPreferencesForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['preferred_brands', 'preferred_styles', 'preferred_colors']
+        widgets = {
+            'preferred_brands': forms.Select(attrs={'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}),
+            'preferred_styles': forms.Select(attrs={'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}),
+            'preferred_colors': forms.Select(attrs={'class': 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'}),
+        }
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
