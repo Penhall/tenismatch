@@ -103,20 +103,28 @@ class ModelCreationView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         form.instance.status = 'draft'
         return super().form_valid(form)
 
-class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
+class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, View): # Alterado para View
     model = AIModel
     form_class = ModelReviewForm
     template_name = 'manager/model_review.html'
     success_url = reverse_lazy('tenis_admin:manager_dashboard')
 
-    def form_valid(self, form):
-        self.object.status = form.cleaned_data['decision']
-        self.object.save()
-        if self.object.status == 'approved':
-            messages.success(self.request, 'Modelo aprovado com sucesso!')
-        else:
-            messages.warning(self.request, 'Modelo rejeitado.')
-        return super().form_valid(form)
+    def get(self, request, *args, **kwargs):
+        model = get_object_or_404(AIModel, pk=kwargs['pk'])
+        form = ModelReviewForm(instance=model) # Instancia o formulário com a instância do modelo
+        return render(request, self.template_name, {'form': form, 'model': model})
+
+    def post(self, request, *args, **kwargs):
+        model = get_object_or_404(AIModel, pk=kwargs['pk'])
+        form = ModelReviewForm(request.POST, instance=model)
+        if form.is_valid():
+            form.save()
+            if form.cleaned_data['decision'] == 'approved':
+                messages.success(request, 'Modelo aprovado com sucesso!')
+            else:
+                messages.warning(request, 'Modelo rejeitado.')
+            return redirect(self.success_url)
+        return render(request, self.template_name, {'form': form, 'model': model})
 
 class DeployModelView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
     model = AIModel

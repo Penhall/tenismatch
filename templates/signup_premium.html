@@ -1,3 +1,4 @@
+<!-- /tenismatch/templates/signup_premium.html -->
 {% extends 'base.html' %}
 {% block content %}
 <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
@@ -5,9 +6,12 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 mt-4">
-            Criar Conta Premium
-        </button>
+        <div class="flex justify-between mt-4">
+            <button type="submit" class="w-1/2 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 mr-2">
+                Criar Conta Premium
+            </button>
+            <a href="{% url 'manager_dashboard' %}" class="w-1/2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 text-sm">Área Reservada</a>
+        </div>
     </form>
 </div>
 {% endblock %}
