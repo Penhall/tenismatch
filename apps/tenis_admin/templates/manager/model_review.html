@@ -1,0 +1,76 @@
+# /tenismatch/apps/tenis_admin/templates/manager/model_review.html 
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-start mb-6">
+            <h1 class="text-2xl font-bold">{{ model.name }} v{{ model.version }}</h1>
+            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">Em Revisão</span>
+        </div>
+
+        <!-- Informações do Modelo -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+            <div>
+                <h3 class="font-medium mb-2">Detalhes</h3>
+                <dl class="space-y-2">
+                    <dt class="text-gray-600">Criado por</dt>
+                    <dd>{{ model.created_by.get_full_name }}</dd>
+                    <dt class="text-gray-600">Data de Criação</dt>
+                    <dd>{{ model.created_at|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+            <div>
+                <h3 class="font-medium mb-2">Métricas</h3>
+                {% if model.metrics %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-sm text-gray-600">Precisão</p>
+                        <p class="text-xl font-bold">{{ model.metrics.precision }}%</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-sm text-gray-600">Recall</p>
+                        <p class="text-xl font-bold">{{ model.metrics.recall }}%</p>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500">Métricas não disponíveis</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulário de Revisão -->
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Decisão</label>
+                <div class="space-y-2">
+                    {% for value, text in form.decision.field.choices %}
+                    <div class="flex items-center">
+                        <input type="radio" name="decision" value="{{ value }}" 
+                               id="decision_{{ value }}" class="mr-2">
+                        <label for="decision_{{ value }}">{{ text }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Notas da Revisão</label>
+                {{ form.review_notes }}
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'tenis_admin:manager_dashboard' %}" 
+                   class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    Enviar Revisão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

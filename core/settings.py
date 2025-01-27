@@ -1,14 +1,10 @@
-# /tenismatch/core/settings.py 
 from pathlib import Path
-from pyexpat.errors import messages
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
-
 DEBUG = config('DEBUG', default=True, cast=bool)
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -21,8 +17,9 @@ INSTALLED_APPS = [
     
     # Apps locais
     'apps.users',
-    'apps.matching',
+    'apps.matching', 
     'apps.profiles',
+    'apps.tenis_admin.apps.TenisAdminConfig',
 ]
 
 MIDDLEWARE = [
@@ -33,6 +30,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.users.middleware.PremiumAccessMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -70,11 +68,13 @@ AUTH_PASSWORD_VALIDATORS = [
     }   
 ]
 
+# Internacionalização
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
+# Arquivos estáticos e mídia
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -82,25 +82,18 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-LOGIN_REDIRECT_URL = 'profiles:detail'
+# Autenticação
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'tenis_admin:analyst_dashboard'
 LOGOUT_REDIRECT_URL = 'users:landing'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Adicionar em settings.py
-MIDDLEWARE += [
-   'apps.users.middleware.PremiumAccessMiddleware',
-]
+# Configurações de Machine Learning
+MODEL_VERSION = '1.0.0'
+MODEL_STORAGE_PATH = BASE_DIR / 'models'
+DATASET_STORAGE_PATH = BASE_DIR / 'datasets'
 
-# Decorator para views premium
-from functools import wraps
-from django.shortcuts import redirect
-
-def premium_required(view_func):
-   @wraps(view_func)
-   def wrapper(request, *args, **kwargs):
-       if not request.user.has_premium_access():
-           messages.warning(request, 'Esta função requer conta Premium')
-           return redirect('users:upgrade_premium')
-       return view_func(request, *args, **kwargs)
-   return wrapper
+# Configurações de Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@tenismatch.com'

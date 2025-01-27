@@ -1,16 +1,17 @@
-# /tenismatch/apps/admin/urls.py 
+# /tenismatch/apps/tenis_admin/urls.py 
 from django.urls import path
 from . import views
 
-app_name = 'admin'
+app_name = 'tenis_admin'
 
 urlpatterns = [
     # Analyst URLs
     path('analyst/dashboard/', views.AnalystDashboardView.as_view(), name='analyst_dashboard'),
     path('analyst/dataset/upload/', views.DatasetUploadView.as_view(), name='dataset_upload'),
-    path('analyst/model/create/', views.ModelCreationView.as_view(), name='model_create'),
+    path('analyst/model/create/', views.ModelTrainingView.as_view(), name='model_create'),
     path('analyst/model/train/', views.ModelTrainingView.as_view(), name='model_training'),
     path('analyst/model/detail/<int:pk>/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
+    path('analyst/generate-data/', views.GenerateDataView.as_view(), name='generate_data'),
     
     # Manager URLs
     path('manager/dashboard/', views.ManagerDashboardView.as_view(), name='manager_dashboard'),

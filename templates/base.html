@@ -17,6 +17,11 @@
                 {% if user.is_authenticated %}
                 <div class="space-x-4">
                     <a href="{% url 'matching:match_list' %}">Matches</a>
+                    {% if user.groups.all.0.name == 'Analyst' %}
+                    <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="bg-yellow-400 text-purple-600 px-3 py-1 rounded-full">Área Reservada</a>
+                    {% elif user.groups.all.0.name == 'Manager' %}
+                    <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-green-400 text-purple-600 px-3 py-1 rounded-full">Área Reservada</a>
+                    {% endif %}
                     <a href="{% url 'profiles:edit' %}">Perfil</a>
                     <form action="{% url 'users:logout' %}" method="post" class="inline">
                         {% csrf_token %}

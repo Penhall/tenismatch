@@ -27,3 +27,36 @@ class DatasetPreparation:
         target = self.df_encoded['relacionamentos_formados']
         
         return features, target
+        
+    @staticmethod
+    def generate_training_data(num_samples=1000):
+        """Gera dados sintéticos para treinamento do modelo de matching de tênis"""
+        np.random.seed(42)
+        
+        # Gera dados básicos
+        user_ids = np.arange(1, num_samples + 1)
+        idades = np.random.normal(25, 5, num_samples).astype(int)
+        matches_realizados = np.random.poisson(15, num_samples)
+        taxa_resposta = np.random.uniform(0.1, 0.9, num_samples)
+        
+        # Gera dados categóricos
+        marcas = np.random.choice(['Nike', 'Adidas', 'Puma', 'Asics'], num_samples)
+        estilos = np.random.choice(['Corrida', 'Casual', 'Tênis', 'Basquete'], num_samples)
+        cores = np.random.choice(['Preto', 'Branco', 'Azul', 'Vermelho'], num_samples)
+        
+        # Gera target (relacionamentos formados)
+        relacionamentos = np.random.binomial(1, 0.3, num_samples)
+        
+        # Cria DataFrame
+        df = pd.DataFrame({
+            'user_id': user_ids,
+            'idade': idades,
+            'matches_realizados': matches_realizados,
+            'taxa_resposta': taxa_resposta,
+            'tenis_marca': marcas,
+            'tenis_estilo': estilos,
+            'tenis_cores': cores,
+            'relacionamentos_formados': relacionamentos
+        })
+        
+        return df

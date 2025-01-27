@@ -15,20 +15,20 @@
         </div>
         <nav class="mt-5">
             {% if request.user.groups.all.0.name == 'Analyst' %}
-            <a href="{% url 'admin:analyst_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Dashboard</span>
             </a>
-            <a href="{% url 'admin:dataset_upload' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{% url 'tenis_admin:dataset_upload' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Datasets</span>
             </a>
-            <a href="{% url 'admin:model_training' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{% url 'tenis_admin:model_training' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Treinamento</span>
             </a>
             {% elif request.user.groups.all.0.name == 'Manager' %}
-            <a href="{% url 'admin:manager_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{% url 'tenis_admin:manager_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Dashboard</span>
             </a>
-            <a href="{% url 'admin:metrics' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{% url 'tenis_admin:metrics' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Métricas</span>
             </a>
             {% endif %}

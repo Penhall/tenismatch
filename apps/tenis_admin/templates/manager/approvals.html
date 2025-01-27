@@ -1,9 +1,9 @@
-# /tenismatch/apps/admin/templates/manager/approvals.html 
-{% extends 'admin/base_admin.html' %}
+# /tenismatch/apps/tenis_admin/templates/manager/approvals.html 
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container mx-auto">
-    <h1 class="text-3xl font-bold mb-8">Aprovação de Modelos</h1>
+<div class="container mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold mb-8">Aprovações Pendentes</h1>
 
     {% for model in pending_models %}
     <div class="bg-white rounded-lg shadow-lg mb-6 p-6">
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <form method="post" action="{% url 'admin:model_approve' model.id %}" class="mt-6">
+        <form method="post" action="{% url 'tenis_admin:model_approve' model.id %}" class="mt-6">
             {% csrf_token %}
             <div class="mb-4">
                 <label class="block text-gray-700 text-sm font-bold mb-2">Notas de Revisão</label>
@@ -64,11 +64,11 @@
             
             <div class="flex justify-end space-x-4">
                 <button type="submit" name="action" value="reject" 
-                        class="bg-red-500 text-white px-4 py-2 rounded">
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                     Rejeitar
                 </button>
                 <button type="submit" name="action" value="approve" 
-                        class="bg-green-500 text-white px-4 py-2 rounded">
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
                     Aprovar
                 </button>
             </div>

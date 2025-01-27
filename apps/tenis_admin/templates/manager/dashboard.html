@@ -1,37 +1,38 @@
-# /tenismatch/apps/admin/templates/manager/dashboard.html 
+# /tenismatch/apps/tenis_admin/templates/manager/dashboard.html 
 {% extends 'base.html' %}
-{% load static %}
 
 {% block content %}
 <div class="container mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Dashboard do Gerente</h1>
-        <a href="{% url 'admin:metrics' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
-            Ver Métricas
-        </a>
+        <div class="space-x-4">
+            <a href="{% url 'tenis_admin:metrics' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
+                Ver Métricas
+            </a>
+        </div>
     </div>
 
-    <!-- Estatísticas -->
+    <!-- KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Modelos Pendentes</h3>
-            <p class="text-3xl font-bold text-yellow-500">{{ models.review.count }}</p>
+            <h3 class="text-lg font-semibold mb-2">Aguardando Revisão</h3>
+            <p class="text-3xl font-bold text-yellow-500">{{ pending_reviews }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-2">Aprovados Hoje</h3>
-            <p class="text-3xl font-bold text-green-500">{{ models.approved_today }}</p>
+            <p class="text-3xl font-bold text-green-500">{{ approved_today }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-2">Taxa de Aprovação</h3>
             <p class="text-3xl font-bold">{{ approval_rate }}%</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Média Precisão</h3>
+            <h3 class="text-lg font-semibold mb-2">Precisão Média</h3>
             <p class="text-3xl font-bold">{{ avg_precision }}%</p>
         </div>
     </div>
 
-    <!-- Modelos para Revisão -->
+    <!-- Modelos Pendentes -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b">
             <h2 class="text-xl font-semibold">Modelos Aguardando Revisão</h2>
@@ -56,17 +57,21 @@
                         {{ model.created_by.get_full_name }}
                     </td>
                     <td class="px-6 py-4">
-                        <span class="text-sm">
-                            Precisão: {{ model.metrics.precision }}%<br>
-                            Recall: {{ model.metrics.recall }}%
-                        </span>
+                        {% if model.metrics %}
+                        <div class="text-sm">
+                            <p>Precisão: {{ model.metrics.precision }}%</p>
+                            <p>Recall: {{ model.metrics.recall }}%</p>
+                        </div>
+                        {% else %}
+                        <span class="text-gray-500">Sem métricas</span>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4">
                         {{ model.created_at|date:"d/m/Y H:i" }}
                     </td>
                     <td class="px-6 py-4">
-                        <a href="{% url 'admin:model_review' model.id %}" 
-                           class="bg-blue-500 text-white px-4 py-2 rounded">
+                        <a href="{% url 'tenis_admin:model_review' model.id %}" 
+                           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                             Revisar
                         </a>
                     </td>
