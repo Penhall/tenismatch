@@ -5,9 +5,8 @@ from .models import AIModel, Dataset
 class DatasetUploadForm(forms.ModelForm):
     class Meta:
         model = Dataset
-        fields = ['name', 'description', 'file']
+        fields = ['name', 'file']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 4, 'class': 'w-full border rounded-md p-2'}),
             'name': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
             'file': forms.FileInput(attrs={'class': 'w-full border rounded-md p-2'})
         }
@@ -20,11 +19,10 @@ class ModelTrainingForm(forms.ModelForm):
     
     class Meta:
         model = AIModel
-        fields = ['name', 'version', 'description']
+        fields = ['name', 'version', 'dataset']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
-            'version': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
-            'description': forms.Textarea(attrs={'rows': 4, 'class': 'w-full border rounded-md p-2'})
+            'version': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'})
         }
 
 class ModelReviewForm(forms.Form):

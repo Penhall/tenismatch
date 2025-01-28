@@ -1,5 +1,5 @@
 # /tenismatch/apps/tenis_admin/views.py 
-from django.views.generic import ListView, CreateView, UpdateView, DetailView, View, FormView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, View, FormView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
@@ -268,3 +268,50 @@ class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, DetailView):
             
         model.save()
         return redirect('tenis_admin:manager_dashboard')
+        
+class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateView):
+    template_name = 'manager/metrics_dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        period = int(self.request.GET.get('period', 30))
+        
+        metrics_service = MetricsService()
+        
+        # Coleta métricas relacionadas aos modelos
+        model_metrics = metrics_service.get_model_performance_metrics(days=period)
+        daily_model_metrics = metrics_service.get_daily_model_metrics(days=period)
+        
+        # Prepara dados para gráficos
+        context.update({
+            'model_metrics': model_metrics,
+            'daily_model_metrics': {
+                'dates': [m['date'].strftime('%d/%m') for m in daily_model_metrics],
+                'accuracies': [m['avg_accuracy'] for m in daily_model_metrics],
+                'precisions': [m['avg_precision'] for m in daily_model_metrics],
+                'recalls': [m['avg_recall'] for m in daily_model_metrics],
+                'f1_scores': [m['avg_f1_score'] for m in daily_model_metrics]
+            }
+        })
+        
+        return context
+
+class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView):
+    model = AIModel
+    template_name = 'manager/model_performance.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model = self.get_object()
+        
+        # Aqui você pode adicionar métricas específicas do modelo que não dependam de matches
+        # Por exemplo, você pode usar as métricas salvas durante o treinamento do modelo
+        
+        context.update({
+            'accuracy': model.metrics.get('accuracy', 0),
+            'precision': model.metrics.get('precision', 0),
+            'recall': model.metrics.get('recall', 0),
+            'f1_score': model.metrics.get('f1_score', 0),
+        })
+        
+        return context

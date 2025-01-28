@@ -1,6 +1,6 @@
 import joblib
 from apps.tenis_admin.models import AIModel
-from apps.tenis_admin.services.training_service import SneakerMatchTraining
+from ...tenis_admin.services.training_service import SneakerMatchTraining
 
 class TenisMatchRecommender:
     def __init__(self):

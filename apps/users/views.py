@@ -5,12 +5,23 @@ from django.utils import timezone
 from pyexpat.errors import messages
 from django.shortcuts import redirect, render
 from django.views import View
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .models import User
 from .forms import CustomUserCreationForm, UserUpdateForm
+from apps.matching.models import Match
+
+class UserDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['matches'] = Match.objects.filter(user=user).order_by('-created_at')[:5]
+        context['total_matches'] = Match.objects.filter(user=user).count()
+        return context
 
 def landing_page(request):
     return render(request, 'landing.html')
@@ -24,22 +35,53 @@ class SignUpView(CreateView):
     template_name = 'users/signup.html'
     success_url = reverse_lazy('users:login')
 
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        user.is_approved = False
+        user.role = 'ANALISTA'
+        user.save()
+        return super().form_valid(form)
+
+class ApproveAnalystView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.role != 'GERENTE':
+            return redirect('home')
+        unapproved_analysts = User.objects.filter(role='ANALISTA', is_approved=False)
+        return render(request, 'users/approve_analysts.html', {'analysts': unapproved_analysts})
+
+    def post(self, request):
+        if request.user.role != 'GERENTE':
+            return redirect('home')
+        analyst_id = request.POST.get('analyst_id')
+        if analyst_id:
+            analyst = User.objects.get(id=analyst_id)
+            analyst.is_approved = True
+            analyst.save()
+        return redirect('users:approve_analysts')
+
+class CustomLoginView(LoginView):
+    template_name = 'users/login.html'
+    
+    def form_valid(self, form):
+        user = form.get_user()
+        if user.role == 'ANALISTA' and not user.is_approved:
+            form.add_error(None, "Sua conta ainda não foi aprovada.")
+            return self.form_invalid(form)
+        return super().form_valid(form)
+
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
     
     def get_success_url(self):
         user = self.request.user
-        # Verificar grupos para redirecionar para dashboards corretos
-        groups = user.groups.all()
-        if groups.filter(name='Analyst').exists():
+        if user.role == 'ANALISTA':
             return reverse_lazy('tenis_admin:analyst_dashboard')
-        elif groups.filter(name='Manager').exists():
+        elif user.role == 'GERENTE':
             return reverse_lazy('tenis_admin:manager_dashboard')
         elif user.is_staff:
-            return reverse_lazy('admin:index') # Dashboard admin padrão se não for analista/gerente
+            return reverse_lazy('admin:index')
         else:
-            # Redirecionar para o perfil para usuários normais
-            return reverse_lazy('profiles:detail')
+            return reverse_lazy('users:dashboard')
 
 class CustomLogoutView(LogoutView):
     next_page = '/'

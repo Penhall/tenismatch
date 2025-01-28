@@ -1,62 +1,72 @@
 # /tenismatch/apps/matching/ml/dataset.py 
-import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
 class DatasetPreparation:
     def __init__(self):
-        self.scaler = StandardScaler()
-        
-    def load_data(self, filename='tenis_match_dataset.csv'):
-        self.df = pd.read_csv(filename)
-        return self.df
-        
-    def preprocess_data(self):
-        # Codificação one-hot para variáveis categóricas
-        categorical_features = ['tenis_marca', 'tenis_estilo', 'tenis_cores']
-        self.df_encoded = pd.get_dummies(self.df, columns=categorical_features)
-        
-        # Normalização de features numéricas
-        numeric_features = ['idade', 'matches_realizados', 'taxa_resposta']
-        self.df_encoded[numeric_features] = self.scaler.fit_transform(self.df_encoded[numeric_features])
-        
-        return self.df_encoded
-        
-    def create_feature_matrix(self):
-        features = self.df_encoded.drop(['user_id', 'relacionamentos_formados'], axis=1)
-        target = self.df_encoded['relacionamentos_formados']
-        
-        return features, target
+        self.styles = ['ESP', 'CAS', 'VIN', 'SOC', 'FAS']
+        self.brands = ['Nike', 'Adidas', 'Vans', 'Converse', 'New Balance']
+        self.colors = ['BLK', 'WHT', 'COL', 'NEU']
         
     @staticmethod
-    def generate_training_data(num_samples=1000):
-        """Gera dados sintéticos para treinamento do modelo de matching de tênis"""
-        np.random.seed(42)
+    def generate_training_data(n_samples=1000):
+        """Gera dataset sintético para treinamento"""
+        prep = DatasetPreparation()
+        data = []
         
-        # Gera dados básicos
-        user_ids = np.arange(1, num_samples + 1)
-        idades = np.random.normal(25, 5, num_samples).astype(int)
-        matches_realizados = np.random.poisson(15, num_samples)
-        taxa_resposta = np.random.uniform(0.1, 0.9, num_samples)
+        for _ in range(n_samples):
+            # Gera um registro sintético
+            record = {
+                'style': np.random.choice(prep.styles),
+                'brand': np.random.choice(prep.brands),
+                'color': np.random.choice(prep.colors),
+                'price': np.random.randint(100, 1000),
+                'occasion': np.random.choice(['casual', 'sport', 'formal']),
+            }
+            
+            # Simula sucesso do match baseado em regras
+            match_prob = prep._calculate_match_probability(record)
+            record['match_success'] = 1 if np.random.random() < match_prob else 0
+            
+            data.append(record)
+            
+        return data
+    
+    def _calculate_match_probability(self, record):
+        """Calcula probabilidade base de match para dados sintéticos"""
+        prob = 0.5  # Probabilidade base
         
-        # Gera dados categóricos
-        marcas = np.random.choice(['Nike', 'Adidas', 'Puma', 'Asics'], num_samples)
-        estilos = np.random.choice(['Corrida', 'Casual', 'Tênis', 'Basquete'], num_samples)
-        cores = np.random.choice(['Preto', 'Branco', 'Azul', 'Vermelho'], num_samples)
+        # Ajusta baseado no estilo
+        style_probs = {
+            'ESP': 0.7,  # Esportivo tem alta chance
+            'CAS': 0.6,  # Casual também
+            'VIN': 0.5,  # Vintage médio
+            'SOC': 0.4,  # Social menor
+            'FAS': 0.6   # Fashion bom
+        }
+        prob += style_probs.get(record['style'], 0)
         
-        # Gera target (relacionamentos formados)
-        relacionamentos = np.random.binomial(1, 0.3, num_samples)
+        # Ajusta baseado na marca
+        brand_probs = {
+            'Nike': 0.1,
+            'Adidas': 0.1,
+            'Vans': 0.05,
+            'Converse': 0.05,
+            'New Balance': 0.05
+        }
+        prob += brand_probs.get(record['brand'], 0)
         
-        # Cria DataFrame
-        df = pd.DataFrame({
-            'user_id': user_ids,
-            'idade': idades,
-            'matches_realizados': matches_realizados,
-            'taxa_resposta': taxa_resposta,
-            'tenis_marca': marcas,
-            'tenis_estilo': estilos,
-            'tenis_cores': cores,
-            'relacionamentos_formados': relacionamentos
-        })
+        # Normaliza probabilidade
+        return min(max(prob / 2, 0), 1)  # Garante entre 0 e 1
+    
+    @staticmethod
+    def load_and_prepare_data(file_path):
+        """Carrega e prepara dados de um arquivo CSV"""
+        df = pd.read_csv(file_path)
         
-        return df
+        # Validações básicas
+        required_columns = ['style', 'brand', 'color', 'price']
+        if not all(col in df.columns for col in required_columns):
+            raise ValueError("Dataset não contém todas as colunas necessárias")
+            
+        return df.to_dict('records')

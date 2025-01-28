@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold mb-8">Métricas de Desempenho dos Modelos</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Acurácia Média</h3>
+            <p class="text-3xl font-bold">{{ model_metrics.avg_accuracy|floatformat:2 }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Precisão Média</h3>
+            <p class="text-3xl font-bold">{{ model_metrics.avg_precision|floatformat:2 }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Recall Médio</h3>
+            <p class="text-3xl font-bold">{{ model_metrics.avg_recall|floatformat:2 }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">F1-Score Médio</h3>
+            <p class="text-3xl font-bold">{{ model_metrics.avg_f1_score|floatformat:2 }}</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Desempenho Diário dos Modelos</h2>
+        <canvas id="dailyMetricsChart"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('dailyMetricsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ daily_model_metrics.dates|safe }},
+            datasets: [{
+                label: 'Acurácia',
+                data: {{ daily_model_metrics.accuracies|safe }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Precisão',
+                data: {{ daily_model_metrics.precisions|safe }},
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }, {
+                label: 'Recall',
+                data: {{ daily_model_metrics.recalls|safe }},
+                borderColor: 'rgb(255, 205, 86)',
+                tension: 0.1
+            }, {
+                label: 'F1-Score',
+                data: {{ daily_model_metrics.f1_scores|safe }},
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

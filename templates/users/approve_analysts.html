@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Aprovar Analistas</h2>
+{% if analysts %}
+    <ul>
+    {% for analyst in analysts %}
+        <li>
+            {{ analyst.username }} - {{ analyst.email }}
+            <form method="post" action="{% url 'users:approve_analysts' %}">
+                {% csrf_token %}
+                <input type="hidden" name="analyst_id" value="{{ analyst.id }}">
+                <button type="submit">Aprovar</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Não há analistas pendentes de aprovação.</p>
+{% endif %}
+{% endblock %}

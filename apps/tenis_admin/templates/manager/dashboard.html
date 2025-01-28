@@ -6,29 +6,28 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Dashboard do Gerente</h1>
         <div class="space-x-4">
-            <a href="{% url 'tenis_admin:metrics' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
-                Ver Métricas
+            <a href="{% url 'tenis_admin:metrics_dashboard' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
+                Métricas de Desempenho
+            </a>
+            <a href="{% url 'users:approve_analysts' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg">
+                Aprovar Analistas
             </a>
         </div>
     </div>
 
     <!-- KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Aguardando Revisão</h3>
+            <h3 class="text-lg font-semibold mb-2">Modelos Aguardando Revisão</h3>
             <p class="text-3xl font-bold text-yellow-500">{{ pending_reviews }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Aprovados Hoje</h3>
+            <h3 class="text-lg font-semibold mb-2">Modelos Aprovados Hoje</h3>
             <p class="text-3xl font-bold text-green-500">{{ approved_today }}</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-2">Taxa de Aprovação</h3>
             <p class="text-3xl font-bold">{{ approval_rate }}%</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-2">Precisão Média</h3>
-            <p class="text-3xl font-bold">{{ avg_precision }}%</p>
         </div>
     </div>
 

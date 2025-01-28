@@ -18,6 +18,6 @@ urlpatterns = [
     path('manager/model/review/<int:pk>/', views.ModelReviewView.as_view(), name='model_review'),
     path('manager/model/approve/<int:pk>/', views.ModelApprovalView.as_view(), name='model_approve'),
     path('manager/model/deploy/<int:pk>/', views.DeployModelView.as_view(), name='model_deploy'),
-    path('manager/metrics/', views.MetricsView.as_view(), name='metrics'),
+    path('manager/metrics/', views.MetricsDashboardView.as_view(), name='metrics_dashboard'),
     path('manager/approvals/', views.ApprovalsView.as_view(), name='approvals'),
 ]

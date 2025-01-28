@@ -1,6 +1,7 @@
 # /tenismatch/apps/matching/models.py 
 from django.db import models
 from apps.users.models import User
+from django.conf import settings
 
 class SneakerProfile(models.Model):
     STYLE_CHOICES = [
@@ -39,3 +40,26 @@ class Match(models.Model):
     class Meta:
         db_table = 'matches'
         unique_together = ('user_a', 'user_b')
+        
+class MatchFeedback(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    match = models.ForeignKey('Match', on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[
+        (1, 'Muito Ruim'),
+        (2, 'Ruim'),
+        (3, 'Regular'),
+        (4, 'Bom'),
+        (5, 'Muito Bom')
+    ])
+    feedback_text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'match')
+        
+    @property
+    def is_positive(self):
+        return self.rating >= 4
+        
+    def __str__(self):
+        return f"Feedback de {self.user} para match {self.match_id}"
