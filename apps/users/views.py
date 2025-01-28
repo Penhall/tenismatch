@@ -2,13 +2,15 @@
 # apps/users/views.py
 from datetime import timedelta
 from django.utils import timezone
-from pyexpat.errors import messages
+from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import CreateView, UpdateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.contrib.auth import login
+from django.http import HttpResponseRedirect
 from .models import User
 from .forms import CustomUserCreationForm, UserUpdateForm
 from apps.matching.models import Match
@@ -19,8 +21,7 @@ class UserDashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        context['matches'] = Match.objects.filter(user=user).order_by('-created_at')[:5]
-        context['total_matches'] = Match.objects.filter(user=user).count()
+        # Add user-specific data here that doesn't involve matches
         return context
 
 def landing_page(request):
@@ -62,26 +63,27 @@ class ApproveAnalystView(LoginRequiredMixin, View):
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
     
-    def form_valid(self, form):
-        user = form.get_user()
-        if user.role == 'ANALISTA' and not user.is_approved:
-            form.add_error(None, "Sua conta ainda não foi aprovada.")
-            return self.form_invalid(form)
-        return super().form_valid(form)
-
-class CustomLoginView(LoginView):
-    template_name = 'users/login.html'
-    
     def get_success_url(self):
         user = self.request.user
         if user.role == 'ANALISTA':
-            return reverse_lazy('tenis_admin:analyst_dashboard')
+            if user.is_approved:
+                return reverse_lazy('tenis_admin:analyst_dashboard')
+            else:
+                return reverse_lazy('users:login')  # Redirect back to login with a message
         elif user.role == 'GERENTE':
             return reverse_lazy('tenis_admin:manager_dashboard')
         elif user.is_staff:
             return reverse_lazy('admin:index')
         else:
             return reverse_lazy('users:dashboard')
+
+    def form_valid(self, form):
+        user = form.get_user()
+        if user.role == 'ANALISTA' and not user.is_approved:
+            form.add_error(None, "Sua conta ainda não foi aprovada.")
+            return self.form_invalid(form)
+        login(self.request, user)
+        return HttpResponseRedirect(self.get_success_url())
 
 class CustomLogoutView(LogoutView):
     next_page = '/'

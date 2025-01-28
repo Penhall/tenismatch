@@ -5,25 +5,33 @@
     <h1 class="text-3xl font-bold mb-6">Seu Dashboard</h1>
     
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Resumo de Matches</h2>
-        <p class="text-lg mb-2">Total de Matches: {{ total_matches }}</p>
+        <h2 class="text-xl font-semibold mb-4">Informações da Conta</h2>
+        <p class="text-lg mb-2">Nome de usuário: {{ user.username }}</p>
+        <p class="text-lg mb-2">Email: {{ user.email }}</p>
+        <p class="text-lg mb-2">Membro desde: {{ user.date_joined|date:"d/m/Y" }}</p>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Seu Perfil</h2>
+        <p class="text-lg mb-2">Status da conta: {% if user.is_premium %}Premium{% else %}Gratuita{% endif %}</p>
+        {% if user.is_premium %}
+            <p class="text-lg mb-2">Premium até: {{ user.premium_until|date:"d/m/Y" }}</p>
+        {% else %}
+            <a href="{% url 'users:upgrade_premium' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Upgrade para Premium
+            </a>
+        {% endif %}
     </div>
 
     <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Últimos Matches</h2>
-        {% if matches %}
-            <ul>
-            {% for match in matches %}
-                <li class="mb-4 p-4 border-b">
-                    <p class="font-semibold">Match com: {{ match.other_user.username }}</p>
-                    <p>Data: {{ match.created_at|date:"d/m/Y" }}</p>
-                    <p>Status: {{ match.get_status_display }}</p>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>Você ainda não tem matches.</p>
-        {% endif %}
+        <h2 class="text-xl font-semibold mb-4">Ações Rápidas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="{% url 'profiles:edit' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-center hover:bg-blue-600">
+                Editar Perfil
+            </a>
+            <a href="{% url 'profiles:preferences' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg text-center hover:bg-green-600">
+                Atualizar Preferências
+            </a>
+        </div>
     </div>
 </div>
-{% endblock %}

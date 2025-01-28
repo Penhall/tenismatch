@@ -291,7 +291,10 @@ class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
                 'precisions': [m['avg_precision'] for m in daily_model_metrics],
                 'recalls': [m['avg_recall'] for m in daily_model_metrics],
                 'f1_scores': [m['avg_f1_score'] for m in daily_model_metrics]
-            }
+            },
+            'total_models': AIModel.objects.count(),
+            'models_in_review': AIModel.objects.filter(status='review').count(),
+            'approved_models': AIModel.objects.filter(status='approved').count()
         })
         
         return context
