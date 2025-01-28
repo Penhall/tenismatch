@@ -31,7 +31,7 @@
                 </div>
                 {% else %}
                 <div class="space-x-4">
-                    <a href="#sobre" class="hover:text-gray-200">Sobre</a>
+                    <a href="{% url 'about' %}" class="hover:text-gray-200">Sobre</a>
                     <a href="{% url 'users:login' %}" class="hover:text-gray-200">Entrar</a>
                     <a href="{% url 'users:signup' %}" class="bg-white text-purple-600 px-4 py-2 rounded-full hover:bg-gray-100">Cadastre-se</a>
                 </div>
@@ -59,7 +59,7 @@
         <div class="container mx-auto px-6">
             <p class="text-center">
                 &copy; 2025 TenisMatch. Todos os direitos reservados.
-                <a href="{% url 'users:landing' %}#sobre" class="text-purple-300 hover:underline ml-2">Sobre nós</a>
+                <a href="{% url 'about' %}" class="text-purple-300 hover:underline ml-2">Sobre nós</a>
             </p>
         </div>
     </footer>

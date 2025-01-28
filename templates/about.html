@@ -1,79 +1,51 @@
-<!-- /tenismatch/templates/about.html -->
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sobre a TenisMatch{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-6 py-8">
-    <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl font-bold text-center mb-8">Sobre a TenisMatch</h1>
+    <h2 class="text-2xl font-bold mb-4">Sobre a TenisMatch</h2>
 
-        <!-- Nossa História -->
-        <section class="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Nossa História Inspiradora</h2>
-            <p class="text-gray-700 mb-4">
-                Tudo começou em setembro de 2024, quando nosso fundador, João "Pé-de-Valsa" Silva, foi abandonado no altar. 
-                O motivo? A noiva não suportava seus tênis favoritos, um par de Crocs neon com meias de dedo. Devastado, 
-                João percebeu que havia um nicho inexplorado no mercado de relacionamentos: unir pessoas com gostos calçadistas semelhantes.
-            </p>
-            <p class="text-gray-700">
-                Entre lágrimas e calos, João transformou sua dor em inovação. Afinal, se existe alma gêmea, por que não 
-                pode existir sola gêmea? Como já dizia o poeta: "Difícil é gostar tanto do seu All Star Azul." João 
-                entendeu que essa dificuldade poderia ser a chave para conexões mais profundas.
-            </p>
-        </section>
+    <section class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">Nossa História Inspiradora</h3>
+        <p>Bem-vindos à TenisMatch, onde o amor começa pelos pés e termina no coração!</p>
+        <p>Tudo começou em setembro de 2024, quando nosso fundador, João "Pé-de-Valsa" Silva, foi abandonado no altar. O motivo? A noiva não suportava seus tênis favoritos, um par de Crocs neon com meias de dedo. Devastado, João percebeu que havia um nicho inexplorado no mercado de relacionamentos: unir pessoas com gostos calçadistas semelhantes.</p>
+        <p>Entre lágrimas e calos, João transformou sua dor em inovação. Afinal, se existe alma gêmea, por que não pode existir sola gêmea? Como já dizia o poeta: "Difícil é gostar tanto do seu All Star Azul." João entendeu que essa dificuldade poderia ser a chave para conexões mais profundas.</p>
+    </section>
 
-        <!-- Nossa Missão -->
-        <section class="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Nossa Missão</h2>
-            <p class="text-gray-700">
-                Na TenisMatch, acreditamos que o amor verdadeiro começa no chão e sobe. Nossa missão é criar conexões 
-                genuínas baseadas na paixão mútua por calçados, porque quem combina nos pés, combina na vida!
-            </p>
-        </section>
+    <section class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">Nossa Missão</h3>
+        <p>Na TenisMatch, acreditamos que o amor verdadeiro começa no chão e sobe. Nossa missão é criar conexões genuínas baseadas na paixão mútua por calçados, porque quem combina nos pés, combina na vida!</p>
+    </section>
 
-        <!-- Como Funcionamos -->
-        <section class="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Como Funcionamos</h2>
-            <ul class="list-disc list-inside text-gray-700 space-y-2">
-                <li>Crie um perfil exibindo sua coleção de tênis (quanto mais extravagante, melhor!)</li>
-                <li>Compartilhe fotos dos seus pés (com moderação, não queremos assustar ninguém... ainda)</li>
-                <li>Dê match em perfis com estilos de calçados compatíveis</li>
-                <li>Converse sobre suas aventuras podais e sneakers favoritos</li>
-            </ul>
-        </section>
+    <section class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">Como Funcionamos</h3>
+        <p>Nosso app revolucionário permite que você:</p>
+        <ul>
+            <li>Crie um perfil exibindo sua coleção de tênis (quanto mais extravagante, melhor!)</li>
+            <li>Compartilhe fotos dos seus pés (com moderação, não queremos assustar ninguém... ainda)</li>
+            <li>Dê match em perfis com estilos de calçados compatíveis</li>
+            <li>Converse sobre suas aventuras podais e sneakers favoritos</li>
+        </ul>
+    </section>
 
-        <!-- Por Que Escolher -->
-        <section class="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <h2 class="text-2xl font-bold mb-4">Por Que Escolher a TenisMatch?</h2>
-            <div class="space-y-4">
-                <div>
-                    <h3 class="font-semibold text-purple-600">Conexões Autênticas</h3>
-                    <p class="text-gray-700">Encontre alguém que ame seus All Stars tanto quanto você</p>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-purple-600">Ambiente Seguro</h3>
-                    <p class="text-gray-700">Moderação rigorosa para manter os fetichistas por pés sob controle</p>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-purple-600">Mais que Aparências</h3>
-                    <p class="text-gray-700">Vá além do superficial e conecte-se através do seu amor por solas e cadarços</p>
-                </div>
-            </div>
-        </section>
+    <section class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">Por Que Escolher a TenisMatch?</h3>
+        <ul>
+            <li><strong>Conexões Autênticas:</strong> Encontre alguém que ame seus All Stars tanto quanto você</li>
+            <li><strong>Ambiente Seguro:</strong> Moderação rigorosa para manter os fetichistas por pés sob controle</li>
+            <li><strong>Mais que Aparências:</strong> Vá além do superficial e conecte-se através do seu amor por solas e cadarços</li>
+        </ul>
+        <p>Lembre-se: "Quem vê cara, não vê coração, mas quem vê pé, tênis e cara já tem muito mais informação." Na TenisMatch, acreditamos que essa sabedoria popular é a chave para relacionamentos mais sinceros e duradouros.</p>
+    </section>
 
-        <!-- Nossa Visão -->
-        <section class="bg-white rounded-lg shadow-lg p-8">
-            <h2 class="text-2xl font-bold mb-4">Nossa Visão</h2>
-            <p class="text-gray-700 mb-4">
-                Imaginamos um mundo onde ninguém precise pisar sozinho em poças d'água. Seja você um colecionador de 
-                tênis vintage, um maratonista ou alguém que simplesmente aprecia um bom par de meias fedorentas, há 
-                um match perfeito esperando por você na TenisMatch.
-            </p>
-            <div class="text-center mt-8">
-                <a href="{% url 'users:signup' %}" class="bg-purple-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-purple-700">
-                    Comece Sua Jornada
-                </a>
-            </div>
-        </section>
-    </div>
+    <section class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">Nossa Visão</h3>
+        <p>Imaginamos um mundo onde ninguém precise pisar sozinho em poças d'água. Seja você um colecionador de tênis vintage, um maratonista ou alguém que simplesmente aprecia um bom par de meias fedorentas, há um match perfeito esperando por você na TenisMatch.</p>
+        <p>Dê o primeiro passo em direção a um novo tipo de relacionamento. Quem sabe? Seu próximo grande amor pode estar apenas a um clique de distância, pronto para tropeçar na sua vida.</p>
+        <p>Junte-se à TenisMatch hoje e encontre alguém que se encaixe perfeitamente no seu estilo de vida, um passo (possivelmente desajeitado) de cada vez!</p>
+        <p>Lembre-se: na TenisMatch, não importa se você tem chulé ou usa sandália com meia, aqui todos têm uma chance de encontrar seu par perfeito!</p>
+    </section>
 </div>
 {% endblock %}
