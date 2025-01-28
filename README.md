@@ -19,12 +19,123 @@ O projeto utiliza Django 5.0 como framework web principal. Outras dependências 
 *   `python-decouple`: Outra biblioteca para gestão de configurações, similar ao `django-environ`.
 *   `pillow`: Para processamento de imagens, o que pode ser relevante para funcionalidades relacionadas a tênis, como upload de fotos.
 
-**Documentação:**
+# Estrutura do Projeto
 
-A presença do arquivo `docs/estrutura.md` sugere que o projeto possui documentação da estrutura, o que facilita a compreensão da arquitetura.
+```
+d:/PYTHON/tenismatch/
+├── .gitignore
+├── asgi.py
+├── manage.py
+├── README.md
+├── requirements.txt
+├── apps/
+│   ├── matching/                 # App de correspondência de tênis
+│   │   ├── ml/                  # Módulos de machine learning
+│   │   ├── services/            # Serviços de processamento e recomendação
+│   │   └── [outros arquivos]    # Views, models, forms, etc.
+│   ├── profiles/                # App de gerenciamento de perfis
+│   ├── tenis_admin/             # App administrativa
+│   │   ├── static/              # Arquivos estáticos da área admin
+│   │   ├── templates/           # Templates específicos para admin
+│   │   │   ├── analyst/         # Interface do analista
+│   │   │   └── manager/         # Interface do gerente
+│   │   └── [outros arquivos]    # Views, models, forms, etc.
+│   └── users/                   # App de autenticação e usuários
+├── core/                        # Configurações do projeto
+├── docs/                        # Documentação
+├── media/                       # Arquivos de mídia enviados
+├── resources/                   # Recursos estáticos do projeto
+├── scripts/                     # Scripts de automação
+├── static/                      # Arquivos estáticos
+└── templates/                   # Templates HTML
+```
 
-**Conclusão:**
+# Instalação
 
-O projeto TenisMatch aparenta ser uma aplicação de matchmaking de tênis construída com Django, utilizando machine learning para recomendações de correspondência. A estrutura do projeto é bem organizada, com aplicativos separados para funcionalidades distintas (matching, profiles, users). A lista de dependências indica o uso de tecnologias modernas para desenvolvimento web e machine learning em Python.
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITORIO]
+cd tenismatch
+```
 
-Este resumo fornece uma visão geral do projeto com base na análise da estrutura de arquivos, documentação e dependências. Se precisar de uma análise mais detalhada de algum aspecto específico, como o algoritmo de recomendação ou os modelos de dados, me diga!
+2. Crie um ambiente virtual e ative-o:
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
+```
+
+3. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+4. Configure as variáveis de ambiente:
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+```
+DEBUG=True
+SECRET_KEY=sua_chave_secreta
+DATABASE_URL=sqlite:///db.sqlite3
+```
+
+5. Execute as migrações:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+6. Crie um superusuário:
+```bash
+python manage.py createsuperuser
+```
+
+7. Inicie o servidor:
+```bash
+python manage.py runserver
+```
+
+# Criação de Perfis Administrativos
+
+## Perfil de Analista
+
+1. Acesse o painel administrativo em `http://localhost:8000/admin`
+2. Faça login com as credenciais de superusuário
+3. Na seção "Users", selecione o usuário que será Analista
+4. Na seção "Permissions":
+   - Marque "Staff status"
+   - Adicione as permissões:
+     - tenis_admin | dataset | Can add dataset
+     - tenis_admin | dataset | Can change dataset
+     - tenis_admin | dataset | Can view dataset
+     - tenis_admin | model | Can add model
+     - tenis_admin | model | Can change model
+     - tenis_admin | model | Can view model
+5. O Analista terá acesso ao dashboard em `http://localhost:8000/tenis-admin/analyst/dashboard/`
+
+## Perfil de Gerente
+
+1. Acesse o painel administrativo em `http://localhost:8000/admin`
+2. Faça login com as credenciais de superusuário
+3. Na seção "Users", selecione o usuário que será Gerente
+4. Na seção "Permissions":
+   - Marque "Staff status"
+   - Adicione as permissões:
+     - tenis_admin | model | Can change model
+     - tenis_admin | model | Can view model
+     - tenis_admin | dataset | Can view dataset
+     - tenis_admin | metrics | Can view metrics
+5. O Gerente terá acesso ao dashboard em `http://localhost:8000/tenis-admin/manager/dashboard/`
+
+Os Analistas podem:
+- Fazer upload de datasets
+- Criar e treinar modelos
+- Visualizar métricas de treinamento
+- Gerar dados sintéticos
+
+Os Gerentes podem:
+- Aprovar ou rejeitar modelos
+- Visualizar métricas de desempenho
+- Monitorar o sistema
+- Revisar datasets
