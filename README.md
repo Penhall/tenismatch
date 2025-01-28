@@ -102,31 +102,23 @@ python manage.py runserver
 
 1. Acesse o painel administrativo em `http://localhost:8000/admin`
 2. Faça login com as credenciais de superusuário
-3. Na seção "Users", selecione o usuário que será Analista
-4. Na seção "Permissions":
+3. Na seção "Groups", crie um grupo chamado "Analyst" se ainda não existir
+4. Na seção "Users", selecione o usuário que será Analista
+5. Na seção "Permissions":
    - Marque "Staff status"
-   - Adicione as permissões:
-     - tenis_admin | dataset | Can add dataset
-     - tenis_admin | dataset | Can change dataset
-     - tenis_admin | dataset | Can view dataset
-     - tenis_admin | model | Can add model
-     - tenis_admin | model | Can change model
-     - tenis_admin | model | Can view model
-5. O Analista terá acesso ao dashboard em `http://localhost:8000/tenis-admin/analyst/dashboard/`
+   - Em "Groups", adicione o usuário ao grupo "Analyst"
+6. O Analista terá acesso ao dashboard em `http://localhost:8000/tenis-admin/analyst/dashboard/`
 
 ## Perfil de Gerente
 
 1. Acesse o painel administrativo em `http://localhost:8000/admin`
 2. Faça login com as credenciais de superusuário
-3. Na seção "Users", selecione o usuário que será Gerente
-4. Na seção "Permissions":
+3. Na seção "Groups", crie um grupo chamado "Manager" se ainda não existir
+4. Na seção "Users", selecione o usuário que será Gerente
+5. Na seção "Permissions":
    - Marque "Staff status"
-   - Adicione as permissões:
-     - tenis_admin | model | Can change model
-     - tenis_admin | model | Can view model
-     - tenis_admin | dataset | Can view dataset
-     - tenis_admin | metrics | Can view metrics
-5. O Gerente terá acesso ao dashboard em `http://localhost:8000/tenis-admin/manager/dashboard/`
+   - Em "Groups", adicione o usuário ao grupo "Manager"
+6. O Gerente terá acesso ao dashboard em `http://localhost:8000/tenis-admin/manager/dashboard/`
 
 Os Analistas podem:
 - Fazer upload de datasets
