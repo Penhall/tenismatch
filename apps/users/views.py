@@ -26,7 +26,21 @@ class SignUpView(CreateView):
 
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
-    success_url = reverse_lazy('profiles:detail')
+    
+    def get_success_url(self):
+        user = self.request.user
+        if user.is_staff:
+            # Verificar grupos para redirecionar para dashboards corretos
+            groups = user.groups.all()
+            if groups.filter(name='Analyst').exists():
+                return reverse_lazy('tenis_admin:analyst_dashboard')
+            elif groups.filter(name='Manager').exists():
+                return reverse_lazy('tenis_admin:manager_dashboard')
+            else:
+                return reverse_lazy('admin:index') # Dashboard admin padrão se não for analista/gerente
+        else:
+            # Redirecionar para o perfil para usuários normais
+            return reverse_lazy('profiles:detail')
 
 class CustomLogoutView(LogoutView):
     next_page = '/'

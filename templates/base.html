@@ -24,7 +24,10 @@
                         <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-green-400 text-purple-600 px-3 py-1 rounded-full hover:bg-green-300">Área Reservada</a>
                     {% endif %}
                     <a href="{% url 'profiles:edit' %}" class="hover:text-gray-200">Perfil</a>
-                    <a href="{% url 'users:logout' %}" class="hover:text-gray-200">Sair</a>
+<form method="post" action="{% url 'users:logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="hover:text-gray-200">Sair</button>
+</form>
                 </div>
                 {% else %}
                 <div class="space-x-4">
