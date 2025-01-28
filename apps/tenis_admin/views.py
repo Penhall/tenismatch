@@ -103,7 +103,7 @@ class ModelCreationView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         form.instance.status = 'draft'
         return super().form_valid(form)
 
-class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, View): # Alterado para View
+class ModelReviewViewOLD(LoginRequiredMixin, ManagerRequiredMixin, View): # Alterado para View
     model = AIModel
     form_class = ModelReviewForm
     template_name = 'manager/model_review.html'
@@ -196,3 +196,75 @@ class GenerateDataView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
         
         messages.success(self.request, f'Dataset gerado com {form.cleaned_data["n_samples"]} amostras')
         return response
+
+
+class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
+    model = Dataset
+    form_class = DatasetUploadForm
+    template_name = 'analyst/data_upload.html'
+    success_url = reverse_lazy('tenis_admin:analyst_dashboard')
+
+    def form_valid(self, form):
+        form.instance.uploaded_by = self.request.user
+        response = super().form_valid(form)
+        
+        # Processa o dataset
+        success, message = DatasetService.process_dataset(self.object.id)
+        if success:
+            messages.success(self.request, 'Dataset enviado e processado com sucesso!')
+        else:
+            messages.error(self.request, message)
+            
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['datasets'] = Dataset.objects.filter(
+            uploaded_by=self.request.user
+        ).order_by('-uploaded_at')
+        return context
+        
+class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
+    model = AIModel
+    form_class = ModelTrainingForm
+    template_name = 'analyst/training.html'
+    success_url = reverse_lazy('tenis_admin:analyst_dashboard')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.status = 'draft'
+        response = super().form_valid(form)
+        
+        # Obter dados de treinamento do dataset
+        training_data = DatasetService.get_training_data(form.cleaned_data['dataset'].id)
+        
+        # Instanciar e treinar o modelo
+        trainer = SneakerMatchTraining()
+        metrics = trainer.train_model(training_data)
+        
+        # Salvar métricas
+        self.object.metrics = metrics
+        self.object.status = 'review'
+        self.object.save()
+        
+        messages.success(self.request, 
+            f'Modelo treinado com sucesso! Acurácia: {metrics["accuracy"]:.2%}')
+        return response
+        
+class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, DetailView):
+    model = AIModel
+    template_name = 'manager/model_review.html'
+
+    def post(self, request, *args, **kwargs):
+        model = self.get_object()
+        action = request.POST.get('action')
+        
+        if action == 'approve':
+            model.status = 'approved'
+            messages.success(request, 'Modelo aprovado com sucesso!')
+        else:
+            model.status = 'rejected'
+            messages.warning(request, 'Modelo rejeitado.')
+            
+        model.save()
+        return redirect('tenis_admin:manager_dashboard')
