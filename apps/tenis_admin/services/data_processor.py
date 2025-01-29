@@ -1,14 +1,26 @@
 import pandas as pd
 import numpy as np
 from ..models import Dataset
+import xml.etree.ElementTree as ET
 
 class DatasetService:
     @staticmethod
     def process_dataset(dataset_id):
         dataset = Dataset.objects.get(id=dataset_id)
         try:
-            # Lê o CSV
-            df = pd.read_csv(dataset.file.path)
+            if dataset.file_type == 'csv':
+                df = pd.read_csv(dataset.file.path)
+            elif dataset.file_type in ['xls', 'xlsx']:
+                df = pd.read_excel(dataset.file.path)
+            elif dataset.file_type == 'xml':
+                tree = ET.parse(dataset.file.path)
+                root = tree.getroot()
+                data = []
+                for item in root.findall('item'):
+                    data.append({child.tag: child.text for child in item})
+                df = pd.DataFrame(data)
+            else:
+                raise ValueError(f"Tipo de arquivo não suportado: {dataset.file_type}")
             
             # Valida colunas necessárias
             required_columns = ['tenis_marca', 'tenis_estilo', 'tenis_cores', 'tenis_preco']
@@ -41,7 +53,19 @@ class DatasetService:
     @staticmethod
     def get_training_data(dataset_id):
         dataset = Dataset.objects.get(id=dataset_id)
-        df = pd.read_csv(dataset.file.path)
+        if dataset.file_type == 'csv':
+            df = pd.read_csv(dataset.file.path)
+        elif dataset.file_type in ['xls', 'xlsx']:
+            df = pd.read_excel(dataset.file.path)
+        elif dataset.file_type == 'xml':
+            tree = ET.parse(dataset.file.path)
+            root = tree.getroot()
+            data = []
+            for item in root.findall('item'):
+                data.append({child.tag: child.text for child in item})
+            df = pd.DataFrame(data)
+        else:
+            raise ValueError(f"Tipo de arquivo não suportado: {dataset.file_type}")
         
         # Prepara dados para treinamento
         training_data = {
@@ -54,7 +78,7 @@ class DatasetService:
                 'brand': row['tenis_marca'],
                 'style': row['tenis_estilo'],
                 'color': row['tenis_cores'],
-                'price_range': row['tenis_preco']
+                'price_range': float(row['tenis_preco'])
             }
             training_data['features'].append(features)
             training_data['matches'].append(row.get('match_success', 0))

@@ -4,7 +4,19 @@
 {% block content %}
 <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
     <h2 class="text-2xl font-bold mb-6 text-center">Cadastro</h2>
-    <form method="post">
+    {% if form.errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong class="font-bold">Erro no cadastro:</strong>
+            <ul class="list-disc list-inside">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <form method="post" id="signup-form">
         {% csrf_token %}
         {% for field in form %}
             <div class="mb-4">
@@ -25,4 +37,13 @@
         <a href="{% url 'users:login' %}" class="text-purple-600">Faça login</a>
     </p>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signup-form');
+    form.addEventListener('submit', function(event) {
+        console.log('Form submitted');
+    });
+});
+</script>
 {% endblock %}

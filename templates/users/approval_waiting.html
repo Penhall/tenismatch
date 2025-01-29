@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8 mt-10">
+    <h2 class="text-2xl font-bold mb-6 text-center">Aguardando Aprovação</h2>
+    <p class="text-center mb-4">
+        Seu cadastro foi realizado com sucesso. Por favor, aguarde a aprovação do administrador para acessar o sistema.
+    </p>
+    <p class="text-center">
+        Você será notificado por e-mail quando sua conta for aprovada.
+    </p>
+    <div class="mt-6 text-center">
+        <a href="{% url 'users:login' %}" class="text-blue-600 hover:text-blue-800">Voltar para a página de login</a>
+    </div>
+</div>
+{% endblock %}

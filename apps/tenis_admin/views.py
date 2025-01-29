@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import AIModel, Dataset
 from .forms import DatasetUploadForm, ModelTrainingForm, ModelReviewForm
-from .services import ModelTrainingService, ModelDeploymentService
+from .services import ModelTrainingService, ModelDeploymentService, MetricsService, DatasetService
 
 from django.http import HttpResponse
 import pandas as pd
@@ -15,11 +15,11 @@ from apps.matching.ml.dataset import DatasetPreparation
 
 class AnalystRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.groups.filter(name='Analyst').exists()
+        return self.request.user.role == 'ANALISTA'
 
 class ManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.groups.filter(name='Manager').exists()
+        return self.request.user.role == 'GERENTE'
 
 class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, ListView):
     model = AIModel
@@ -66,13 +66,26 @@ class ModelTrainingDetailView(LoginRequiredMixin, AnalystRequiredMixin, DetailVi
     context_object_name = 'model'
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
     model = AIModel
     template_name = 'manager/dashboard.html'
     context_object_name = 'models'
 
+    def dispatch(self, request, *args, **kwargs):
+        logger.info(f"User {request.user.username} (role: {request.user.role}) attempting to access ManagerDashboardView")
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
+        logger.info(f"Fetching models for review in ManagerDashboardView")
         return AIModel.objects.filter(status='review')
+
+    def handle_no_permission(self):
+        logger.warning(f"User {self.request.user.username} (role: {self.request.user.role}) denied access to ManagerDashboardView")
+        return super().handle_no_permission()
 
 class ModelApprovalView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
     model = AIModel
@@ -209,12 +222,17 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         response = super().form_valid(form)
         
         # Processa o dataset
-        success, message = DatasetService.process_dataset(self.object.id)
-        if success:
-            messages.success(self.request, 'Dataset enviado e processado com sucesso!')
-        else:
-            messages.error(self.request, message)
-            
+        try:
+            success, message = DatasetService.process_dataset(self.object.id)
+            if success:
+                messages.success(self.request, 'Dataset enviado e processado com sucesso!')
+            else:
+                raise ValueError(message)
+        except Exception as e:
+            messages.error(self.request, f'Erro ao processar o dataset: {str(e)}')
+            self.object.delete()
+            return redirect(self.get_success_url())
+        
         return response
 
     def get_context_data(self, **kwargs):
@@ -223,6 +241,12 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
             uploaded_by=self.request.user
         ).order_by('-uploaded_at')
         return context
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f'Erro no campo {field}: {error}')
+        return super().form_invalid(form)
         
 class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = AIModel

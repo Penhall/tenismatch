@@ -13,4 +13,5 @@ urlpatterns = [
     path('upgrade/', views.UpgradePremiumView.as_view(), name='upgrade_premium'),
     path('approve-analysts/', views.ApproveAnalystView.as_view(), name='approve_analysts'),
     path('dashboard/', views.UserDashboardView.as_view(), name='dashboard'),
+    path('approval-waiting/', views.ApprovalWaitingView.as_view(), name='approval_waiting'),
 ]

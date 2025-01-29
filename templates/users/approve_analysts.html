@@ -1,21 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Aprovar Analistas</h2>
-{% if analysts %}
-    <ul>
-    {% for analyst in analysts %}
-        <li>
-            {{ analyst.username }} - {{ analyst.email }}
-            <form method="post" action="{% url 'users:approve_analysts' %}">
-                {% csrf_token %}
-                <input type="hidden" name="analyst_id" value="{{ analyst.id }}">
-                <button type="submit">Aprovar</button>
-            </form>
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Não há analistas pendentes de aprovação.</p>
-{% endif %}
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6">Aprovar Analistas</h2>
+    {% if analysts %}
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {% for analyst in analysts %}
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h3 class="text-xl font-semibold mb-2">{{ analyst.username }}</h3>
+                <p class="text-gray-600 mb-2">{{ analyst.email }}</p>
+                <p class="text-gray-600 mb-4">Data de cadastro: {{ analyst.date_joined|date:"d/m/Y H:i" }}</p>
+                <form method="post" action="{% url 'users:approve_analysts' %}" onsubmit="return confirm('Tem certeza que deseja aprovar {{ analyst.username }}?');">
+                    {% csrf_token %}
+                    <input type="hidden" name="analyst_id" value="{{ analyst.id }}">
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                        Aprovar
+                    </button>
+                </form>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-lg text-gray-600">Não há analistas pendentes de aprovação.</p>
+    {% endif %}
+</div>
 {% endblock %}
