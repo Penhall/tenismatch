@@ -21,12 +21,8 @@ class DatasetPreparation:
                 'brand': np.random.choice(prep.brands),
                 'color': np.random.choice(prep.colors),
                 'price': np.random.randint(100, 1000),
-                'occasion': np.random.choice(['casual', 'sport', 'formal']),
+                'match_success': 1 if np.random.random() < 0.5 else 0,
             }
-            
-            # Simula sucesso do match baseado em regras
-            match_prob = prep._calculate_match_probability(record)
-            record['match_success'] = 1 if np.random.random() < match_prob else 0
             
             data.append(record)
             

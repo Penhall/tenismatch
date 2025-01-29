@@ -227,7 +227,9 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
             if success:
                 messages.success(self.request, 'Dataset enviado e processado com sucesso!')
             else:
-                raise ValueError(message)
+                messages.error(self.request, f'Erro ao processar o dataset: {message}')
+                self.object.delete()
+                return redirect(self.get_success_url())
         except Exception as e:
             messages.error(self.request, f'Erro ao processar o dataset: {str(e)}')
             self.object.delete()

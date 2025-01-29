@@ -1,0 +1,1001 @@
+style,brand,color,price,match_success
+ESP,Vans,COL,837,0
+ESP,Vans,BLK,772,0
+SOC,Nike,COL,246,1
+CAS,Vans,NEU,740,0
+CAS,Vans,COL,582,0
+ESP,Adidas,WHT,594,1
+VIN,New Balance,NEU,861,1
+ESP,Vans,BLK,436,0
+ESP,Nike,COL,335,0
+ESP,Vans,BLK,852,0
+FAS,Nike,NEU,499,0
+VIN,Converse,WHT,272,1
+SOC,Nike,BLK,790,0
+VIN,Converse,BLK,160,1
+SOC,Nike,BLK,573,0
+ESP,Adidas,BLK,893,0
+VIN,Vans,COL,489,1
+FAS,Converse,BLK,597,0
+SOC,Adidas,BLK,879,0
+SOC,Nike,NEU,984,1
+SOC,Nike,NEU,871,1
+SOC,Vans,NEU,374,0
+ESP,New Balance,COL,598,1
+CAS,New Balance,BLK,498,1
+ESP,Nike,NEU,875,0
+VIN,Vans,COL,909,0
+ESP,Adidas,BLK,974,0
+ESP,Adidas,NEU,375,0
+SOC,New Balance,BLK,305,1
+VIN,New Balance,COL,610,0
+SOC,Nike,WHT,510,1
+CAS,Vans,COL,298,0
+CAS,Nike,COL,436,1
+FAS,Converse,BLK,311,1
+FAS,Nike,NEU,391,1
+FAS,Adidas,BLK,264,1
+ESP,Vans,BLK,827,0
+SOC,New Balance,NEU,733,1
+CAS,Vans,NEU,459,1
+VIN,Vans,COL,321,0
+CAS,Converse,BLK,309,1
+VIN,Nike,COL,338,0
+SOC,Vans,BLK,206,0
+CAS,Adidas,WHT,103,0
+SOC,Converse,WHT,939,1
+CAS,New Balance,NEU,234,0
+VIN,Vans,BLK,945,0
+FAS,Adidas,COL,404,0
+ESP,Nike,BLK,583,1
+CAS,Adidas,NEU,125,1
+SOC,Nike,WHT,531,1
+SOC,Nike,COL,564,1
+VIN,Nike,BLK,754,1
+FAS,Converse,COL,159,1
+ESP,Adidas,NEU,284,0
+ESP,New Balance,BLK,705,1
+CAS,Vans,NEU,580,0
+FAS,New Balance,NEU,479,1
+VIN,Converse,NEU,120,1
+SOC,Converse,BLK,455,0
+ESP,New Balance,BLK,664,0
+CAS,Nike,BLK,870,0
+VIN,New Balance,WHT,217,0
+SOC,Vans,WHT,776,0
+SOC,Converse,BLK,978,1
+FAS,Nike,NEU,522,0
+CAS,Nike,COL,817,1
+VIN,Converse,NEU,773,1
+VIN,Adidas,COL,830,1
+SOC,Adidas,BLK,552,0
+SOC,Vans,WHT,231,1
+ESP,New Balance,BLK,379,0
+FAS,New Balance,NEU,204,0
+ESP,Vans,COL,106,1
+FAS,Vans,WHT,268,0
+VIN,New Balance,COL,795,0
+CAS,Converse,WHT,197,1
+ESP,New Balance,BLK,955,1
+ESP,New Balance,COL,511,0
+SOC,New Balance,COL,609,1
+CAS,Vans,NEU,224,1
+VIN,Converse,BLK,423,0
+SOC,New Balance,BLK,604,1
+ESP,Converse,WHT,165,0
+ESP,Converse,NEU,808,1
+SOC,Converse,WHT,126,1
+VIN,Vans,WHT,969,0
+SOC,Nike,COL,247,1
+ESP,Adidas,NEU,872,1
+FAS,Adidas,NEU,919,1
+ESP,Converse,COL,567,1
+ESP,Adidas,COL,836,0
+VIN,Vans,WHT,359,0
+VIN,Converse,COL,913,1
+SOC,Nike,NEU,735,0
+VIN,New Balance,BLK,944,0
+CAS,Adidas,COL,620,0
+CAS,Converse,BLK,177,0
+VIN,New Balance,BLK,455,0
+VIN,New Balance,BLK,169,0
+CAS,New Balance,WHT,976,0
+CAS,Adidas,NEU,453,1
+VIN,Adidas,COL,675,1
+ESP,Vans,WHT,218,0
+CAS,Converse,BLK,476,0
+CAS,Nike,COL,111,1
+ESP,Converse,NEU,110,0
+FAS,Vans,NEU,538,1
+SOC,New Balance,WHT,336,1
+VIN,Vans,COL,800,0
+ESP,Vans,BLK,936,1
+VIN,New Balance,COL,159,0
+FAS,Vans,BLK,642,0
+CAS,Vans,COL,482,0
+SOC,Adidas,NEU,629,1
+CAS,Nike,BLK,365,1
+FAS,New Balance,NEU,574,1
+ESP,New Balance,NEU,796,1
+SOC,Nike,BLK,976,1
+SOC,New Balance,WHT,198,0
+ESP,Nike,BLK,768,1
+ESP,Nike,WHT,115,1
+ESP,Converse,BLK,987,0
+FAS,Nike,WHT,154,1
+VIN,New Balance,COL,152,1
+SOC,New Balance,WHT,312,1
+SOC,Adidas,COL,513,0
+ESP,Adidas,BLK,874,0
+SOC,Vans,BLK,754,0
+VIN,Converse,BLK,454,1
+SOC,Vans,NEU,540,0
+VIN,Nike,COL,557,1
+FAS,Vans,WHT,806,0
+SOC,Vans,NEU,287,1
+CAS,Nike,BLK,836,0
+FAS,Adidas,WHT,783,0
+VIN,Nike,BLK,602,1
+SOC,Adidas,NEU,378,1
+FAS,Nike,BLK,595,0
+FAS,New Balance,BLK,260,0
+CAS,Adidas,WHT,722,1
+FAS,Nike,BLK,440,0
+FAS,New Balance,WHT,446,0
+ESP,Nike,COL,274,1
+FAS,Vans,BLK,600,0
+FAS,Adidas,BLK,313,1
+FAS,Adidas,NEU,363,0
+VIN,Nike,COL,950,0
+VIN,New Balance,NEU,486,0
+ESP,Nike,BLK,359,0
+CAS,Adidas,COL,646,1
+VIN,Converse,COL,539,1
+ESP,Vans,WHT,130,1
+CAS,Vans,WHT,182,1
+SOC,New Balance,COL,654,1
+FAS,Nike,WHT,890,1
+FAS,New Balance,COL,740,1
+FAS,New Balance,NEU,301,1
+VIN,Nike,NEU,538,0
+VIN,Converse,WHT,874,1
+CAS,Converse,BLK,562,1
+SOC,Adidas,NEU,844,0
+VIN,New Balance,COL,831,1
+VIN,Converse,COL,290,0
+FAS,Adidas,WHT,988,1
+VIN,Converse,WHT,900,1
+ESP,Converse,BLK,637,1
+VIN,New Balance,NEU,702,0
+FAS,Vans,NEU,658,1
+ESP,Converse,NEU,942,1
+VIN,Nike,WHT,947,1
+SOC,Adidas,WHT,123,0
+FAS,Converse,WHT,758,0
+SOC,Converse,WHT,666,0
+CAS,Converse,BLK,225,1
+FAS,Vans,COL,713,1
+ESP,Nike,NEU,600,0
+SOC,Vans,WHT,975,0
+ESP,Nike,COL,312,1
+SOC,Nike,NEU,732,1
+SOC,New Balance,WHT,427,1
+SOC,New Balance,WHT,161,0
+CAS,New Balance,NEU,280,1
+CAS,Nike,NEU,918,1
+ESP,Adidas,BLK,659,0
+FAS,Converse,WHT,742,0
+VIN,Adidas,COL,111,1
+ESP,New Balance,WHT,798,0
+FAS,Converse,WHT,165,1
+ESP,Nike,COL,942,1
+VIN,Vans,BLK,545,1
+CAS,Vans,WHT,759,0
+VIN,New Balance,WHT,578,0
+VIN,Vans,NEU,225,1
+ESP,Adidas,NEU,978,0
+SOC,Nike,NEU,335,1
+FAS,Adidas,WHT,260,1
+SOC,Converse,WHT,100,0
+ESP,Vans,BLK,887,1
+ESP,Converse,COL,647,1
+CAS,Converse,BLK,285,0
+FAS,Nike,WHT,883,0
+SOC,New Balance,NEU,372,0
+FAS,Vans,NEU,948,1
+ESP,Nike,BLK,196,0
+SOC,Converse,WHT,258,0
+VIN,Nike,BLK,601,0
+FAS,Adidas,COL,328,0
+CAS,Converse,BLK,385,0
+VIN,Converse,NEU,916,1
+VIN,Converse,BLK,659,1
+ESP,Vans,BLK,214,0
+ESP,New Balance,COL,633,1
+ESP,Nike,COL,436,1
+VIN,Nike,COL,985,1
+SOC,Converse,BLK,859,1
+FAS,Adidas,WHT,195,0
+CAS,Adidas,WHT,218,1
+CAS,Nike,COL,521,1
+ESP,Converse,BLK,123,1
+CAS,Vans,COL,746,0
+CAS,Vans,COL,625,1
+VIN,Adidas,BLK,284,1
+CAS,Nike,WHT,810,1
+VIN,Adidas,NEU,788,0
+FAS,New Balance,WHT,327,0
+CAS,New Balance,BLK,508,1
+VIN,Vans,COL,909,1
+CAS,Converse,BLK,530,0
+SOC,Nike,NEU,353,1
+SOC,Nike,COL,166,0
+SOC,Vans,BLK,815,1
+ESP,Vans,NEU,731,1
+FAS,Vans,NEU,298,0
+ESP,Nike,WHT,410,1
+SOC,Nike,BLK,726,1
+SOC,Adidas,NEU,183,0
+CAS,Converse,COL,226,1
+FAS,Converse,WHT,732,0
+SOC,Converse,NEU,134,0
+CAS,Nike,COL,250,1
+FAS,New Balance,NEU,368,1
+SOC,Converse,WHT,464,0
+SOC,New Balance,WHT,671,0
+CAS,New Balance,WHT,762,1
+CAS,Nike,COL,891,1
+VIN,New Balance,BLK,888,1
+SOC,Nike,WHT,917,0
+SOC,Converse,COL,368,1
+VIN,Vans,NEU,657,1
+FAS,New Balance,NEU,655,0
+SOC,Nike,NEU,463,0
+FAS,Nike,BLK,947,0
+ESP,Converse,NEU,959,0
+CAS,Converse,COL,449,1
+CAS,Converse,NEU,166,0
+SOC,Converse,NEU,333,0
+CAS,Adidas,BLK,382,1
+VIN,Adidas,WHT,988,0
+ESP,New Balance,BLK,782,1
+FAS,Vans,NEU,811,0
+FAS,Nike,COL,851,0
+FAS,Adidas,NEU,866,0
+ESP,New Balance,WHT,608,1
+SOC,Converse,WHT,162,1
+ESP,Vans,WHT,461,0
+VIN,Nike,BLK,301,1
+SOC,Converse,COL,939,1
+CAS,Nike,BLK,387,0
+FAS,Adidas,NEU,857,0
+ESP,Nike,NEU,686,1
+FAS,New Balance,WHT,481,1
+VIN,Adidas,NEU,466,0
+CAS,New Balance,BLK,196,1
+ESP,Adidas,BLK,931,1
+SOC,New Balance,BLK,748,1
+ESP,New Balance,BLK,871,1
+FAS,New Balance,BLK,469,0
+ESP,Nike,COL,313,1
+CAS,Vans,BLK,768,1
+SOC,New Balance,NEU,682,0
+FAS,Converse,COL,254,1
+ESP,Adidas,BLK,603,0
+FAS,Converse,COL,637,0
+FAS,Vans,NEU,914,0
+ESP,New Balance,BLK,867,1
+SOC,Nike,BLK,546,1
+ESP,Nike,COL,284,1
+CAS,Vans,BLK,222,0
+ESP,Vans,WHT,252,1
+CAS,Nike,BLK,218,0
+CAS,New Balance,BLK,272,1
+ESP,Adidas,NEU,791,0
+FAS,Vans,BLK,295,0
+FAS,Adidas,NEU,974,0
+SOC,Nike,COL,810,0
+VIN,Converse,COL,335,1
+CAS,New Balance,BLK,770,0
+SOC,Vans,NEU,967,0
+VIN,Vans,WHT,488,0
+SOC,Vans,COL,179,0
+VIN,New Balance,NEU,464,0
+CAS,Vans,NEU,311,1
+SOC,Vans,WHT,249,1
+FAS,Adidas,NEU,525,0
+SOC,Adidas,NEU,986,1
+CAS,Vans,BLK,141,1
+VIN,Adidas,COL,196,0
+SOC,Converse,NEU,938,1
+FAS,New Balance,COL,526,1
+VIN,Nike,WHT,119,0
+FAS,Adidas,BLK,373,1
+CAS,Converse,COL,333,1
+ESP,Adidas,BLK,116,1
+CAS,New Balance,WHT,416,0
+VIN,New Balance,NEU,712,1
+SOC,Adidas,BLK,765,0
+CAS,Vans,NEU,788,1
+FAS,Converse,COL,359,1
+ESP,Nike,NEU,391,1
+SOC,Converse,COL,197,0
+FAS,Adidas,NEU,653,1
+VIN,Adidas,WHT,831,0
+SOC,Converse,COL,160,1
+VIN,New Balance,COL,546,0
+VIN,Vans,WHT,418,0
+VIN,Vans,WHT,890,1
+ESP,Nike,WHT,369,1
+SOC,New Balance,COL,611,1
+VIN,New Balance,BLK,621,0
+SOC,Nike,COL,111,0
+CAS,Nike,BLK,427,0
+SOC,Nike,WHT,832,1
+SOC,Nike,NEU,316,0
+SOC,Converse,NEU,300,0
+VIN,Adidas,NEU,347,0
+FAS,New Balance,COL,938,1
+ESP,New Balance,NEU,162,1
+ESP,Nike,BLK,512,0
+VIN,Vans,NEU,234,0
+SOC,Nike,BLK,784,0
+FAS,Adidas,WHT,305,1
+VIN,Nike,WHT,304,1
+FAS,Converse,WHT,772,0
+VIN,Vans,BLK,360,0
+ESP,Adidas,BLK,199,0
+CAS,New Balance,WHT,518,0
+CAS,Converse,WHT,106,1
+ESP,Nike,NEU,325,0
+CAS,Nike,BLK,709,0
+CAS,Converse,NEU,251,0
+VIN,New Balance,WHT,835,0
+FAS,Nike,WHT,833,1
+SOC,Vans,NEU,447,1
+CAS,Nike,NEU,482,1
+CAS,Adidas,WHT,267,1
+CAS,Adidas,COL,559,1
+SOC,Vans,WHT,317,1
+SOC,Adidas,NEU,513,1
+ESP,Adidas,WHT,519,0
+VIN,Vans,NEU,687,1
+SOC,Adidas,NEU,888,1
+FAS,Nike,WHT,601,0
+VIN,Adidas,NEU,838,0
+VIN,Vans,COL,456,1
+CAS,Vans,BLK,184,0
+FAS,Converse,WHT,653,0
+ESP,Nike,COL,230,1
+CAS,Converse,NEU,407,0
+SOC,Converse,BLK,338,0
+FAS,Adidas,COL,784,0
+SOC,Adidas,COL,525,0
+SOC,Converse,WHT,724,0
+VIN,Nike,COL,313,0
+VIN,Adidas,WHT,805,0
+VIN,Vans,NEU,196,0
+ESP,Converse,WHT,809,1
+VIN,New Balance,COL,233,1
+VIN,Adidas,WHT,794,0
+ESP,Nike,BLK,220,0
+CAS,Nike,BLK,366,0
+CAS,Vans,WHT,301,1
+VIN,New Balance,COL,490,1
+SOC,New Balance,COL,392,0
+CAS,Converse,WHT,366,0
+SOC,Converse,COL,834,0
+VIN,Nike,COL,527,0
+VIN,New Balance,WHT,140,0
+VIN,Vans,BLK,239,0
+FAS,Converse,WHT,871,0
+CAS,Adidas,COL,702,1
+SOC,Vans,WHT,552,0
+VIN,Nike,NEU,114,1
+FAS,Nike,BLK,657,1
+CAS,Converse,BLK,259,0
+SOC,Nike,NEU,433,0
+SOC,Converse,COL,299,0
+ESP,Vans,NEU,570,0
+SOC,Converse,BLK,227,0
+CAS,Nike,BLK,473,0
+VIN,New Balance,COL,918,1
+VIN,Vans,COL,729,1
+VIN,Nike,NEU,899,1
+ESP,Converse,WHT,365,0
+CAS,Adidas,BLK,529,1
+VIN,Converse,NEU,637,0
+FAS,Nike,WHT,420,1
+CAS,New Balance,COL,500,0
+CAS,Adidas,NEU,554,0
+ESP,Converse,BLK,353,0
+ESP,New Balance,COL,425,0
+VIN,Vans,WHT,964,0
+ESP,New Balance,WHT,441,0
+ESP,Converse,NEU,910,1
+CAS,Nike,NEU,677,1
+CAS,Nike,WHT,478,0
+VIN,New Balance,NEU,788,1
+SOC,New Balance,COL,280,0
+CAS,New Balance,NEU,169,1
+VIN,New Balance,BLK,257,1
+FAS,New Balance,BLK,922,1
+ESP,New Balance,COL,349,1
+SOC,Adidas,COL,122,1
+ESP,Nike,WHT,238,0
+FAS,New Balance,NEU,400,0
+SOC,Vans,COL,114,1
+CAS,Converse,BLK,294,1
+ESP,Adidas,COL,567,1
+VIN,Vans,BLK,452,1
+CAS,Nike,COL,331,0
+FAS,Vans,BLK,143,0
+FAS,Converse,BLK,488,1
+SOC,Nike,NEU,636,0
+VIN,Converse,COL,934,0
+FAS,New Balance,BLK,873,1
+VIN,Nike,NEU,864,0
+FAS,Vans,NEU,424,0
+FAS,Nike,COL,753,1
+FAS,Vans,WHT,529,1
+SOC,Nike,COL,195,0
+FAS,Converse,COL,183,1
+ESP,Adidas,WHT,895,1
+ESP,Vans,NEU,239,1
+VIN,Vans,WHT,821,0
+FAS,New Balance,BLK,775,1
+VIN,Vans,WHT,903,0
+SOC,Nike,WHT,897,1
+VIN,Nike,WHT,955,0
+VIN,Adidas,WHT,116,0
+FAS,Converse,COL,866,1
+VIN,Adidas,NEU,899,0
+ESP,Vans,NEU,117,0
+ESP,Converse,BLK,237,1
+SOC,Vans,WHT,627,0
+CAS,Converse,BLK,471,1
+VIN,New Balance,NEU,143,1
+FAS,Vans,WHT,249,0
+FAS,Converse,NEU,504,0
+ESP,Converse,WHT,236,0
+ESP,Converse,WHT,920,1
+VIN,New Balance,COL,778,0
+CAS,Vans,WHT,809,0
+CAS,Adidas,WHT,192,0
+CAS,New Balance,BLK,962,0
+CAS,New Balance,NEU,322,0
+CAS,Adidas,NEU,822,1
+ESP,Vans,NEU,143,0
+VIN,Converse,BLK,744,0
+SOC,Vans,COL,548,0
+SOC,Nike,COL,630,0
+ESP,Converse,NEU,470,1
+VIN,New Balance,BLK,235,1
+ESP,New Balance,NEU,347,0
+SOC,Adidas,NEU,824,0
+FAS,Vans,WHT,879,1
+VIN,Nike,NEU,935,0
+ESP,Nike,BLK,634,0
+CAS,Converse,NEU,119,1
+ESP,Converse,BLK,677,1
+VIN,New Balance,BLK,312,0
+SOC,Vans,NEU,703,1
+CAS,New Balance,NEU,414,1
+VIN,Nike,BLK,864,1
+VIN,Vans,COL,989,0
+SOC,Converse,COL,975,0
+CAS,New Balance,NEU,191,1
+SOC,Vans,BLK,656,0
+VIN,Nike,COL,271,1
+VIN,Converse,WHT,259,0
+FAS,Nike,BLK,514,1
+VIN,Nike,WHT,155,1
+VIN,Nike,COL,613,0
+VIN,Nike,BLK,929,0
+SOC,Converse,COL,940,1
+ESP,Adidas,BLK,182,0
+ESP,Adidas,BLK,202,1
+CAS,Nike,WHT,696,1
+FAS,Nike,BLK,354,1
+CAS,Converse,NEU,269,0
+FAS,Converse,COL,565,1
+CAS,Vans,WHT,130,0
+ESP,Converse,COL,848,0
+FAS,Converse,COL,507,0
+VIN,New Balance,BLK,815,0
+CAS,Adidas,NEU,751,0
+SOC,Vans,WHT,866,0
+FAS,Vans,NEU,775,0
+SOC,Nike,COL,126,0
+ESP,Converse,WHT,343,1
+SOC,New Balance,BLK,169,0
+SOC,Vans,WHT,931,1
+VIN,New Balance,BLK,121,1
+ESP,Nike,WHT,449,0
+FAS,Nike,COL,341,0
+SOC,New Balance,NEU,371,0
+ESP,Adidas,COL,959,1
+SOC,Nike,NEU,869,1
+FAS,Nike,COL,167,0
+CAS,Adidas,NEU,711,0
+VIN,Converse,NEU,374,1
+VIN,Nike,NEU,749,0
+SOC,New Balance,WHT,502,0
+VIN,Nike,NEU,519,1
+VIN,Adidas,NEU,571,1
+FAS,Adidas,WHT,779,0
+FAS,New Balance,BLK,822,1
+ESP,Vans,COL,662,1
+CAS,Adidas,COL,876,0
+SOC,Converse,WHT,902,1
+FAS,Adidas,BLK,866,1
+VIN,Vans,COL,863,0
+SOC,Vans,BLK,821,0
+VIN,Converse,NEU,663,1
+FAS,New Balance,COL,784,0
+FAS,New Balance,WHT,936,1
+VIN,Nike,WHT,187,0
+CAS,Vans,COL,164,0
+CAS,Converse,NEU,984,0
+FAS,Nike,NEU,728,1
+FAS,Adidas,COL,233,1
+CAS,New Balance,NEU,197,1
+ESP,Nike,COL,585,0
+ESP,New Balance,NEU,923,1
+VIN,New Balance,BLK,764,1
+CAS,New Balance,COL,871,0
+ESP,Adidas,WHT,606,0
+VIN,Nike,NEU,967,1
+ESP,Converse,NEU,388,1
+CAS,New Balance,NEU,503,1
+CAS,Vans,WHT,640,0
+SOC,New Balance,COL,298,1
+CAS,Nike,NEU,282,1
+VIN,Nike,WHT,210,1
+ESP,Nike,NEU,676,1
+ESP,Vans,WHT,874,0
+FAS,Converse,WHT,257,0
+FAS,Vans,WHT,726,1
+ESP,Converse,COL,400,1
+VIN,New Balance,COL,336,1
+ESP,New Balance,BLK,184,1
+ESP,Converse,BLK,276,0
+CAS,Vans,NEU,390,0
+CAS,New Balance,COL,989,0
+ESP,Adidas,COL,722,0
+CAS,Adidas,WHT,525,1
+FAS,Vans,BLK,866,1
+FAS,Vans,WHT,376,1
+FAS,Adidas,WHT,493,0
+SOC,Adidas,WHT,733,1
+VIN,New Balance,COL,888,1
+SOC,Converse,BLK,819,1
+SOC,New Balance,WHT,126,0
+ESP,Nike,COL,881,0
+SOC,New Balance,BLK,170,1
+VIN,Nike,WHT,567,0
+SOC,Vans,COL,560,0
+FAS,Converse,WHT,431,1
+ESP,Converse,WHT,502,0
+SOC,Converse,BLK,354,0
+CAS,Vans,WHT,437,0
+CAS,Vans,WHT,216,1
+SOC,Adidas,NEU,219,1
+CAS,Converse,NEU,838,1
+CAS,Converse,COL,897,1
+FAS,Converse,WHT,621,1
+CAS,Vans,COL,138,1
+VIN,Nike,NEU,898,0
+ESP,Vans,BLK,432,1
+ESP,Converse,BLK,282,1
+ESP,Adidas,NEU,630,0
+FAS,Converse,NEU,684,0
+FAS,Converse,COL,726,1
+SOC,Adidas,COL,525,1
+FAS,New Balance,BLK,721,1
+CAS,Vans,WHT,206,0
+ESP,New Balance,BLK,266,0
+SOC,New Balance,NEU,175,1
+ESP,Adidas,COL,777,0
+ESP,New Balance,BLK,967,0
+VIN,Vans,NEU,765,1
+SOC,New Balance,NEU,852,0
+VIN,Converse,BLK,769,1
+CAS,New Balance,WHT,569,1
+FAS,Vans,NEU,720,0
+CAS,Adidas,WHT,762,0
+FAS,New Balance,WHT,652,1
+CAS,Vans,COL,756,0
+SOC,Converse,COL,362,1
+FAS,Converse,BLK,112,1
+FAS,Nike,COL,602,0
+VIN,Vans,NEU,184,1
+CAS,Converse,BLK,149,0
+CAS,Adidas,WHT,877,1
+VIN,Adidas,WHT,982,1
+SOC,Nike,NEU,417,1
+VIN,Vans,NEU,664,0
+CAS,Vans,WHT,987,1
+ESP,Adidas,COL,851,0
+CAS,Converse,WHT,377,1
+VIN,New Balance,COL,187,1
+FAS,New Balance,BLK,820,0
+VIN,Vans,WHT,332,0
+ESP,Vans,WHT,916,1
+SOC,Adidas,NEU,107,1
+ESP,Nike,COL,358,1
+ESP,Adidas,NEU,820,0
+ESP,Converse,BLK,536,1
+ESP,Converse,BLK,150,0
+FAS,Converse,NEU,984,0
+VIN,Converse,NEU,978,0
+ESP,Adidas,COL,194,1
+ESP,Nike,NEU,960,0
+SOC,Vans,WHT,607,1
+VIN,Vans,BLK,774,0
+FAS,Vans,NEU,353,1
+VIN,Adidas,COL,108,1
+FAS,Adidas,NEU,416,0
+FAS,New Balance,COL,925,0
+SOC,Adidas,COL,303,1
+CAS,Vans,WHT,327,1
+VIN,Adidas,NEU,416,1
+SOC,New Balance,BLK,976,0
+SOC,Nike,NEU,569,0
+CAS,Adidas,BLK,468,0
+VIN,Vans,NEU,725,1
+SOC,Vans,WHT,404,1
+VIN,Nike,BLK,950,1
+ESP,New Balance,WHT,331,1
+ESP,Nike,COL,913,1
+ESP,Converse,BLK,622,1
+ESP,Vans,COL,584,1
+SOC,Vans,BLK,111,0
+ESP,Converse,BLK,882,0
+CAS,New Balance,WHT,355,1
+VIN,New Balance,COL,553,1
+VIN,Nike,BLK,475,0
+FAS,Adidas,WHT,606,0
+FAS,Vans,COL,779,0
+SOC,Converse,BLK,718,1
+CAS,New Balance,NEU,495,0
+FAS,Nike,COL,708,1
+SOC,Converse,WHT,625,1
+FAS,Adidas,NEU,938,1
+SOC,Adidas,BLK,826,0
+CAS,Nike,WHT,645,1
+FAS,Adidas,WHT,873,1
+ESP,Converse,COL,971,1
+CAS,Nike,BLK,509,0
+FAS,Nike,COL,226,1
+FAS,Converse,NEU,457,0
+FAS,Adidas,COL,285,1
+FAS,Vans,BLK,500,1
+FAS,Nike,NEU,933,0
+ESP,Vans,COL,715,0
+VIN,New Balance,WHT,575,0
+VIN,Nike,COL,662,1
+VIN,Adidas,WHT,307,0
+FAS,New Balance,NEU,612,0
+FAS,Vans,BLK,170,0
+VIN,Nike,BLK,351,0
+SOC,Adidas,WHT,985,0
+VIN,Nike,BLK,335,0
+FAS,Nike,WHT,306,1
+VIN,New Balance,BLK,132,1
+CAS,New Balance,WHT,790,0
+CAS,Converse,WHT,606,0
+SOC,Nike,BLK,795,0
+FAS,New Balance,BLK,447,1
+CAS,Vans,COL,134,1
+FAS,New Balance,COL,892,1
+FAS,Converse,NEU,627,0
+CAS,Converse,BLK,850,1
+VIN,Converse,BLK,983,1
+FAS,Nike,COL,117,1
+VIN,Nike,NEU,772,0
+FAS,Nike,WHT,743,0
+CAS,Converse,COL,695,1
+ESP,Adidas,BLK,237,1
+CAS,Nike,WHT,155,0
+SOC,New Balance,BLK,161,0
+ESP,Nike,WHT,836,1
+CAS,Vans,NEU,205,1
+VIN,Nike,WHT,766,1
+SOC,New Balance,NEU,724,1
+FAS,Vans,COL,468,0
+FAS,Adidas,WHT,547,0
+ESP,Adidas,COL,957,1
+VIN,Adidas,WHT,315,1
+SOC,Adidas,BLK,199,0
+FAS,Adidas,WHT,746,0
+FAS,Vans,BLK,282,1
+FAS,Vans,WHT,479,1
+CAS,Nike,NEU,664,1
+FAS,Converse,WHT,149,1
+VIN,Converse,NEU,306,1
+FAS,Vans,NEU,198,0
+VIN,Converse,COL,315,1
+ESP,Converse,BLK,270,1
+FAS,New Balance,BLK,875,0
+FAS,New Balance,COL,849,1
+VIN,Adidas,NEU,276,1
+SOC,Converse,COL,272,0
+FAS,New Balance,COL,358,1
+VIN,Vans,COL,111,0
+FAS,Adidas,WHT,738,1
+CAS,Vans,NEU,192,1
+FAS,Vans,NEU,975,1
+SOC,Converse,NEU,179,0
+VIN,Converse,COL,447,1
+VIN,Nike,WHT,989,1
+SOC,New Balance,NEU,609,1
+FAS,Vans,COL,832,0
+CAS,Vans,WHT,925,0
+CAS,Converse,COL,514,0
+VIN,New Balance,WHT,161,1
+SOC,Nike,COL,325,1
+FAS,Converse,COL,362,1
+ESP,Vans,COL,510,0
+SOC,Nike,NEU,845,1
+VIN,Adidas,NEU,154,0
+CAS,Nike,WHT,872,1
+FAS,Nike,WHT,412,0
+FAS,New Balance,NEU,596,0
+FAS,Nike,WHT,161,0
+SOC,Vans,WHT,305,0
+FAS,Nike,NEU,966,1
+FAS,Adidas,BLK,146,1
+VIN,Nike,BLK,750,0
+CAS,Adidas,COL,262,0
+ESP,New Balance,COL,176,1
+FAS,Nike,WHT,402,1
+ESP,Converse,COL,464,0
+VIN,Nike,BLK,630,1
+SOC,Nike,WHT,167,1
+SOC,Converse,NEU,374,1
+FAS,Adidas,WHT,527,0
+SOC,Converse,WHT,528,0
+SOC,Adidas,NEU,897,0
+SOC,Adidas,WHT,951,1
+FAS,New Balance,BLK,255,1
+SOC,Adidas,BLK,460,0
+CAS,New Balance,COL,461,1
+FAS,Vans,WHT,551,0
+FAS,Vans,COL,790,1
+SOC,Converse,WHT,374,0
+ESP,Converse,WHT,676,0
+VIN,New Balance,BLK,662,0
+CAS,New Balance,BLK,168,0
+VIN,Converse,BLK,457,0
+VIN,Converse,COL,562,0
+FAS,Converse,WHT,957,1
+FAS,New Balance,BLK,955,1
+VIN,New Balance,BLK,574,1
+ESP,Adidas,COL,384,0
+ESP,Adidas,WHT,350,0
+FAS,New Balance,COL,919,1
+CAS,Adidas,WHT,698,0
+FAS,Nike,BLK,348,0
+SOC,Converse,WHT,606,1
+SOC,New Balance,NEU,824,1
+CAS,New Balance,COL,916,1
+FAS,Adidas,BLK,213,1
+CAS,Converse,COL,841,1
+ESP,Nike,NEU,627,1
+FAS,Nike,COL,743,0
+CAS,Adidas,COL,135,0
+FAS,New Balance,BLK,468,1
+VIN,Converse,WHT,847,0
+VIN,Adidas,NEU,745,0
+CAS,Nike,COL,135,0
+FAS,Vans,COL,136,0
+CAS,Vans,COL,289,0
+FAS,Converse,WHT,177,0
+CAS,Converse,BLK,681,0
+CAS,New Balance,BLK,752,1
+VIN,Converse,NEU,492,0
+ESP,Adidas,COL,978,1
+SOC,New Balance,COL,428,1
+CAS,Converse,NEU,929,1
+FAS,New Balance,NEU,481,1
+ESP,Vans,NEU,953,1
+CAS,Nike,WHT,931,0
+FAS,Adidas,BLK,947,0
+SOC,Nike,COL,260,0
+ESP,New Balance,WHT,431,0
+VIN,Nike,WHT,222,0
+SOC,Adidas,NEU,895,0
+ESP,Converse,NEU,856,1
+SOC,New Balance,COL,244,0
+SOC,Adidas,COL,162,0
+ESP,Adidas,WHT,860,0
+VIN,Converse,COL,148,0
+FAS,Adidas,NEU,546,1
+VIN,Adidas,NEU,562,1
+FAS,Adidas,NEU,289,0
+CAS,Nike,COL,431,0
+ESP,Nike,BLK,401,0
+ESP,Nike,COL,175,1
+ESP,Vans,WHT,881,1
+ESP,Vans,BLK,286,0
+SOC,Converse,COL,253,1
+ESP,Vans,COL,337,0
+CAS,Vans,BLK,214,0
+FAS,Adidas,NEU,435,0
+SOC,Nike,BLK,647,0
+ESP,Adidas,NEU,778,1
+FAS,Converse,COL,852,0
+SOC,Nike,BLK,560,1
+VIN,Adidas,COL,103,0
+ESP,Adidas,BLK,210,1
+VIN,Adidas,WHT,547,1
+SOC,Adidas,BLK,470,1
+CAS,Converse,WHT,755,0
+VIN,Nike,BLK,767,1
+FAS,Adidas,COL,142,1
+ESP,Adidas,BLK,402,1
+FAS,Converse,NEU,205,0
+FAS,Converse,NEU,944,0
+CAS,Vans,NEU,440,1
+CAS,New Balance,WHT,595,1
+SOC,New Balance,NEU,916,1
+SOC,Converse,BLK,236,1
+SOC,Converse,WHT,211,0
+SOC,Nike,NEU,236,1
+VIN,Nike,NEU,434,0
+SOC,Nike,NEU,876,1
+CAS,New Balance,BLK,110,1
+CAS,Vans,NEU,923,0
+ESP,Adidas,NEU,704,1
+CAS,New Balance,COL,734,0
+FAS,New Balance,WHT,780,1
+VIN,New Balance,WHT,808,0
+ESP,Vans,BLK,653,0
+CAS,Converse,WHT,620,1
+SOC,Adidas,WHT,854,0
+FAS,Adidas,WHT,938,1
+VIN,Converse,WHT,103,0
+FAS,Converse,WHT,277,1
+SOC,Converse,BLK,488,1
+ESP,Converse,NEU,463,1
+SOC,Nike,BLK,579,1
+CAS,Vans,WHT,670,1
+CAS,Nike,NEU,615,1
+VIN,Vans,NEU,454,0
+ESP,Nike,NEU,934,0
+CAS,Adidas,NEU,765,1
+VIN,Adidas,COL,413,1
+CAS,Vans,BLK,275,1
+ESP,New Balance,COL,525,0
+VIN,Nike,NEU,219,1
+VIN,Nike,COL,734,0
+VIN,Nike,NEU,665,0
+SOC,Adidas,WHT,848,0
+VIN,Adidas,COL,158,0
+ESP,Nike,NEU,652,1
+SOC,Vans,BLK,623,1
+VIN,Adidas,WHT,751,0
+VIN,Adidas,BLK,489,1
+CAS,Vans,WHT,598,0
+ESP,Converse,WHT,326,0
+ESP,Vans,COL,266,0
+SOC,Nike,BLK,857,1
+ESP,Nike,NEU,511,1
+VIN,New Balance,COL,600,1
+ESP,Vans,COL,195,1
+ESP,Adidas,NEU,720,1
+CAS,Adidas,BLK,528,1
+CAS,Nike,BLK,114,1
+FAS,Vans,BLK,639,0
+VIN,Adidas,NEU,588,0
+FAS,Vans,COL,241,0
+FAS,New Balance,WHT,786,0
+FAS,New Balance,BLK,140,1
+FAS,Nike,COL,982,0
+CAS,Vans,WHT,655,0
+VIN,Nike,BLK,619,0
+FAS,Vans,WHT,981,0
+ESP,Nike,COL,170,1
+FAS,Converse,BLK,680,0
+VIN,Adidas,WHT,291,1
+SOC,Nike,WHT,247,0
+SOC,Vans,NEU,649,0
+FAS,Adidas,WHT,795,1
+FAS,Vans,NEU,821,1
+VIN,Vans,COL,930,1
+ESP,Vans,COL,249,1
+FAS,Adidas,NEU,207,0
+FAS,New Balance,NEU,496,1
+CAS,Vans,WHT,733,1
+VIN,Adidas,WHT,173,1
+FAS,Adidas,NEU,271,1
+ESP,Vans,NEU,665,1
+CAS,New Balance,COL,722,1
+VIN,Vans,BLK,737,0
+VIN,Converse,COL,375,0
+CAS,New Balance,BLK,466,0
+ESP,Nike,BLK,133,0
+CAS,Nike,BLK,820,1
+VIN,Vans,NEU,783,0
+VIN,Nike,BLK,932,1
+ESP,Nike,NEU,468,0
+SOC,Vans,WHT,579,1
+CAS,New Balance,NEU,756,1
+ESP,Vans,WHT,239,1
+VIN,Nike,COL,939,1
+CAS,Converse,WHT,623,0
+VIN,New Balance,COL,228,0
+FAS,New Balance,COL,422,0
+ESP,Converse,NEU,509,0
+ESP,Nike,COL,978,0
+FAS,Adidas,WHT,899,1
+CAS,Nike,WHT,369,1
+ESP,Adidas,COL,440,1
+VIN,Converse,COL,638,0
+SOC,Converse,WHT,184,0
+CAS,Vans,COL,996,1
+VIN,Nike,COL,476,1
+ESP,Vans,COL,959,0
+ESP,Nike,COL,969,0
+FAS,Nike,COL,432,1
+CAS,Adidas,BLK,311,1
+ESP,Vans,NEU,713,0
+VIN,New Balance,BLK,334,0
+FAS,Converse,COL,471,0
+CAS,New Balance,NEU,202,0
+VIN,New Balance,WHT,968,0
+CAS,Nike,COL,613,1
+VIN,Adidas,COL,338,1
+ESP,Nike,WHT,132,0
+FAS,Converse,COL,492,1
+CAS,Converse,WHT,568,1
+VIN,Adidas,COL,665,1
+CAS,Adidas,COL,657,0
+FAS,Adidas,COL,793,1
+SOC,New Balance,BLK,891,1
+FAS,Converse,COL,180,0
+ESP,Nike,COL,517,0
+ESP,New Balance,NEU,467,1
+CAS,Nike,COL,948,0
+VIN,Adidas,BLK,647,0
+VIN,Adidas,WHT,200,0
+VIN,Vans,NEU,890,1
+FAS,Nike,COL,317,1
+CAS,Adidas,NEU,758,1
+SOC,Vans,COL,838,1
+SOC,Converse,NEU,941,1
+CAS,Vans,BLK,676,1
+CAS,Nike,BLK,778,0
+ESP,Adidas,WHT,501,1
+SOC,Nike,WHT,210,0
+FAS,Adidas,WHT,981,0
+CAS,Vans,BLK,971,1
+ESP,Converse,COL,971,1
+VIN,New Balance,BLK,580,0
+VIN,Adidas,COL,212,0
+FAS,New Balance,NEU,973,1
+ESP,New Balance,BLK,455,1
+SOC,Adidas,COL,947,0
+VIN,Converse,NEU,341,0
+VIN,New Balance,WHT,942,1
+SOC,New Balance,BLK,788,1
+VIN,Vans,WHT,729,1
+VIN,Converse,COL,269,1
+VIN,New Balance,WHT,604,1
+SOC,Nike,WHT,136,0
+CAS,Adidas,WHT,310,0
+FAS,New Balance,NEU,988,0
+ESP,Adidas,COL,742,0
+SOC,New Balance,COL,365,0
+FAS,Nike,NEU,414,0
+ESP,Converse,COL,461,0
+ESP,New Balance,WHT,587,1
+FAS,Nike,WHT,908,1
+VIN,Nike,BLK,700,1
+SOC,Converse,COL,645,1
+VIN,Converse,BLK,289,1
+VIN,Nike,NEU,561,1
+FAS,Converse,WHT,569,0
+SOC,Vans,BLK,142,1
+CAS,New Balance,BLK,389,0

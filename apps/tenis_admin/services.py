@@ -14,10 +14,13 @@ class DatasetService:
             dataset.records_count = len(df)
             dataset.is_processed = True
             dataset.save()
-            return True
+            return True, None
+        except ValueError as ve:
+            print(f"Erro de validação do dataset: {str(ve)}")
+            return False, str(ve)
         except Exception as e:
             print(f"Erro ao processar dataset: {str(e)}")
-            return False
+            return False, "Erro desconhecido ao processar o dataset."
 
 class ModelTrainingService:
     @staticmethod
