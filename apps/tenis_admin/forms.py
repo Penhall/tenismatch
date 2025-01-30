@@ -1,6 +1,6 @@
 # /tenismatch/apps/tenis_admin/forms.py 
 from django import forms
-from .models import Dataset, AIModel
+from .models import Dataset, AIModel, ColumnMapping  
 
 class DatasetUploadForm(forms.ModelForm):
     class Meta:
@@ -67,4 +67,42 @@ class GenerateDataForm(forms.Form):
         initial=True,
         widget=forms.CheckboxInput(attrs={'class': 'mr-2'}),
         help_text='Incluir labels para treinamento supervisionado'
+    )
+    
+class DatasetMappingForm(forms.Form):
+    def __init__(self, *args, columns=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if columns:
+            column_choices = [(col, col) for col in columns]
+            # Criar campos dinâmicos baseados nas colunas necessárias
+            for required_col, label in ColumnMapping.required_columns.items():
+                self.fields[f'mapping_{required_col}'] = forms.ChoiceField(
+                    label=label,
+                    choices=[('', '---')] + column_choices,
+                    required=True,
+                    widget=forms.Select(attrs={
+                        'class': 'w-full border rounded-md p-2',
+                        'data-required-column': required_col
+                    })
+                )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Verificar se não há mapeamentos duplicados
+        mappings = [value for key, value in cleaned_data.items() if key.startswith('mapping_') and value]
+        if len(mappings) != len(set(mappings)):
+            raise forms.ValidationError("Cada coluna do dataset só pode ser mapeada uma vez")
+        return cleaned_data
+
+class MappingConfirmationForm(forms.Form):
+    confirm = forms.BooleanField(
+        required=True,
+        label='Confirmo que o mapeamento está correto',
+        widget=forms.CheckboxInput(attrs={'class': 'mr-2'})
+    )
+    process_now = forms.BooleanField(
+        required=False,
+        initial=True,
+        label='Processar dataset imediatamente após confirmação',
+        widget=forms.CheckboxInput(attrs={'class': 'mr-2'})
     )

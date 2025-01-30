@@ -1,0 +1,85 @@
+<!--# /tenismatch/apps/tenis_admin/templates/analyst/mapping/mapping.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-6">Mapeamento de Colunas</h2>
+        
+        <!-- Instruções -->
+        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+            <p class="text-blue-700">
+                Selecione qual coluna do seu dataset corresponde a cada campo necessário.
+                Cada coluna só pode ser mapeada uma vez.
+            </p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">
+                    {{ field.label }}
+                </label>
+                <div class="relative">
+                    {{ field }}
+                    {% if field.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                {% for error in form.non_field_errors %}
+                <p class="text-red-700">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Ações -->
+            <div class="flex justify-end space-x-4 mt-8">
+                <a href="{% url 'tenis_admin:dataset_preview' dataset.id %}" 
+                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    Voltar
+                </a>
+                <button type="submit" 
+                        class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                    Continuar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selects = document.querySelectorAll('select');
+    
+    function updateOptions() {
+        const usedValues = Array.from(selects)
+            .map(select => select.value)
+            .filter(value => value !== '');
+
+        selects.forEach(select => {
+            const currentValue = select.value;
+            Array.from(select.options).forEach(option => {
+                if (option.value && option.value !== currentValue) {
+                    option.disabled = usedValues.includes(option.value);
+                }
+            });
+        });
+    }
+
+    selects.forEach(select => {
+        select.addEventListener('change', updateOptions);
+    });
+
+    updateOptions();
+});
+</script>
+{% endblock %}
+{% endblock %}

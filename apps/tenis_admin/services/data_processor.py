@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as ET
 import logging
-from typing import Tuple, Dict, Any
-from ..models import Dataset
+from typing import Tuple, Dict, Any, List
+from ..models import Dataset, ColumnMapping
 
 logger = logging.getLogger(__name__)
 
@@ -18,19 +18,15 @@ class DatasetService:
 
     @classmethod
     def process_dataset(cls, dataset_id: int) -> Tuple[bool, str]:
-        """
-        Processa um dataset após o upload.
-        
-        Args:
-            dataset_id: ID do dataset a ser processado
-            
-        Returns:
-            Tuple[bool, str]: (sucesso, mensagem)
-        """
         dataset = Dataset.objects.get(id=dataset_id)
         
         try:
             df = cls._read_dataset_file(dataset)
+            
+            # Se existe mapeamento, aplicar
+            if hasattr(dataset, 'column_mapping') and dataset.column_mapping.is_validated:
+                df = df.rename(columns=dataset.column_mapping.mapping)
+            
             cls._validate_columns(df)
             stats = cls._calculate_stats(df)
             
@@ -47,35 +43,45 @@ class DatasetService:
             return False, f"Erro ao processar dataset: {str(e)}"
 
     @classmethod
-    def get_training_data(cls, dataset_id: int) -> Dict[str, Any]:
-        """
-        Prepara dados do dataset para treinamento.
-        
-        Args:
-            dataset_id: ID do dataset
-            
-        Returns:
-            Dict contendo features e matches
-        """
+    def get_dataset_columns(cls, dataset_id: int) -> List[str]:
+        """Retorna lista de colunas do dataset"""
         dataset = Dataset.objects.get(id=dataset_id)
-        df = cls._read_dataset_file(dataset)
-        
-        training_data = {
-            'features': [],
-            'matches': []
+        df = pd.read_csv(dataset.file.path, nrows=1)
+        return list(df.columns)
+
+    @classmethod
+    def get_preview_data(cls, dataset_id: int, rows: int = 5) -> Dict:
+        """Retorna preview dos dados para visualização"""
+        dataset = Dataset.objects.get(id=dataset_id)
+        df = pd.read_csv(dataset.file.path, nrows=rows)
+        return {
+            'columns': list(df.columns),
+            'data': df.to_dict('records'),
+            'total_rows': sum(1 for _ in open(dataset.file.path)) - 1
         }
         
-        for _, row in df.iterrows():
-            features = {
-                'brand': row['tenis_marca'],
-                'style': row['tenis_estilo'],
-                'color': row['tenis_cores'],
-                'price_range': float(row['tenis_preco'])
-            }
-            training_data['features'].append(features)
-            training_data['matches'].append(row.get('match_success', 0))
+    @classmethod
+    def validate_mapping(cls, dataset_id: int, mapping: Dict[str, str]) -> Tuple[bool, str]:
+        """Valida se o mapeamento proposto é válido"""
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.read_csv(dataset.file.path, nrows=1)
             
-        return training_data
+            # Verificar se colunas existem
+            for original_col in mapping.keys():
+                if original_col not in df.columns:
+                    return False, f"Coluna '{original_col}' não existe no dataset"
+                    
+            # Verificar se todos os campos necessários estão mapeados
+            mapped_cols = set(mapping.values())
+            for required in cls.REQUIRED_COLUMNS:
+                if required not in mapped_cols:
+                    return False, f"Campo obrigatório '{required}' não mapeado"
+                    
+            return True, ""
+            
+        except Exception as e:
+            return False, str(e)
 
     @staticmethod
     def _read_dataset_file(dataset: Dataset) -> pd.DataFrame:

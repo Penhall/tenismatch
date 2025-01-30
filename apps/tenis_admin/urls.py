@@ -6,41 +6,20 @@ app_name = 'tenis_admin'
 
 urlpatterns = [
     # Analyst URLs
-    path('analyst/dashboard/', 
-        views.AnalystDashboardView.as_view(), 
-        name='analyst_dashboard'),
+    path('analyst/dashboard/', views.AnalystDashboardView.as_view(), name='analyst_dashboard'),
     
     # Dataset Management
-    path('analyst/dataset/upload/', 
-        views.DatasetUploadView.as_view(), 
-        name='dataset_upload'),
-    path('analyst/dataset/generate/', 
-        views.GenerateDataView.as_view(), 
-        name='generate_data'),
+    path('analyst/dataset/upload/', views.DatasetUploadView.as_view(), name='dataset_upload'),
+    path('analyst/dataset/<int:pk>/preview/', views.DatasetPreviewView.as_view(), name='dataset_preview'),
+    path('analyst/dataset/<int:pk>/mapping/', views.DatasetMappingView.as_view(), name='dataset_mapping'),
         
-    # Model Training
-    path('analyst/model/create/', 
-        views.ModelTrainingView.as_view(), 
-        name='model_create'),
-    path('analyst/model/detail/<int:pk>/', 
-        views.ModelTrainingDetailView.as_view(), 
-        name='model_detail'),
+    # Model Training and Management
+    path('analyst/model/create/', views.ModelTrainingView.as_view(), name='model_create'),
+    path('analyst/model/<int:pk>/detail/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
     
     # Manager URLs
-    path('manager/dashboard/', 
-        views.ManagerDashboardView.as_view(), 
-        name='manager_dashboard'),
-    
-    # Model Review and Approval
-    path('manager/model/review/<int:pk>/', 
-        views.ModelReviewView.as_view(), 
-        name='model_review'),
-    path('manager/model/performance/<int:pk>/', 
-        views.ModelPerformanceView.as_view(), 
-        name='model_performance'),
-    
-    # Metrics and Analytics
-    path('manager/metrics/', 
-        views.MetricsDashboardView.as_view(), 
-        name='metrics_dashboard'),
+    path('manager/dashboard/', views.ManagerDashboardView.as_view(), name='manager_dashboard'),
+    path('manager/model/<int:pk>/review/', views.ModelReviewView.as_view(), name='model_review'),
+    path('manager/model/<int:pk>/performance/', views.ModelPerformanceView.as_view(), name='model_performance'),
+    path('manager/metrics/', views.MetricsDashboardView.as_view(), name='metrics_dashboard'),
 ]

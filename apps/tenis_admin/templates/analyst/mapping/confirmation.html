@@ -1,0 +1,85 @@
+<!--# /tenismatch/apps/tenis_admin/templates/analyst/mapping/confirmation.html-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-6">Confirmar Mapeamento</h2>
+
+        <!-- Resumo do Mapeamento -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Mapeamento Definido:</h3>
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2 text-left">Campo do Sistema</th>
+                        <th class="px-4 py-2 text-left">Coluna do Dataset</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for system_col, dataset_col in mapping.items %}
+                    <tr class="border-b">
+                        <td class="px-4 py-2 font-medium">{{ system_col }}</td>
+                        <td class="px-4 py-2">{{ dataset_col }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Preview com Mapeamento -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-4">Preview com Mapeamento:</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            {% for col in preview_columns %}
+                            <th class="px-4 py-2 text-left">{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in preview_data %}
+                        <tr class="border-b">
+                            {% for col in preview_columns %}
+                            <td class="px-4 py-2">{{ row|get_item:col }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Formulário de Confirmação -->
+        <form method="post" class="mt-8">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="mb-4">
+                <label class="flex items-center">
+                    {{ field }}
+                    <span class="ml-2">{{ field.label }}</span>
+                </label>
+                {% if field.errors %}
+                <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Ações -->
+            <div class="flex justify-end space-x-4 mt-8">
+                <a href="{% url 'tenis_admin:mapping_create' dataset.id %}" 
+                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                    Voltar
+                </a>
+                <button type="submit" 
+                        class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                    Confirmar e Continuar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

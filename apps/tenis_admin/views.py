@@ -10,8 +10,14 @@ import pandas as pd
 from io import StringIO
 import logging
 
-from .models import AIModel, Dataset
-from .forms import DatasetUploadForm, ModelTrainingForm, ModelReviewForm, GenerateDataForm
+from .models import AIModel, Dataset, ColumnMapping
+from .forms import (
+    DatasetUploadForm, 
+    ModelTrainingForm, 
+    ModelReviewForm, 
+    GenerateDataForm,
+    DatasetMappingForm
+)
 from .services import (
     ModelTrainingService, 
     ModelDeploymentService, 
@@ -21,6 +27,8 @@ from .services import (
 from apps.matching.ml.dataset import DatasetPreparation
 
 logger = logging.getLogger(__name__)
+
+# Resto do código permanece igual...
 
 # Mixins
 class AnalystRequiredMixin(UserPassesTestMixin):
@@ -45,9 +53,17 @@ class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['datasets'] = Dataset.objects.filter(
-            uploaded_by=self.request.user
-        ).order_by('-uploaded_at')
+        # Remove datasets com arquivos faltantes
+        datasets = Dataset.objects.filter(uploaded_by=self.request.user)
+        valid_datasets = []
+        for dataset in datasets:
+            try:
+                if dataset.file and dataset.file.path:
+                    valid_datasets.append(dataset)
+            except FileNotFoundError:
+                dataset.delete()  # opcional: remover dataset do banco
+                
+        context['datasets'] = valid_datasets
         return context
 
 class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
@@ -245,3 +261,62 @@ class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView)
             'recent_matches': MetricsService.get_recent_matches(self.object.id)
         })
         return context
+        
+
+################### DATASET PREVIEW AND MAPPING VIEWS ###################
+
+class DatasetPreviewView(LoginRequiredMixin, AnalystRequiredMixin, DetailView):
+    model = Dataset
+    template_name = 'analyst/mapping/preview.html'
+    context_object_name = 'dataset'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            preview = DatasetService.get_preview_data(self.object.id)
+            context['preview'] = preview
+        except Exception as e:
+            messages.error(self.request, f'Erro ao carregar preview: {str(e)}')
+            context['preview'] = {'columns': [], 'data': [], 'total_rows': 0}
+        return context
+
+class DatasetMappingView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
+    template_name = 'analyst/mapping/mapping.html'
+    form_class = DatasetMappingForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.dataset = get_object_or_404(Dataset, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['columns'] = DatasetService.get_dataset_columns(self.dataset.id)
+        return kwargs
+
+    def form_valid(self, form):
+        mapping = {
+            field.replace('mapping_', ''): value 
+            for field, value in form.cleaned_data.items() 
+            if field.startswith('mapping_')
+        }
+        
+        # Validar e salvar mapeamento
+        success, message = DatasetService.validate_mapping(self.dataset.id, mapping)
+        if not success:
+            messages.error(self.request, message)
+            return self.form_invalid(form)
+            
+        # Criar/atualizar mapeamento
+        column_mapping, _ = ColumnMapping.objects.get_or_create(dataset=self.dataset)
+        column_mapping.mapping = mapping
+        column_mapping.is_validated = True
+        column_mapping.save()
+        
+        # Processar dataset
+        success, message = DatasetService.process_dataset(self.dataset.id)
+        if not success:
+            messages.error(self.request, message)
+            return self.form_invalid(form)
+            
+        messages.success(self.request, 'Dataset mapeado e processado com sucesso!')
+        return redirect('tenis_admin:analyst_dashboard')

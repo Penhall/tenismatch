@@ -1,0 +1,50 @@
+<!--# /tenismatch/apps/tenis_admin/templates/analyst/mapping/preview.html-->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-6">Preview do Dataset: {{ dataset.name }}</h2>
+
+        <!-- Informações do Dataset -->
+        <div class="mb-8">
+            <p class="text-gray-600">Total de registros: {{ preview.total_rows }}</p>
+            <p class="text-gray-600">Colunas encontradas: {{ preview.columns|length }}</p>
+        </div>
+
+        <!-- Preview dos Dados -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead>
+                    <tr class="bg-gray-100">
+                        {% for column in preview.columns %}
+                        <th class="px-4 py-2 text-left">{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in preview.data %}
+                    <tr class="border-b">
+                        {% for col in preview.columns %}
+                        <td class="px-4 py-2">{{ row|get_item:col }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Ações -->
+        <div class="mt-8 flex justify-end space-x-4">
+            <a href="{% url 'tenis_admin:dataset_upload' %}" 
+               class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                Voltar
+            </a>
+            <a href="{% url 'tenis_admin:mapping_create' dataset.id %}" 
+               class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Continuar para Mapeamento
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
