@@ -9,6 +9,7 @@ urlpatterns = [
     path('analyst/dashboard/', views.AnalystDashboardView.as_view(), name='analyst_dashboard'),
     
     # Dataset Management
+    path('analyst/dataset/generate/', views.GenerateDataView.as_view(), name='generate_data'),
     path('analyst/dataset/upload/', views.DatasetUploadView.as_view(), name='dataset_upload'),
     path('analyst/dataset/<int:pk>/preview/', views.DatasetPreviewView.as_view(), name='dataset_preview'),
     path('analyst/dataset/<int:pk>/mapping/', views.DatasetMappingView.as_view(), name='dataset_mapping'),

@@ -1,5 +1,6 @@
 # /tenismatch/apps/tenis_admin/views.py
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, View, FormView, TemplateView
+from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
