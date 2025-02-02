@@ -1,4 +1,3 @@
-# /tenismatch/apps/tenis_admin/services.py 
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -8,11 +7,36 @@ from .models import Dataset, AIModel
 class DatasetService:
     @staticmethod
     def process_dataset(dataset_id):
-        """Apenas marca o dataset como processado sem validar"""
+        """Processa o dataset validando antes de marcar como processado"""
+        is_valid, error = DatasetService.validate_dataset(dataset_id)
+        if is_valid:
+            dataset = Dataset.objects.get(id=dataset_id)
+            dataset.is_processed = True
+            dataset.save()
+            return True, None
+        else:
+            return False, error
+
+    @staticmethod
+    def validate_dataset(dataset_id):
+        """Valida o dataset e marca como processado se válido"""
         dataset = Dataset.objects.get(id=dataset_id)
-        dataset.is_processed = True
-        dataset.save()
-        return True, None
+        required_columns = ['tenis_marca', 'tenis_estilo', 'tenis_cores', 'tenis_preco']
+        
+        try:
+            df = pd.read_csv(dataset.file.path)
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            
+            if missing_columns:
+                return False, f"Colunas ausentes no dataset: {', '.join(missing_columns)}"
+            
+            # Implementar lógica adicional de processamento, se necessário
+            
+            dataset.is_processed = True
+            dataset.save()
+            return True, None
+        except Exception as e:
+            return False, f"Erro ao validar dataset: {str(e)}"
 
 class ModelTrainingService:
     @staticmethod
@@ -36,7 +60,6 @@ class ModelTrainingService:
             model.status = 'review'
             model.save()
             return True
-            
         except Exception as e:
             print(f"Erro no treinamento: {str(e)}")
             return False

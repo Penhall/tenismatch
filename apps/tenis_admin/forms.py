@@ -1,18 +1,18 @@
-# /tenismatch/apps/tenis_admin/forms.py 
 from django import forms
 from .models import Dataset, AIModel, ColumnMapping  
 
 class DatasetUploadForm(forms.ModelForm):
     class Meta:
         model = Dataset
-        fields = ['name', 'description', 'file']
+        fields = ['name', 'description', 'file', 'file_type']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
             'description': forms.Textarea(attrs={
                 'class': 'w-full border rounded-md p-2',
                 'rows': 3
             }),
-            'file': forms.FileInput(attrs={'class': 'w-full border rounded-md p-2'})
+            'file': forms.FileInput(attrs={'class': 'w-full border rounded-md p-2'}),
+            'file_type': forms.Select(attrs={'class': 'w-full border rounded-md p-2'}),
         }
 
 class ModelTrainingForm(forms.ModelForm):
@@ -50,7 +50,7 @@ class ModelReviewForm(forms.Form):
         }),
         required=True
     )
-    
+
 class GenerateDataForm(forms.Form):
     n_samples = forms.IntegerField(
         label='Número de Amostras',

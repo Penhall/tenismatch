@@ -1,5 +1,3 @@
-# Nome do Arquivo: apps/tenis_admin/models.py
-
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -26,6 +24,11 @@ class Dataset(models.Model):
     is_processed = models.BooleanField(default=False)
     dataset_type = models.CharField(max_length=20, choices=DATASET_TYPES, default='upload')
     file_size = models.BigIntegerField(default=0)
+    file_type = models.CharField(
+        max_length=10,
+        choices=[("csv", "CSV"), ("json", "JSON"), ("xlsx", "Excel")],
+        default="csv",
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
     stats = models.JSONField(null=True, blank=True)
     
@@ -57,6 +60,13 @@ class ColumnMapping(models.Model):
     is_validated = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    required_columns = {
+        'tenis_marca': 'Marca',
+        'tenis_estilo': 'Estilo',
+        'tenis_cores': 'Cores',
+        'tenis_preco': 'Preço'
+    }
 
     def __str__(self):
         return f"Mapeamento para {self.dataset.name}"
