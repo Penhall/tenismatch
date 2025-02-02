@@ -17,7 +17,7 @@ class DatasetUploadForm(forms.ModelForm):
 
 class ModelTrainingForm(forms.ModelForm):
     dataset = forms.ModelChoiceField(
-        queryset=Dataset.objects.filter(is_processed=True),
+        queryset=Dataset.objects.filter(is_processed=True),  # Alterado apenas esta linha
         widget=forms.Select(attrs={'class': 'w-full border rounded-md p-2'})
     )
     

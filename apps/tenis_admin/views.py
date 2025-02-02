@@ -3,7 +3,6 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
-from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.utils import timezone
 import pandas as pd
@@ -11,6 +10,7 @@ from io import StringIO
 import logging
 import os
 from django.core.files.base import ContentFile  # Adicionado
+from .services.dataset_service import DatasetService
 
 from .models import AIModel, Dataset, ColumnMapping
 from .forms import (
@@ -23,8 +23,7 @@ from .forms import (
 from .services import (
     ModelTrainingService, 
     ModelDeploymentService, 
-    MetricsService, 
-    DatasetService
+    MetricsService
 )
 from apps.matching.ml.dataset import DatasetPreparation
 
@@ -114,9 +113,11 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        new_datasets = DatasetService.sync_datasets(self.request.user)
+        if new_datasets > 0:
+            messages.info(self.request, f'{new_datasets} novos datasets encontrados.')
         context['datasets'] = Dataset.objects.filter(
-            uploaded_by=self.request.user,
-            is_processed=True
+            uploaded_by=self.request.user
         ).order_by('-uploaded_at')
         return context
 
@@ -203,9 +204,23 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     form_class = ModelTrainingForm
     template_name = 'analyst/model_creation.html'
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        
+        # Sincroniza datasets antes de exibir o form
+        DatasetService.sync_datasets(self.request.user)
+        
+        # Atualiza queryset do campo dataset
+        form.fields['dataset'].queryset = Dataset.objects.filter(
+            is_processed=True
+        ).order_by('-uploaded_at')
+        
+        return form
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+        form.instance.status = 'draft'  # Iniciar como rascunho
         response = super().form_valid(form)
         
         try:
@@ -213,7 +228,7 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
             success, message = ModelTrainingService.train_model(self.object.id, form.cleaned_data.get('dataset').id)
             if success:
                 messages.success(self.request, 'Modelo treinado com sucesso!')
-                self.object.is_trained = True
+                self.object.status = 'review'  # Mudar para revisão após treino
                 self.object.save()
             else:
                 messages.error(self.request, f'Erro ao treinar o modelo: {message}')
@@ -231,7 +246,7 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['models'] = AIModel.objects.filter(
             created_by=self.request.user,
-            is_trained=True
+            status__in=['review', 'approved']  # Mostrar modelos em revisão ou aprovados
         ).order_by('-created_at')
         return context
 
@@ -290,5 +305,3 @@ class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
         context['approved_models'] = AIModel.objects.filter(status='approved').count()
         context['rejected_models'] = AIModel.objects.filter(status='rejected').count()
         return context
-
-# Resto do código permanece igual...
