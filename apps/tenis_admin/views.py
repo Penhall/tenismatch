@@ -81,7 +81,8 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         # Salva o nome do dataset antes de processar o arquivo
         dataset_name = form.cleaned_data.get('name')
         form.instance.uploaded_by = self.request.user
-        form.instance.name = dataset_name  # Garante que o nome seja salvo corretamente
+        form.instance.name = dataset_name
+        form.instance.status = 'ready'  # Inicia como ready para testes
         
         response = super().form_valid(form)
         
@@ -94,14 +95,16 @@ class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
             
             os.rename(original_path, new_path)
             self.object.file.name = os.path.join(os.path.dirname(self.object.file.name), new_filename)
+            
+            # Atualiza o status e salva
+            self.object.status = 'ready'
             self.object.save()
             
             # Verifica se o arquivo foi salvo corretamente
             if not self.object.file or not os.path.exists(new_path):
                 raise FileNotFoundError('Arquivo não encontrado após upload')
                 
-            # Removido o processamento do dataset durante upload
-            # Isso será feito durante a criação do modelo
+            messages.success(self.request, 'Dataset enviado com sucesso!')
                 
         except Exception as e:
             logger.error(f'Erro no upload do dataset: {str(e)}')

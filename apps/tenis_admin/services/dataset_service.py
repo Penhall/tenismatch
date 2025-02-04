@@ -1,6 +1,10 @@
 import os
 from django.conf import settings
 from ..models import Dataset
+import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 class DatasetService:
     @staticmethod
@@ -43,3 +47,35 @@ class DatasetService:
             )
         
         return len(new_files)  # retorna quantidade de novos datasets encontrados
+
+    @staticmethod
+    def process_dataset(dataset_id):
+        """Processa um dataset após upload"""
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            
+            # Lê o arquivo CSV
+            df = pd.read_csv(dataset.file.path)
+            
+            # Verifica se tem as colunas necessárias
+            required_columns = set(['tenis_marca', 'tenis_estilo', 'tenis_cores', 'tenis_preco'])
+            current_columns = set(df.columns)
+            
+            # Salva estatísticas básicas
+            dataset.records_count = len(df)
+            dataset.stats = {
+                'columns': list(df.columns),
+                'rows': len(df),
+                'missing_columns': list(required_columns - current_columns)
+            }
+            
+            # Atualiza status
+            dataset.status = 'ready'
+            dataset.save()
+            
+            logger.info(f'Dataset {dataset_id} processado com sucesso')
+            return True
+            
+        except Exception as e:
+            logger.error(f'Erro ao processar dataset {dataset_id}: {str(e)}')
+            return False
