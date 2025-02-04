@@ -213,7 +213,7 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         
         # Atualiza queryset do campo dataset
         form.fields['dataset'].queryset = Dataset.objects.filter(
-            is_processed=True
+            status='ready'  # Alterado
         ).order_by('-uploaded_at')
         
         return form
