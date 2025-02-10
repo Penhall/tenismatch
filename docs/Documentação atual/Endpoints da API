@@ -1,0 +1,76 @@
+# Endpoints da API
+
+## **Visão Geral**
+A API do **TenisMatch** segue os princípios do **RESTful** e utiliza **Django Rest Framework (DRF)** para fornecer endpoints seguros e eficientes. O sistema utiliza **autenticação JWT** para garantir acesso seguro às informações dos usuários e recomendações.
+
+## **Autenticação e Segurança**
+A API implementa os seguintes mecanismos de segurança:
+- **Autenticação JWT** para proteger endpoints
+- **Rate limiting** para evitar abuso
+- **Proteção contra CSRF, SQL Injection e XSS**
+- **Registro de logs de requisições suspeitas**
+
+### **Endpoints de Autenticação**
+| Método | Endpoint                | Descrição |
+|--------|-------------------------|------------|
+| POST   | `/api/auth/signup/`     | Criação de novo usuário |
+| POST   | `/api/auth/login/`      | Autenticação de usuário e geração de token JWT |
+| POST   | `/api/auth/logout/`     | Logout do usuário |
+| POST   | `/api/auth/token/refresh/` | Renovação do token JWT |
+
+Exemplo de autenticação:
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "usuario@email.com", "password": "senha123"}'
+```
+
+## **Endpoints de Gerenciamento de Usuários**
+| Método | Endpoint                 | Descrição |
+|--------|--------------------------|------------|
+| GET    | `/api/users/profile/`    | Obtém informações do usuário autenticado |
+| PUT    | `/api/users/profile/`    | Atualiza informações do usuário |
+| GET    | `/api/users/list/`       | Lista todos os usuários (apenas para administradores) |
+
+## **Endpoints de Datasets**
+| Método | Endpoint                | Descrição |
+|--------|-------------------------|------------|
+| GET    | `/api/datasets/`        | Lista todos os datasets disponíveis |
+| POST   | `/api/datasets/upload/` | Upload de um novo dataset |
+| GET    | `/api/datasets/{id}/`   | Obtém detalhes de um dataset específico |
+| DELETE | `/api/datasets/{id}/`   | Remove um dataset (apenas para administradores) |
+
+Exemplo de upload de dataset:
+```bash
+curl -X POST http://127.0.0.1:8000/api/datasets/upload/ \
+  -H "Authorization: Bearer <TOKEN>" \
+  -F "file=@dataset.csv"
+```
+
+## **Endpoints de Modelos de IA**
+| Método | Endpoint                   | Descrição |
+|--------|----------------------------|------------|
+| GET    | `/api/models/`             | Lista todos os modelos treinados |
+| POST   | `/api/models/train/`       | Inicia o treinamento de um modelo |
+| GET    | `/api/models/{id}/`        | Obtém detalhes de um modelo específico |
+| PUT    | `/api/models/{id}/approve/`| Aprova um modelo para produção |
+
+## **Endpoints de Recomendação**
+| Método | Endpoint                   | Descrição |
+|--------|----------------------------|------------|
+| GET    | `/api/recommendations/`    | Obtém recomendações para o usuário autenticado |
+| GET    | `/api/recommendations/{id}/` | Obtém detalhes de uma recomendação específica |
+
+Exemplo de requisição de recomendações:
+```bash
+curl -X GET http://127.0.0.1:8000/api/recommendations/ \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+## **Próximos Passos**
+- Implementação de cache para melhorar performance
+- Expansão dos filtros para personalização das recomendações
+- Integração com WebSockets para atualizações em tempo real
+
+---
+Esse documento será atualizado conforme novos endpoints forem adicionados à API.
