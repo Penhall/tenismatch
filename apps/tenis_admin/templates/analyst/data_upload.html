@@ -1,8 +1,20 @@
 <!--# /tenismatch/apps/tenis_admin/templates/analyst/data_upload.html  -->
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Upload de Dataset - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Área do Analista</span>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Upload de Dataset</span>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-6 py-8">
+<div class="container mx-auto px-6 py-8">
     <div class="bg-white rounded-lg shadow-lg p-6">
         <h1 class="text-2xl font-bold mb-8">Upload de Dataset</h1>
 

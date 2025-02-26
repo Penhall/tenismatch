@@ -1,15 +1,26 @@
-<!--# /tenismatch/apps/tenis_admin/templates/manager/dashboard.html -->
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Dashboard do Gerente - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Área do Gerente</span>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Dashboard</span>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold">Dashboard do Gerente</h1>
         <div class="space-x-4">
-            <a href="{% url 'tenis_admin:metrics_dashboard' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
+            <a href="{% url 'tenis_admin:metrics_dashboard' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
                 Métricas de Desempenho
             </a>
-            <a href="{% url 'users:approve_analysts' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg">
+            <a href="{% url 'users:approve_analysts' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                 Aprovar Analistas
             </a>
         </div>

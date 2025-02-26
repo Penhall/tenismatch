@@ -1,37 +1,124 @@
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Meu Dashboard - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Dashboard</span>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<nav class="p-4">
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Menu</h3>
+        <a href="{% url 'users:dashboard' %}" class="block py-2 px-4 text-gray-800 bg-purple-50 rounded-lg mb-1">
+            Dashboard
+        </a>
+        <a href="{% url 'matching:match_list' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Matches
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Perfil</h3>
+        <a href="{% url 'profiles:edit' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Editar Perfil
+        </a>
+        <a href="{% url 'profiles:preferences' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Preferências
+        </a>
+    </div>
+
+    {% if user.role == 'ANALISTA' or user.role == 'GERENTE' %}
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Área Reservada</h3>
+        {% if user.role == 'ANALISTA' %}
+        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Analista
+        </a>
+        {% elif user.role == 'GERENTE' %}
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Gerente
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Seu Dashboard</h1>
-    
-    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Informações da Conta</h2>
-        <p class="text-lg mb-2">Nome de usuário: {{ user.username }}</p>
-        <p class="text-lg mb-2">Email: {{ user.email }}</p>
-        <p class="text-lg mb-2">Membro desde: {{ user.date_joined|date:"d/m/Y" }}</p>
-    </div>
-
-    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Seu Perfil</h2>
-        <p class="text-lg mb-2">Status da conta: {% if user.is_premium %}Premium{% else %}Gratuita{% endif %}</p>
-        {% if user.is_premium %}
-            <p class="text-lg mb-2">Premium até: {{ user.premium_until|date:"d/m/Y" }}</p>
-        {% else %}
-            <a href="{% url 'users:upgrade_premium' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-                Upgrade para Premium
-            </a>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Meu Dashboard</h1>
+        {% if not user.is_premium %}
+        <a href="{% url 'users:upgrade_premium' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+            Upgrade para Premium
+        </a>
         {% endif %}
     </div>
 
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Ações Rápidas</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="{% url 'profiles:edit' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-center hover:bg-blue-600">
-                Editar Perfil
-            </a>
-            <a href="{% url 'profiles:preferences' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg text-center hover:bg-green-600">
-                Atualizar Preferências
-            </a>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Informações da Conta -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Informações da Conta</h2>
+            <div class="space-y-3">
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Nome de usuário:</span>
+                    <span class="font-medium">{{ user.username }}</span>
+                </p>
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Email:</span>
+                    <span class="font-medium">{{ user.email }}</span>
+                </p>
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Membro desde:</span>
+                    <span class="font-medium">{{ user.date_joined|date:"d/m/Y" }}</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Status da Conta -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Status da Conta</h2>
+            <div class="space-y-3">
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Tipo de conta:</span>
+                    <span class="font-medium {% if user.is_premium %}text-purple-600{% endif %}">
+                        {% if user.is_premium %}Premium{% else %}Gratuita{% endif %}
+                    </span>
+                </p>
+                {% if user.is_premium %}
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Premium até:</span>
+                    <span class="font-medium">{{ user.premium_until|date:"d/m/Y" }}</span>
+                </p>
+                {% else %}
+                <p class="flex justify-between">
+                    <span class="text-gray-600">Matches restantes:</span>
+                    <span class="font-medium">{{ user.matches_remaining }}</span>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Ações Rápidas</h2>
+            <div class="space-y-3">
+                <a href="{% url 'profiles:edit' %}" class="block w-full bg-blue-500 text-white text-center px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Editar Perfil
+                </a>
+                <a href="{% url 'profiles:preferences' %}" class="block w-full bg-green-500 text-white text-center px-4 py-2 rounded-lg hover:bg-green-600">
+                    Atualizar Preferências
+                </a>
+                <a href="{% url 'matching:match_list' %}" class="block w-full bg-purple-500 text-white text-center px-4 py-2 rounded-lg hover:bg-purple-600">
+                    Ver Matches
+                </a>
+            </div>
         </div>
     </div>
 </div>
+{% endblock %}

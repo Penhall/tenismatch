@@ -1,49 +1,200 @@
-<!-- /tenismatch/templates/profiles/preferences.html -->
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Preferências - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Perfil</span>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Preferências</span>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<nav class="p-4">
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Menu</h3>
+        <a href="{% url 'users:dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard
+        </a>
+        <a href="{% url 'matching:match_list' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Matches
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Perfil</h3>
+        <a href="{% url 'profiles:edit' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Editar Perfil
+        </a>
+        <a href="{% url 'profiles:preferences' %}" class="block py-2 px-4 text-gray-800 bg-purple-50 rounded-lg mb-1">
+            Preferências
+        </a>
+    </div>
+
+    {% if user.role == 'ANALISTA' or user.role == 'GERENTE' %}
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Área Reservada</h3>
+        {% if user.role == 'ANALISTA' %}
+        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Analista
+        </a>
+        {% elif user.role == 'GERENTE' %}
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Gerente
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8">
-    <h2 class="text-2xl font-bold mb-6">Preferências de Match</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Idade Mínima</label>
-                {{ form.age_min }}
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Idade Máxima</label>
-                {{ form.age_max }}
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Localização Preferida</label>
-                {{ form.location_preference }}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Marca Preferida</label>
-                {{ form.preferred_brands }}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Estilo Preferido</label>
-                {{ form.preferred_styles }}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Cor Preferida</label>
-                {{ form.preferred_colors }}
-            </div>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Minhas Preferências</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'profiles:edit' %}" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                Editar Perfil
+            </a>
+            <a href="{% url 'matching:match_list' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Ver Matches
+            </a>
         </div>
+    </div>
 
-        <div class="mt-8">
-            <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
-                Salvar Preferências
-            </button>
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-6">
+            <form method="post" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Preferências de Tênis -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-6">Preferências de Tênis</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Marcas Favoritas -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Marcas Favoritas</h3>
+                            <div class="space-y-2">
+                                {% for brand in form.favorite_brands %}
+                                <div class="flex items-center">
+                                    {{ brand.tag }}
+                                    <label for="{{ brand.id_for_label }}" class="ml-2">{{ brand.choice_label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Estilos Preferidos -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Estilos Preferidos</h3>
+                            <div class="space-y-2">
+                                {% for style in form.preferred_styles %}
+                                <div class="flex items-center">
+                                    {{ style.tag }}
+                                    <label for="{{ style.id_for_label }}" class="ml-2">{{ style.choice_label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <!-- Cores Favoritas -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Cores Favoritas</h3>
+                            <div class="space-y-2">
+                                {% for color in form.favorite_colors %}
+                                <div class="flex items-center">
+                                    {{ color.tag }}
+                                    <label for="{{ color.id_for_label }}" class="ml-2">{{ color.choice_label }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Faixa de Preço -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Faixa de Preço</h3>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preço Mínimo</label>
+                                {{ form.price_min }}
+                            </div>
+                            <div class="mt-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Preço Máximo</label>
+                                {{ form.price_max }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preferências de Match -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-6">Preferências de Match</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Importância das Preferências -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Importância das Preferências</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                                    {{ form.brand_importance }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Estilo</label>
+                                    {{ form.style_importance }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cor</label>
+                                    {{ form.color_importance }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Preço</label>
+                                    {{ form.price_importance }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Outras Preferências -->
+                        <div>
+                            <h3 class="text-lg font-medium mb-3">Outras Preferências</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Distância Máxima (km)</label>
+                                    {{ form.max_distance }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Faixa Etária</label>
+                                    {{ form.age_range }}
+                                </div>
+                                <div class="flex items-center mt-4">
+                                    {{ form.show_only_premium }}
+                                    <label for="{{ form.show_only_premium.id_for_label }}" class="ml-2">
+                                        Mostrar apenas usuários premium
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <a href="{% url 'users:dashboard' %}" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                        Salvar Preferências
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

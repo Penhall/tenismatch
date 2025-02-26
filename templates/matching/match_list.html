@@ -1,41 +1,164 @@
-<!-- /tenismatch/templates/matching/match_list.html -->
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Meus Matches - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Matches</span>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<nav class="p-4">
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Menu</h3>
+        <a href="{% url 'users:dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard
+        </a>
+        <a href="{% url 'matching:match_list' %}" class="block py-2 px-4 text-gray-800 bg-purple-50 rounded-lg mb-1">
+            Matches
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Perfil</h3>
+        <a href="{% url 'profiles:edit' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Editar Perfil
+        </a>
+        <a href="{% url 'profiles:preferences' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Preferências
+        </a>
+    </div>
+
+    {% if user.role == 'ANALISTA' or user.role == 'GERENTE' %}
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Área Reservada</h3>
+        {% if user.role == 'ANALISTA' %}
+        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Analista
+        </a>
+        {% elif user.role == 'GERENTE' %}
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Gerente
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold mb-8">Seus Matches</h2>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Meus Matches</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'profiles:preferences' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Atualizar Preferências
+            </a>
+            {% if not user.is_premium %}
+            <a href="{% url 'users:upgrade_premium' %}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                Upgrade para Premium
+            </a>
+            {% endif %}
+        </div>
+    </div>
 
+    <!-- Filtros -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                <select name="brand" class="w-full border rounded-md p-2">
+                    <option value="">Todas as marcas</option>
+                    <option value="nike">Nike</option>
+                    <option value="adidas">Adidas</option>
+                    <option value="puma">Puma</option>
+                    <option value="other">Outras</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Estilo</label>
+                <select name="style" class="w-full border rounded-md p-2">
+                    <option value="">Todos os estilos</option>
+                    <option value="casual">Casual</option>
+                    <option value="esportivo">Esportivo</option>
+                    <option value="fashion">Fashion</option>
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Matches -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for match in matches %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <div class="p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-semibold">{{ match.user.username }}</h3>
-                    <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
-                        {{ match.compatibility_score }}% compatível
-                    </span>
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-semibold">{{ match.user.username }}</h3>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{{ match.compatibility }}% compatível</span>
                 </div>
-                
-                <div class="space-y-2 text-gray-600">
-                    <p><strong>Tênis:</strong> {{ match.sneaker_profile.brand }}</p>
-                    <p><strong>Estilo:</strong> {{ match.sneaker_profile.get_style_display }}</p>
-                    <p><strong>Localização:</strong> {{ match.user.location }}</p>
+                <div class="mb-4">
+                    <p class="text-gray-600 mb-2">Preferências de tênis:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">{{ match.brand }}</span>
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">{{ match.style }}</span>
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">{{ match.color }}</span>
+                    </div>
                 </div>
-
-                <div class="mt-6">
-                    <a href="{% url 'matching:match_detail' match.id %}" 
-                       class="block text-center bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
-                        Ver Perfil
+                <div class="flex justify-between">
+                    <a href="{% url 'matching:match_detail' match.id %}" class="text-blue-600 hover:text-blue-800">
+                        Ver detalhes
                     </a>
+                    <button class="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600">
+                        Conectar
+                    </button>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-span-3 text-center py-12">
-            <p class="text-gray-500">Ainda não encontramos matches para você.</p>
-            <p class="mt-2">Complete seu perfil para aumentar suas chances!</p>
+        <div class="col-span-3 bg-white shadow-md rounded-lg p-8 text-center">
+            <h3 class="text-xl font-semibold mb-2">Nenhum match encontrado</h3>
+            <p class="text-gray-600 mb-4">Atualize suas preferências para encontrar novos matches.</p>
+            <a href="{% url 'profiles:preferences' %}" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                Atualizar Preferências
+            </a>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Paginação -->
+    {% if matches.has_other_pages %}
+    <div class="flex justify-center mt-8">
+        <div class="flex space-x-1">
+            {% if matches.has_previous %}
+            <a href="?page={{ matches.previous_page_number }}" class="px-4 py-2 border rounded text-purple-600 hover:bg-purple-50">
+                Anterior
+            </a>
+            {% endif %}
+            
+            {% for i in matches.paginator.page_range %}
+                {% if matches.number == i %}
+                <span class="px-4 py-2 border rounded bg-purple-600 text-white">{{ i }}</span>
+                {% else %}
+                <a href="?page={{ i }}" class="px-4 py-2 border rounded text-purple-600 hover:bg-purple-50">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if matches.has_next %}
+            <a href="?page={{ matches.next_page_number }}" class="px-4 py-2 border rounded text-purple-600 hover:bg-purple-50">
+                Próxima
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,45 +1,82 @@
 <!--# /tenismatch/apps/tenis_admin/templates/analyst/model_creation.html -->
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Criar Novo Modelo - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Área do Analista</span>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Criar Modelo</span>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-6 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-6">
-        <h1 class="text-2xl font-bold mb-8">Criar Novo Modelo</h1>
+<div class="container mx-auto px-6 py-8">
+    <!-- Cabeçalho -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Criar Novo Modelo</h1>
+        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="text-purple-600 hover:text-purple-800">
+            &larr; Voltar para o Dashboard
+        </a>
+    </div>
 
+    <!-- Informações sobre datasets disponíveis -->
+    {% if datasets_count == 0 %}
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6">
+        <div class="flex">
+            <div class="py-1">
+                <svg class="w-6 h-6 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <div>
+                <p class="font-bold">Nenhum dataset disponível</p>
+                <p>Você precisa fazer upload de um dataset antes de criar um modelo. <a href="{% url 'tenis_admin:dataset_upload' %}" class="text-blue-600 hover:underline">Faça upload de um dataset</a> ou <a href="{% url 'tenis_admin:generate_data' %}" class="text-blue-600 hover:underline">gere dados sintéticos</a>.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulário de criação de modelo -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
         <form method="post" class="space-y-6">
             {% csrf_token %}
             
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Dataset Base</label>
                     {{ form.dataset }}
+                    <p class="mt-1 text-sm text-gray-500">Selecione o dataset que será usado para treinar o modelo</p>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Modelo</label>
                     {{ form.name }}
+                    <p class="mt-1 text-sm text-gray-500">Dê um nome descritivo para o modelo</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Versão</label>
                     {{ form.version }}
+                    <p class="mt-1 text-sm text-gray-500">Versão do modelo (ex: 1.0, 2.1)</p>
                 </div>
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-                    <select name="model_type" class="w-full border rounded-md p-2">
-                        <option value="collaborative">Collaborative Filtering</option>
-                        <option value="content">Content-Based</option>
-                        <option value="hybrid">Híbrido</option>
-                    </select>
+                    {{ form.model_type }}
+                    <p class="mt-1 text-sm text-gray-500">Selecione o algoritmo de aprendizado de máquina</p>
                 </div>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Descrição</label>
                 {{ form.description }}
+                <p class="mt-1 text-sm text-gray-500">Descreva o propósito e características do modelo</p>
             </div>
 
             <div class="bg-gray-50 p-4 rounded-md">
@@ -49,11 +86,13 @@
                         <label class="block text-sm text-gray-600">Learning Rate</label>
                         <input type="number" name="learning_rate" value="0.001" step="0.001" 
                                class="mt-1 w-full border rounded-md p-2">
+                        <p class="mt-1 text-xs text-gray-500">Taxa de aprendizado do modelo (valores menores = treinamento mais lento, mas potencialmente mais preciso)</p>
                     </div>
                     <div>
                         <label class="block text-sm text-gray-600">Regularização</label>
                         <input type="number" name="reg_param" value="0.01" step="0.01" 
                                class="mt-1 w-full border rounded-md p-2">
+                        <p class="mt-1 text-xs text-gray-500">Parâmetro de regularização para evitar overfitting</p>
                     </div>
                 </div>
             </div>
@@ -68,6 +107,29 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Informações sobre o processo de criação de modelos -->
+    <div class="mt-8 bg-blue-50 p-6 rounded-lg">
+        <h2 class="text-lg font-semibold mb-4">Sobre o Processo de Criação de Modelos</h2>
+        <div class="space-y-4">
+            <div>
+                <h3 class="font-medium">1. Seleção de Dataset</h3>
+                <p class="text-sm text-gray-600">Selecione um dataset que contenha as colunas necessárias: tenis_marca, tenis_estilo, tenis_cores e tenis_preco.</p>
+            </div>
+            <div>
+                <h3 class="font-medium">2. Treinamento</h3>
+                <p class="text-sm text-gray-600">Após a criação, o modelo será treinado automaticamente usando o dataset selecionado.</p>
+            </div>
+            <div>
+                <h3 class="font-medium">3. Revisão</h3>
+                <p class="text-sm text-gray-600">O modelo treinado será enviado para revisão pelo gerente antes de ser aprovado para uso.</p>
+            </div>
+            <div>
+                <h3 class="font-medium">4. Implantação</h3>
+                <p class="text-sm text-gray-600">Após aprovação, o modelo estará disponível para uso no sistema de recomendação.</p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -70,3 +70,14 @@ class ColumnMapping(models.Model):
 
     def __str__(self):
         return f"Mapeamento para {self.dataset.name}"
+    
+    def get_missing_mappings(self):
+        """
+        Retorna uma lista de colunas requeridas que ainda não foram mapeadas.
+        
+        Returns:
+            list: Lista de nomes de colunas que ainda precisam ser mapeadas
+        """
+        mapped_columns = set(self.mapping.values())
+        required_columns = set(self.required_columns.keys())
+        return list(required_columns - mapped_columns)

@@ -9,8 +9,9 @@ import pandas as pd
 from io import StringIO
 import logging
 import os
-from django.core.files.base import ContentFile  # Adicionado
+from django.core.files.base import ContentFile
 from .services.dataset_service import DatasetService
+from .services.metrics_service import MetricsService
 
 from .models import AIModel, Dataset, ColumnMapping
 from .forms import (
@@ -22,8 +23,7 @@ from .forms import (
 )
 from .services import (
     ModelTrainingService, 
-    ModelDeploymentService, 
-    MetricsService
+    ModelDeploymentService
 )
 from apps.matching.ml.dataset import DatasetPreparation
 
@@ -52,22 +52,37 @@ class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Remove datasets com arquivos faltantes
+        
+        # Obter todos os datasets do usuário
         datasets = Dataset.objects.filter(uploaded_by=self.request.user)
+        
+        # Verificar quais datasets têm arquivos válidos
         valid_datasets = []
+        invalid_datasets = []
+        
         for dataset in datasets:
             try:
-                if dataset.file and dataset.file.path and os.path.exists(dataset.file.path):
+                if dataset.file and os.path.exists(dataset.file.path):
                     valid_datasets.append(dataset)
-            except FileNotFoundError:
-                dataset.delete()
-                    
+                else:
+                    invalid_datasets.append(dataset)
+                    logger.warning(f"Dataset {dataset.id} ({dataset.name}) tem arquivo inválido ou inexistente: {dataset.file}")
+            except Exception as e:
+                invalid_datasets.append(dataset)
+                logger.error(f"Erro ao verificar arquivo do dataset {dataset.id} ({dataset.name}): {str(e)}")
+        
+        # Registrar quantos datasets foram considerados inválidos
+        if invalid_datasets:
+            logger.warning(f"{len(invalid_datasets)} datasets com arquivos inválidos foram encontrados")
+        
         context['datasets'] = valid_datasets
+        context['invalid_datasets_count'] = len(invalid_datasets)
         
         # Adiciona contagens de modelos por status
         context['models_in_review'] = AIModel.objects.filter(created_by=self.request.user, status='review').count()
         context['approved_models'] = AIModel.objects.filter(created_by=self.request.user, status='approved').count()
         context['rejected_models'] = AIModel.objects.filter(created_by=self.request.user, status='rejected').count()
+        context['total_models'] = AIModel.objects.filter(created_by=self.request.user).count()
         
         return context
 
@@ -148,7 +163,7 @@ class GenerateDataView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
             )
             
             # Salvar o arquivo gerado
-            dataset.file.save(f"{dataset.name}.csv", ContentFile(generated_data))  # Modificado
+            dataset.file.save(f"{dataset.name}.csv", ContentFile(generated_data))
             
             messages.success(self.request, 'Dataset sintético gerado e salvo com sucesso!')
         except Exception as e:
@@ -212,45 +227,93 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
         form = super().get_form(form_class)
         
         # Sincroniza datasets antes de exibir o form
-        DatasetService.sync_datasets(self.request.user)
+        try:
+            new_datasets = DatasetService.sync_datasets(self.request.user)
+            if new_datasets > 0:
+                messages.info(self.request, f'{new_datasets} novos datasets encontrados.')
+        except Exception as e:
+            logger.error(f"Erro ao sincronizar datasets: {str(e)}")
+            messages.warning(self.request, f"Erro ao sincronizar datasets: {str(e)}")
         
         # Atualiza queryset do campo dataset
-        form.fields['dataset'].queryset = Dataset.objects.filter(
-            status='ready'  # Alterado
-        ).order_by('-uploaded_at')
+        try:
+            datasets = Dataset.objects.filter(status='ready')
+            # Verificar quais datasets têm arquivos válidos
+            valid_datasets_ids = []
+            for dataset in datasets:
+                try:
+                    if dataset.file and os.path.exists(dataset.file.path):
+                        valid_datasets_ids.append(dataset.id)
+                except Exception as e:
+                    logger.error(f"Erro ao verificar arquivo do dataset {dataset.id}: {str(e)}")
+            
+            # Filtrar apenas datasets válidos
+            form.fields['dataset'].queryset = Dataset.objects.filter(id__in=valid_datasets_ids).order_by('-uploaded_at')
+            
+            # Verificar se há datasets disponíveis
+            if not form.fields['dataset'].queryset.exists():
+                messages.warning(self.request, 'Não há datasets válidos disponíveis para treinamento. Por favor, faça upload de um dataset primeiro.')
+        except Exception as e:
+            logger.error(f"Erro ao atualizar queryset de datasets: {str(e)}")
+            messages.error(self.request, f"Erro ao carregar datasets: {str(e)}")
         
         return form
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.status = 'draft'  # Iniciar como rascunho
+        
+        # Verificar se o dataset existe e é válido
+        dataset = form.cleaned_data.get('dataset')
+        if not dataset or not dataset.file or not os.path.exists(dataset.file.path):
+            messages.error(self.request, 'O dataset selecionado não é válido ou não existe.')
+            return self.form_invalid(form)
+        
+        # Salvar o modelo
         response = super().form_valid(form)
         
         try:
             # Processa o modelo somente após a criação do dataset
-            success, message = ModelTrainingService.train_model(self.object.id, form.cleaned_data.get('dataset').id)
+            logger.info(f"Iniciando treinamento do modelo {self.object.id} com o dataset {dataset.id}")
+            success, message = ModelTrainingService.train_model(self.object.id, dataset.id)
+            
             if success:
-                messages.success(self.request, 'Modelo treinado com sucesso!')
-                self.object.status = 'review'  # Mudar para revisão após treino
-                self.object.save()
+                messages.success(self.request, 'Modelo treinado com sucesso e enviado para revisão!')
+                logger.info(f"Modelo {self.object.id} treinado com sucesso")
             else:
+                logger.error(f"Falha ao treinar modelo {self.object.id}: {message}")
                 messages.error(self.request, f'Erro ao treinar o modelo: {message}')
-                self.object.delete()
-                return redirect(self.get_success_url())
+                # Não excluir o modelo, apenas marcar como falha
+                self.object.status = 'rejected'
+                self.object.save()
         except Exception as e:
-            logger.error(f'Erro no treinamento do modelo: {str(e)}')
+            logger.error(f'Erro no treinamento do modelo {self.object.id}: {str(e)}')
             messages.error(self.request, f'Erro ao treinar o modelo: {str(e)}')
-            self.object.delete()
-            return redirect(self.get_success_url())
+            # Não excluir o modelo, apenas marcar como falha
+            self.object.status = 'rejected'
+            self.object.save()
         
         return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['models'] = AIModel.objects.filter(
-            created_by=self.request.user,
-            status__in=['review', 'approved']  # Mostrar modelos em revisão ou aprovados
+            created_by=self.request.user
         ).order_by('-created_at')
+        
+        # Adicionar informações sobre datasets disponíveis
+        datasets = Dataset.objects.filter(uploaded_by=self.request.user)
+        valid_datasets = []
+        for dataset in datasets:
+            try:
+                if dataset.file and os.path.exists(dataset.file.path):
+                    valid_datasets.append(dataset)
+            except Exception as e:
+                logger.error(f"Erro ao verificar arquivo do dataset {dataset.id}: {str(e)}")
+        
+        context['available_datasets'] = valid_datasets
+        context['datasets_count'] = len(valid_datasets)
+        
         return context
 
 class ModelTrainingDetailView(LoginRequiredMixin, AnalystRequiredMixin, DetailView):
@@ -263,7 +326,8 @@ class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['pending_reviews'] = AIModel.objects.filter(status='review').count()
+        metrics_summary = MetricsService.get_metrics_summary()
+        context.update(metrics_summary)
         return context
 
 class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, FormView):
@@ -297,14 +361,29 @@ class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView)
     template_name = 'manager/model_performance.html'
     context_object_name = 'model'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model_metrics = MetricsService.get_model_metrics(self.object.id)
+        if model_metrics:
+            context['metrics'] = model_metrics
+        return context
+
 class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateView):
     template_name = 'manager/metrics_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Implementar lógica para coletar métricas
-        context['total_datasets'] = Dataset.objects.count()
-        context['total_models'] = AIModel.objects.count()
-        context['approved_models'] = AIModel.objects.filter(status='approved').count()
-        context['rejected_models'] = AIModel.objects.filter(status='rejected').count()
+        
+        # Obter métricas médias
+        model_metrics = MetricsService.calculate_average_metrics()
+        context['model_metrics'] = model_metrics
+        
+        # Obter métricas diárias
+        daily_metrics = MetricsService.get_daily_metrics()
+        context['daily_model_metrics'] = daily_metrics
+        
+        # Adicionar métricas gerais
+        metrics_summary = MetricsService.get_metrics_summary()
+        context.update(metrics_summary)
+        
         return context

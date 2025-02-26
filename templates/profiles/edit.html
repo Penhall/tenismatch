@@ -1,28 +1,133 @@
-<!-- /tenismatch/templates/profiles/edit.html -->
+{% extends 'base_with_sidebar.html' %}
 
-{% extends 'base.html' %}
+{% block title %}Editar Perfil - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Perfil</span>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Editar</span>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<nav class="p-4">
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Menu</h3>
+        <a href="{% url 'users:dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard
+        </a>
+        <a href="{% url 'matching:match_list' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Matches
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Perfil</h3>
+        <a href="{% url 'profiles:edit' %}" class="block py-2 px-4 text-gray-800 bg-purple-50 rounded-lg mb-1">
+            Editar Perfil
+        </a>
+        <a href="{% url 'profiles:preferences' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Preferências
+        </a>
+    </div>
+
+    {% if user.role == 'ANALISTA' or user.role == 'GERENTE' %}
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Área Reservada</h3>
+        {% if user.role == 'ANALISTA' %}
+        <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Analista
+        </a>
+        {% elif user.role == 'GERENTE' %}
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+            Dashboard do Gerente
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-8">
-    <h2 class="text-2xl font-bold mb-6">Editar Perfil</h2>
-    
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-4">
-                <label for="{{ field.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <p class="text-red-500 text-xs italic">{{ field.errors|striptags }}</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-
-        <div class="mt-8">
-            <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700">
-                Salvar Alterações
-            </button>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Editar Perfil</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'profiles:preferences' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                Preferências
+            </a>
+            <a href="{% url 'users:dashboard' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                Cancelar
+            </a>
         </div>
-    </form>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="p-6">
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Foto de Perfil -->
+                <div class="flex flex-col md:flex-row md:space-x-8">
+                    <div class="mb-6 md:mb-0">
+                        <div class="w-32 h-32 rounded-full overflow-hidden bg-gray-200 mb-4">
+                            {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
+                            {% else %}
+                            <img src="/static/img/default-avatar.png" alt="Avatar padrão" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Alterar foto</label>
+                        {{ form.avatar }}
+                    </div>
+                    
+                    <div class="flex-1 space-y-6">
+                        <!-- Informações Pessoais -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4">Informações Pessoais</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sobrenome</label>
+                                    {{ form.last_name }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    {{ form.email }}
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Localização</label>
+                                    {{ form.location }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sobre mim</label>
+                            {{ form.bio }}
+                            <p class="text-sm text-gray-500 mt-1">Conte um pouco sobre você e seus interesses.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <a href="{% url 'users:dashboard' %}" class="px-4 py-2 border rounded text-gray-700 hover:bg-gray-50">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

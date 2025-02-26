@@ -1,9 +1,51 @@
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Métricas de Desempenho - TenisMatch{% endblock %}
+
+{% block breadcrumbs %}
+<div class="text-sm text-gray-600">
+    <a href="{% url 'users:dashboard' %}" class="hover:text-purple-600">Home</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Área do Gerente</span>
+    <span class="mx-2">/</span>
+    <a href="{% url 'tenis_admin:manager_dashboard' %}" class="hover:text-purple-600">Dashboard</a>
+    <span class="mx-2">/</span>
+    <span class="text-gray-800">Métricas de Desempenho</span>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-6 py-8">
-    <h1 class="text-3xl font-bold mb-8">Métricas de Desempenho dos Modelos</h1>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Métricas de Desempenho dos Modelos</h1>
+        <div class="space-x-4">
+            <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
 
+    <!-- Resumo Geral -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Total de Modelos</h3>
+            <p class="text-3xl font-bold">{{ total_models }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Modelos Aprovados</h3>
+            <p class="text-3xl font-bold text-green-500">{{ approved_models }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Modelos Rejeitados</h3>
+            <p class="text-3xl font-bold text-red-500">{{ rejected_models }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Em Revisão</h3>
+            <p class="text-3xl font-bold text-yellow-500">{{ in_review }}</p>
+        </div>
+    </div>
+
+    <!-- Métricas de Performance -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-2">Acurácia Média</h3>
@@ -23,9 +65,18 @@
         </div>
     </div>
 
+    <!-- Gráfico de Desempenho -->
     <div class="bg-white rounded-lg shadow p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Desempenho Diário dos Modelos</h2>
-        <canvas id="dailyMetricsChart"></canvas>
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold">Desempenho Diário dos Modelos</h2>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 text-sm rounded border" onclick="toggleMetric('accuracy')">Acurácia</button>
+                <button class="px-3 py-1 text-sm rounded border" onclick="toggleMetric('precision')">Precisão</button>
+                <button class="px-3 py-1 text-sm rounded border" onclick="toggleMetric('recall')">Recall</button>
+                <button class="px-3 py-1 text-sm rounded border" onclick="toggleMetric('f1')">F1-Score</button>
+            </div>
+        </div>
+        <canvas id="dailyMetricsChart" class="w-full" style="height: 400px;"></canvas>
     </div>
 </div>
 {% endblock %}
@@ -34,7 +85,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('dailyMetricsChart').getContext('2d');
-    new Chart(ctx, {
+    const chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: {{ daily_model_metrics.dates|safe }},
@@ -62,13 +113,44 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 1
+                    max: 1,
+                    ticks: {
+                        callback: function(value) {
+                            return (value * 100).toFixed(0) + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + (context.parsed.y * 100).toFixed(2) + '%';
+                        }
+                    }
                 }
             }
         }
     });
+
+    function toggleMetric(metric) {
+        const datasetMap = {
+            'accuracy': 0,
+            'precision': 1,
+            'recall': 2,
+            'f1': 3
+        };
+        const index = datasetMap[metric];
+        const dataset = chart.data.datasets[index];
+        dataset.hidden = !dataset.hidden;
+        chart.update();
+    }
 </script>
 {% endblock %}
