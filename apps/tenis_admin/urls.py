@@ -17,6 +17,7 @@ urlpatterns = [
     # Model Training and Management
     path('analyst/model/create/', views.ModelTrainingView.as_view(), name='model_create'),
     path('analyst/model/<int:pk>/detail/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
+    path('model/<int:model_id>/progress/', views.model_training_progress, name='model_progress'),
     
     # Manager URLs
     path('manager/dashboard/', views.ManagerDashboardView.as_view(), name='manager_dashboard'),

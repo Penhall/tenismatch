@@ -53,6 +53,27 @@ class AIModel(models.Model):
         ('rejected', 'Rejeitado')
     ])
     metrics = models.JSONField(null=True, blank=True)
+    
+    # Campos para rastreamento de progresso
+    TRAINING_STATUS_CHOICES = [
+        ('queued', 'Na Fila'),
+        ('processing', 'Processando'),
+        ('completed', 'Concluído'),
+        ('failed', 'Falhou')
+    ]
+    
+    training_status = models.CharField(
+        max_length=20, 
+        choices=TRAINING_STATUS_CHOICES,
+        default='queued'
+    )
+    training_progress = models.FloatField(default=0)  # 0-100
+    training_message = models.CharField(max_length=255, blank=True, null=True)
+    training_started_at = models.DateTimeField(null=True, blank=True)
+    training_completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.name} v{self.version}"
 
 class ColumnMapping(models.Model):
     dataset = models.OneToOneField(Dataset, on_delete=models.CASCADE, related_name='column_mapping')

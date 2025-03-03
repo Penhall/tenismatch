@@ -12,6 +12,68 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Função para atualizar o progresso de modelos em treinamento
+    function updateTrainingProgress() {
+        const progressBars = document.querySelectorAll('.training-progress-bar');
+        
+        progressBars.forEach(function(bar) {
+            const modelId = bar.dataset.modelId;
+            
+            fetch(`/tenis_admin/model/${modelId}/progress/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Atualizar barra de progresso
+                    const progressBar = document.getElementById(`progress-bar-${modelId}`);
+                    progressBar.style.width = `${data.progress}%`;
+                    progressBar.setAttribute('aria-valuenow', data.progress);
+                    
+                    // Atualizar mensagem
+                    const messageElement = document.getElementById(`progress-message-${modelId}`);
+                    messageElement.textContent = data.message;
+                    
+                    // Se o treinamento estiver concluído ou falhou, parar de verificar
+                    if (data.status === 'completed' || data.status === 'failed') {
+                        // Atualizar status na tabela sem recarregar a página
+                        const statusElement = document.getElementById(`model-status-${modelId}`);
+                        if (statusElement) {
+                            if (data.status === 'completed') {
+                                statusElement.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Em Revisão</span>';
+                            } else {
+                                statusElement.innerHTML = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Rejeitado</span>';
+                            }
+                        }
+                        
+                        // Remover a classe para não verificar novamente
+                        bar.classList.remove('training-progress-bar');
+                        
+                        // Recarregar a página após 3 segundos para atualizar os contadores
+                        setTimeout(function() {
+                            location.reload();
+                        }, 3000);
+                    }
+                })
+                .catch(error => console.error('Erro ao atualizar progresso:', error));
+        });
+        
+        // Continuar verificando a cada 2 segundos se houver barras de progresso
+        if (document.querySelectorAll('.training-progress-bar').length > 0) {
+            setTimeout(function() {
+                updateTrainingProgress();
+            }, 2000);
+        }
+    }
+    
+    // Iniciar verificação de progresso se houver modelos em treinamento
+    if (document.querySelectorAll('.training-progress-bar').length > 0) {
+        updateTrainingProgress();
+    }
+});
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-6 py-8">
     <div class="flex justify-between items-center mb-8">
@@ -144,18 +206,29 @@
                 <tr>
                     <td class="px-6 py-4">{{ model.name }}</td>
                     <td class="px-6 py-4">v{{ model.version }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if model.status == 'approved' %}bg-green-100 text-green-800
-                            {% elif model.status == 'review' %}bg-yellow-100 text-yellow-800
-                            {% elif model.status == 'rejected' %}bg-red-100 text-red-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
-                            {% if model.status == 'draft' %}Rascunho
-                            {% elif model.status == 'review' %}Em Revisão
-                            {% elif model.status == 'approved' %}Aprovado
-                            {% elif model.status == 'rejected' %}Rejeitado
-                            {% else %}{{ model.status }}{% endif %}
-                        </span>
+                    <td class="px-6 py-4" id="model-status-{{ model.id }}">
+                        {% if model.training_status == 'processing' or model.training_status == 'queued' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                Processando
+                            </span>
+                            <!-- Barra de progresso -->
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2.5 training-progress-bar" data-model-id="{{ model.id }}">
+                                <div id="progress-bar-{{ model.id }}" class="bg-blue-600 h-2.5 rounded-full" style="width: {{ model.training_progress }}%" aria-valuenow="{{ model.training_progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p id="progress-message-{{ model.id }}" class="text-xs text-gray-500 mt-1">{{ model.training_message }}</p>
+                        {% else %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if model.status == 'approved' %}bg-green-100 text-green-800
+                                {% elif model.status == 'review' %}bg-yellow-100 text-yellow-800
+                                {% elif model.status == 'rejected' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {% if model.status == 'draft' %}Rascunho
+                                {% elif model.status == 'review' %}Em Revisão
+                                {% elif model.status == 'approved' %}Aprovado
+                                {% elif model.status == 'rejected' %}Rejeitado
+                                {% else %}{{ model.status }}{% endif %}
+                            </span>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4">{{ model.dataset.name }}</td>
                     <td class="px-6 py-4">{{ model.created_at|date:"d/m/Y" }}</td>

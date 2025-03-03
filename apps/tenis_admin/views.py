@@ -3,12 +3,14 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404, render
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 import pandas as pd
 from io import StringIO
 import logging
 import os
+import time
+import threading
 from django.core.files.base import ContentFile
 from .services.dataset_service import DatasetService
 from .services.metrics_service import MetricsService
@@ -28,6 +30,90 @@ from .services import (
 from apps.matching.ml.dataset import DatasetPreparation
 
 logger = logging.getLogger(__name__)
+
+# Função para treinamento assíncrono
+def train_model_async(model_id, dataset_id):
+    """Função para treinar modelo em uma thread separada"""
+    def _train_task():
+        try:
+            model = AIModel.objects.get(id=model_id)
+            model.training_status = 'processing'
+            model.training_started_at = timezone.now()
+            model.training_message = 'Iniciando treinamento...'
+            model.save()
+            
+            # Etapa 1: Carregando dados (0-20%)
+            model.training_progress = 10
+            model.training_message = 'Carregando dataset...'
+            model.save()
+            time.sleep(1)  # Simulação de processamento
+            
+            # Etapa 2: Preparando dados (20-40%)
+            model.training_progress = 30
+            model.training_message = 'Preparando dados para treinamento...'
+            model.save()
+            time.sleep(1)
+            
+            # Etapa 3: Treinando modelo (40-80%)
+            model.training_progress = 50
+            model.training_message = 'Treinando modelo...'
+            model.save()
+            
+            # Aqui chamamos o treinamento real
+            success, result = ModelTrainingService.train_model(model_id, dataset_id)
+            
+            # Etapa 4: Finalizando (80-100%)
+            if success:
+                model.training_progress = 100
+                model.training_status = 'completed'
+                model.training_message = 'Treinamento concluído com sucesso!'
+                model.status = 'review'  # Status original do modelo
+                if isinstance(result, dict):
+                    model.metrics = result
+            else:
+                model.training_progress = 100
+                model.training_status = 'failed'
+                model.training_message = f'Falha no treinamento: {result}'
+                model.status = 'rejected'
+            
+            model.training_completed_at = timezone.now()
+            model.save()
+            
+        except Exception as e:
+            logger.error(f"Erro no treinamento assíncrono: {str(e)}")
+            try:
+                model = AIModel.objects.get(id=model_id)
+                model.training_status = 'failed'
+                model.training_message = f'Erro: {str(e)}'
+                model.training_completed_at = timezone.now()
+                model.status = 'rejected'
+                model.save()
+            except:
+                pass
+    
+    # Inicia a thread
+    thread = threading.Thread(target=_train_task)
+    thread.daemon = True
+    thread.start()
+    return True
+
+# Endpoint para verificar o progresso do treinamento
+def model_training_progress(request, model_id):
+    """Endpoint para verificar o progresso do treinamento"""
+    try:
+        model = AIModel.objects.get(id=model_id)
+        data = {
+            'id': model.id,
+            'name': model.name,
+            'status': model.training_status,
+            'progress': model.training_progress,
+            'message': model.training_message,
+            'started_at': model.training_started_at,
+            'completed_at': model.training_completed_at
+        }
+        return JsonResponse(data)
+    except AIModel.DoesNotExist:
+        return JsonResponse({'error': 'Modelo não encontrado'}, status=404)
 
 # Mixins
 class AnalystRequiredMixin(UserPassesTestMixin):
@@ -269,29 +355,22 @@ class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
             messages.error(self.request, 'O dataset selecionado não é válido ou não existe.')
             return self.form_invalid(form)
         
+        # Configurar campos de treinamento
+        form.instance.training_status = 'queued'
+        form.instance.training_progress = 0
+        form.instance.training_message = 'Aguardando início do treinamento...'
+        
         # Salvar o modelo
         response = super().form_valid(form)
         
-        try:
-            # Processa o modelo somente após a criação do dataset
-            logger.info(f"Iniciando treinamento do modelo {self.object.id} com o dataset {dataset.id}")
-            success, message = ModelTrainingService.train_model(self.object.id, dataset.id)
-            
-            if success:
-                messages.success(self.request, 'Modelo treinado com sucesso e enviado para revisão!')
-                logger.info(f"Modelo {self.object.id} treinado com sucesso")
-            else:
-                logger.error(f"Falha ao treinar modelo {self.object.id}: {message}")
-                messages.error(self.request, f'Erro ao treinar o modelo: {message}')
-                # Não excluir o modelo, apenas marcar como falha
-                self.object.status = 'rejected'
-                self.object.save()
-        except Exception as e:
-            logger.error(f'Erro no treinamento do modelo {self.object.id}: {str(e)}')
-            messages.error(self.request, f'Erro ao treinar o modelo: {str(e)}')
-            # Não excluir o modelo, apenas marcar como falha
-            self.object.status = 'rejected'
-            self.object.save()
+        # Iniciar treinamento assíncrono
+        train_model_async(self.object.id, dataset.id)
+        
+        # Mensagem para o usuário
+        messages.success(
+            self.request, 
+            'Modelo criado com sucesso! O treinamento foi iniciado e você pode acompanhar o progresso no dashboard.'
+        )
         
         return response
 

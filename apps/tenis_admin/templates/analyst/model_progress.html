@@ -1,0 +1,38 @@
+{% extends "base_with_sidebar.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Progresso do Treinamento: {{ model.name }}</h2>
+    
+    <div class="progress mb-3" style="height: 30px;">
+        <div class="progress-bar progress-bar-striped bg-success" 
+             role="progressbar" 
+             style="width: {{ model.training_progress }}%"
+             aria-valuenow="{{ model.training_progress }}" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+            {{ model.training_progress|floatformat:"0" }}%
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Detalhes do Modelo</h5>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <strong>Status:</strong> 
+                    {% if model.training_progress == 100 %}
+                        <span class="text-success">Treinamento Completo</span>
+                    {% else %}
+                        <span class="text-warning">Em Progresso</span>
+                    {% endif %}
+                </li>
+                <li class="list-group-item">
+                    <strong>Última Atualização:</strong> 
+                    {{ model.updated_at|date:"d/m/Y H:i" }}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
