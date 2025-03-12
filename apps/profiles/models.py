@@ -1,56 +1,80 @@
-# /tenismatch/apps/profiles/models.py 
 from django.db import models
-from apps.users.models import User
+from django.conf import settings
+from django.utils import timezone
+from django.forms.models import model_to_dict
 
-class Profile(models.Model):
-    BRAND_CHOICES = [
-        ('Nike', 'Nike'),
-        ('Adidas', 'Adidas'),
-        ('Puma', 'Puma'),
-        ('Asics', 'Asics'),
-    ]
+class UserProfile(models.Model):
+    USER_TYPES = (
+        ('athlete', 'Atleta'),
+        ('analyst', 'Analista de Moda'),
+        ('enthusiast', 'Entusiasta de Tênis'),
+        ('admin', 'Administrador')
+    )
     
-    STYLE_CHOICES = [
-        ('Corrida', 'Corrida'),
-        ('Casual', 'Casual'),
-        ('Tênis', 'Tênis'),
-        ('Basquete', 'Basquete'),
-    ]
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='profile'
+    )
+    user_type = models.CharField(
+        max_length=20,
+        choices=USER_TYPES,
+        default='athlete'
+    )
+    bio = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
     
-    COLOR_CHOICES = [
-        ('Branco', 'Branco'),
-        ('Azul', 'Azul'),
-        ('Preto', 'Preto'),
-        ('Vermelho', 'Vermelho'),
-    ]
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(max_length=500, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    age_min = models.IntegerField(default=18)
-    age_max = models.IntegerField(default=50)
-    location_preference = models.CharField(max_length=100, blank=True)
-    preferred_brands = models.CharField(max_length=100, choices=BRAND_CHOICES, blank=True)
-    preferred_styles = models.CharField(max_length=100, choices=STYLE_CHOICES, blank=True)
-    preferred_colors = models.CharField(max_length=100, choices=COLOR_CHOICES, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+    # Preferências de estilo
+    shoe_size = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        blank=True,
+        null=True
+    )
+    preferred_brands = models.JSONField(default=list)
+    style_preferences = models.JSONField(
+        default=dict,
+        help_text="Preferências de estilo e personalização"
+    )
+    
+    # Dados profissionais (para analistas)
+    fashion_specialization = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    experience_years = models.IntegerField(default=0)
+    
+    # Metadados técnicos
+    profile_version = models.PositiveIntegerField(default=1)
+    last_updated = models.DateTimeField(auto_now=True)
+    historical_data = models.JSONField(
+        default=list,
+        help_text="Histórico de alterações do perfil"
+    )
+    
+    # Sistema de compatibilidade
+    compatibility_scores = models.JSONField(
+        default=dict,
+        help_text="Scores de compatibilidade com outros usuários"
+    )
+    
+    class Meta:
+        verbose_name = "Perfil Consolidado"
+        verbose_name_plural = "Perfis Consolidados"
+        indexes = [
+            models.Index(fields=['user_type']),
+            models.Index(fields=['shoe_size']),
+        ]
+    
     def __str__(self):
-        return f"{self.user.username}'s profile"
-
-    def calculate_tennis_compatibility(self, tennis_profile):
-        """Calcula a compatibilidade com base nas preferências de tênis"""
-        score = 0
-        
-        if self.preferred_brands and tennis_profile['tenis_marca'] == self.preferred_brands:
-            score += 1
-            
-        if self.preferred_styles and tennis_profile['tenis_estilo'] == self.preferred_styles:
-            score += 1
-            
-        if self.preferred_colors and tennis_profile['tenis_cores'] == self.preferred_colors:
-            score += 1
-            
-        return score / 3  # Retorna um valor entre 0 e 1
+        return f"Perfil de {self.user.username} ({self.user_type})"
+    
+    def save(self, *args, **kwargs):
+        if self.pk:
+            current_profile = UserProfile.objects.get(pk=self.pk)
+            self.historical_data.append({
+                'timestamp': timezone.now().isoformat(),
+                'data': model_to_dict(current_profile)
+            })
+        super().save(*args, **kwargs)

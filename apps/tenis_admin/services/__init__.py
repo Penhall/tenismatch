@@ -1,4 +1,4 @@
-from .data_processor import DataProcessor
+from .data_processor import DataProcessorService as DataProcessor
 from .dataset_service import DatasetService
 from .model_training_service import ModelTrainingService
 from .model_deployment_service import ModelDeploymentService

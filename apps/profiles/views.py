@@ -3,18 +3,18 @@ from django.views.generic import UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Profile
+from .models import UserProfile
 from .forms import ProfileForm, TennisPreferencesForm
 from apps.matching.models import Match  # Importe o model Match
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
-    model = Profile
+    model = UserProfile
     form_class = ProfileForm
     template_name = 'profiles/edit.html'
     success_url = reverse_lazy('profiles:detail')
 
     def get_object(self):
-        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
         return profile
 
     def form_valid(self, form):
@@ -22,7 +22,7 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 class ProfileDetailView(LoginRequiredMixin, DetailView):
-    model = Profile
+    model = UserProfile
     template_name = 'profiles/detail.html'
     context_object_name = 'profile'
 
@@ -30,7 +30,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         return self.request.user.profile
 
 class PreferencesView(LoginRequiredMixin, UpdateView):
-    model = Profile
+    model = UserProfile
     template_name = 'profiles/preferences.html'
     form_class = TennisPreferencesForm
     success_url = reverse_lazy('profiles:detail')
@@ -49,6 +49,7 @@ class PreferencesView(LoginRequiredMixin, UpdateView):
 
 
 class DashboardView(LoginRequiredMixin, DetailView):
+    model = UserProfile
     template_name = 'profiles/dashboard.html'
     context_object_name = 'profile'
 
@@ -61,11 +62,10 @@ class DashboardView(LoginRequiredMixin, DetailView):
 
         context['matches_count'] = Match.objects.filter(user=self.request.user).count()
         context['favorite_matches_count'] = Match.objects.filter(user=self.request.user, is_favorite=True).count()
-        context['preferred_brands_count'] = profile.preferred_brands.count()
-        context['preferred_colors_count'] = profile.preferred_colors.count()
+        context['preferred_brands_count'] = len(profile.preferred_brands)
+        context['style_preferences_count'] = len(profile.style_preferences)
         
         context['latest_matches'] = Match.objects.filter(user=self.request.user).order_by('-matched_at')[:5]
         context['favorite_matches'] = Match.objects.filter(user=self.request.user, is_favorite=True).order_by('-matched_at')[:5]
 
         return context
-

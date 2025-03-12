@@ -31,6 +31,15 @@ from apps.matching.ml.dataset import DatasetPreparation
 
 logger = logging.getLogger(__name__)
 
+# Mixins
+class AnalystRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.role == 'ANALISTA'
+
+class ManagerRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.role == 'GERENTE'
+
 # Função para treinamento assíncrono
 def train_model_async(model_id, dataset_id):
     """Função para treinar modelo em uma thread separada"""
@@ -114,15 +123,6 @@ def model_training_progress(request, model_id):
         return JsonResponse(data)
     except AIModel.DoesNotExist:
         return JsonResponse({'error': 'Modelo não encontrado'}, status=404)
-
-# Mixins
-class AnalystRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.role == 'ANALISTA'
-
-class ManagerRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.role == 'GERENTE'
 
 ###################
 # Analyst Views
@@ -405,14 +405,49 @@ class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Obter métricas gerais
         metrics_summary = MetricsService.get_metrics_summary()
         context.update(metrics_summary)
+        
+        # Adicionar modelos mais recentes para os links do sidebar
+        try:
+            context['latest_model_for_review'] = AIModel.objects.filter(
+                status='review'
+            ).latest('created_at')
+        except AIModel.DoesNotExist:
+            context['latest_model_for_review'] = None
+
+        try:
+            context['latest_approved_model'] = AIModel.objects.filter(
+                status='approved'
+            ).latest('created_at')
+        except AIModel.DoesNotExist:
+            context['latest_approved_model'] = None
+            
         return context
 
 class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, FormView):
     form_class = ModelReviewForm
     template_name = 'manager/model_review.html'
     success_url = reverse_lazy('tenis_admin:manager_dashboard')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the model instance
+        model = get_object_or_404(AIModel, pk=self.kwargs['pk'])
+        context['model'] = model
+        
+        # Get model metrics
+        model_metrics = MetricsService.get_model_metrics(model.id)
+        if model_metrics:
+            # Convert metrics to percentages for display
+            for key in ['accuracy', 'precision', 'recall', 'f1_score']:
+                if key in model_metrics:
+                    model_metrics[key] = round(model_metrics[key] * 100, 2)
+            context['metrics'] = model_metrics
+        
+        return context
 
     def form_valid(self, form):
         model_id = self.kwargs['pk']
@@ -424,16 +459,33 @@ class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, FormView):
         try:
             if decision == 'approved':
                 model.status = 'approved'
+                messages.success(self.request, 'Modelo aprovado com sucesso! O modelo está pronto para produção.')
             elif decision == 'rejected':
                 model.status = 'rejected'
+                messages.warning(self.request, 'Modelo rejeitado. Um novo treinamento será necessário.')
+            
+            # Save review notes if provided
+            if review_notes:
+                model.review_notes = review_notes
+            
+            model.reviewed_at = timezone.now()
+            model.reviewed_by = self.request.user
             model.save()
-            messages.success(self.request, f'Modelo {decision} com sucesso!')
+            
         except Exception as e:
             logger.error(f'Erro ao revisar o modelo: {str(e)}')
             messages.error(self.request, f'Erro ao revisar o modelo: {str(e)}')
-            return redirect(self.get_success_url())
+            return self.form_invalid(form)
         
         return super().form_valid(form)
+
+    def get_initial(self):
+        # Pre-populate form with existing review data if available
+        initial = super().get_initial()
+        model = get_object_or_404(AIModel, pk=self.kwargs['pk'])
+        if model.review_notes:
+            initial['review_notes'] = model.review_notes
+        return initial
 
 class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView):
     model = AIModel

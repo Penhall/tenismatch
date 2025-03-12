@@ -44,8 +44,9 @@ class AIModel(models.Model):
     version = models.CharField(max_length=20)
     description = models.TextField(null=True, blank=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_models')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=[
         ('draft', 'Rascunho'),
         ('review', 'Em Revisão'),
@@ -72,8 +73,25 @@ class AIModel(models.Model):
     training_started_at = models.DateTimeField(null=True, blank=True)
     training_completed_at = models.DateTimeField(null=True, blank=True)
 
+    # Campos para revisão
+    review_notes = models.TextField(blank=True, null=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_models'
+    )
+
     def __str__(self):
         return f"{self.name} v{self.version}"
+
+    def get_status_display(self):
+        return dict(self._meta.get_field('status').choices)[self.status]
+
+    def get_training_status_display(self):
+        return dict(self.TRAINING_STATUS_CHOICES)[self.training_status]
 
 class ColumnMapping(models.Model):
     dataset = models.OneToOneField(Dataset, on_delete=models.CASCADE, related_name='column_mapping')

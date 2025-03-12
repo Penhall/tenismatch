@@ -1,30 +1,49 @@
-# Active Context
+# Funcionalidades por Ator
 
-## Foco Atual
-- Refinamento do sistema de recomendação baseado em Machine Learning
-- Ajustes na interface do usuário para melhorar a experiência
-- Otimização do pipeline de treinamento de modelos
-- Implementação de testes automatizados para garantir estabilidade
+## 1. Usuários Comuns (Jogadores)
+- **Perfil do Jogador** (apps/profiles/models.py)
+  - Cadastro de dados pessoais
+  - Upload de avatar (media/avatars)
+  - Histórico de partidas
+- **Preferências** (templates/profiles/preferences.html)
+  - Configuração de nível de jogo
+  - Preferências de locais/tipos de quadra
+- **Matchmaking** (apps/matching/services/recommender.py)
+  - Sistema de recomendações de parceiros
+  - Visualização de matches (templates/matching/match_list.html)
+- **Dashboard** (templates/profiles/dashboard.html)
+  - Estatísticas de desempenho
+  - Agenda de partidas
 
-## Próximos Passos
-1. Finalizar os testes unitários e integração contínua
-2. Refinar a interface do dashboard para melhor experiência do usuário
-3. Expandir o sistema de recomendação para considerar novos critérios
-4. Melhorar a eficiência do processamento de datasets
+## 2. Analistas
+- **Gestão de Datasets** (apps/tenis_admin/services/dataset_service.py)
+  - Upload de datasets (media/datasets)
+  - Validação de dados
+- **Análise de Métricas** (templates/manager/metrics_dashboard.html)
+  - Monitoramento de performance de modelos
+  - Visualização de KPIs
+- **Modelos de IA** (apps/tenis_admin/services/model_catalog.py)
+  - Comparação de modelos
+  - Avaliação de métricas
 
-## Decisões Recentes
-- **PostgreSQL foi removido**, substituído por SQLite como banco de dados principal
-- **Redis e Celery foram descartados**, devido à falta de necessidade para o projeto atual
-- **Refinada a estrutura de permissões RBAC**, garantindo um controle de acesso mais granular
-- **Revisão na arquitetura da API**, garantindo maior eficiência nos endpoints
+## 3. Administradores
+- **Treinamento de Modelos** (apps/tenis_admin/model_training_service.py)
+  - Pipeline de treinamento automatizado
+  - Configuração de hiperparâmetros
+- **Deploy de Modelos** (apps/tenis_admin/services/model_deployment_service.py)
+  - Versionamento de modelos
+  - Testes A/B
+- **Monitoramento** (apps/tenis_admin/services/metrics_service.py)
+  - Logs de execução
+  - Alertas de desempenho
 
-## Considerações
-- Melhorias no tempo de resposta do sistema de recomendação são prioritárias
-- Avaliação da possibilidade de integração futura com frameworks de deep learning
-- Melhor gerenciamento e estruturação dos datasets para reduzir redundâncias e melhorar a precisão do modelo
-
-## Integrações em Andamento
-- Implementação de testes unitários e integração contínua
-- Ajustes no pipeline de treinamento para melhorar eficiência
-- Refinamento das métricas de recomendação para gerar resultados mais precisos
-
+## 4. Sistema (Processos Automatizados)
+- **Processamento de Dados** (apps/matching/services/data_processor.py)
+  - Limpeza de datasets
+  - Feature engineering
+- **Recomendações** (apps/matching/ml/training.py)
+  - Geração de embeddings
+  - Cálculo de similaridade
+- **Matchmaking** (apps/matching/views.py)
+  - Algoritmo de pairing
+  - Notificações automáticas
