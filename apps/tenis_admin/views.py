@@ -17,14 +17,14 @@ from .services.metrics_service import MetricsService
 
 from .models import AIModel, Dataset, ColumnMapping
 from .forms import (
-    DatasetUploadForm, 
-    ModelTrainingForm, 
-    ModelReviewForm, 
+    DatasetUploadForm,
+    ModelTrainingForm,
+    ModelReviewForm,
     GenerateDataForm,
     DatasetMappingForm
 )
 from .services import (
-    ModelTrainingService, 
+    ModelTrainingService,
     ModelDeploymentService
 )
 from apps.matching.ml.dataset import DatasetPreparation
@@ -40,481 +40,290 @@ class ManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.role == 'GERENTE'
 
-# Função para treinamento assíncrono
-def train_model_async(model_id, dataset_id):
-    """Função para treinar modelo em uma thread separada"""
-    def _train_task():
-        try:
-            model = AIModel.objects.get(id=model_id)
-            model.training_status = 'processing'
-            model.training_started_at = timezone.now()
-            model.training_message = 'Iniciando treinamento...'
-            model.save()
-            
-            # Etapa 1: Carregando dados (0-20%)
-            model.training_progress = 10
-            model.training_message = 'Carregando dataset...'
-            model.save()
-            time.sleep(1)  # Simulação de processamento
-            
-            # Etapa 2: Preparando dados (20-40%)
-            model.training_progress = 30
-            model.training_message = 'Preparando dados para treinamento...'
-            model.save()
-            time.sleep(1)
-            
-            # Etapa 3: Treinando modelo (40-80%)
-            model.training_progress = 50
-            model.training_message = 'Treinando modelo...'
-            model.save()
-            
-            # Aqui chamamos o treinamento real
-            success, result = ModelTrainingService.train_model(model_id, dataset_id)
-            
-            # Etapa 4: Finalizando (80-100%)
-            if success:
-                model.training_progress = 100
-                model.training_status = 'completed'
-                model.training_message = 'Treinamento concluído com sucesso!'
-                model.status = 'review'  # Status original do modelo
-                if isinstance(result, dict):
-                    model.metrics = result
-            else:
-                model.training_progress = 100
-                model.training_status = 'failed'
-                model.training_message = f'Falha no treinamento: {result}'
-                model.status = 'rejected'
-            
-            model.training_completed_at = timezone.now()
-            model.save()
-            
-        except Exception as e:
-            logger.error(f"Erro no treinamento assíncrono: {str(e)}")
-            try:
-                model = AIModel.objects.get(id=model_id)
-                model.training_status = 'failed'
-                model.training_message = f'Erro: {str(e)}'
-                model.training_completed_at = timezone.now()
-                model.status = 'rejected'
-                model.save()
-            except:
-                pass
-    
-    # Inicia a thread
-    thread = threading.Thread(target=_train_task)
-    thread.daemon = True
-    thread.start()
-    return True
-
-# Endpoint para verificar o progresso do treinamento
-def model_training_progress(request, model_id):
-    """Endpoint para verificar o progresso do treinamento"""
-    try:
-        model = AIModel.objects.get(id=model_id)
-        data = {
-            'id': model.id,
-            'name': model.name,
-            'status': model.training_status,
-            'progress': model.training_progress,
-            'message': model.training_message,
-            'started_at': model.training_started_at,
-            'completed_at': model.training_completed_at
-        }
-        return JsonResponse(data)
-    except AIModel.DoesNotExist:
-        return JsonResponse({'error': 'Modelo não encontrado'}, status=404)
-
-###################
-# Analyst Views
-###################
-
-class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, ListView):
-    model = AIModel
+# Dashboard Views
+class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, TemplateView):
     template_name = 'analyst/dashboard.html'
-    context_object_name = 'models'
-
-    def get_queryset(self):
-        return AIModel.objects.filter(created_by=self.request.user)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Obter todos os datasets do usuário
-        datasets = Dataset.objects.filter(uploaded_by=self.request.user)
-        
-        # Verificar quais datasets têm arquivos válidos
-        valid_datasets = []
-        invalid_datasets = []
-        
-        for dataset in datasets:
-            try:
-                if dataset.file and os.path.exists(dataset.file.path):
-                    valid_datasets.append(dataset)
-                else:
-                    invalid_datasets.append(dataset)
-                    logger.warning(f"Dataset {dataset.id} ({dataset.name}) tem arquivo inválido ou inexistente: {dataset.file}")
-            except Exception as e:
-                invalid_datasets.append(dataset)
-                logger.error(f"Erro ao verificar arquivo do dataset {dataset.id} ({dataset.name}): {str(e)}")
-        
-        # Registrar quantos datasets foram considerados inválidos
-        if invalid_datasets:
-            logger.warning(f"{len(invalid_datasets)} datasets com arquivos inválidos foram encontrados")
-        
-        context['datasets'] = valid_datasets
-        context['invalid_datasets_count'] = len(invalid_datasets)
-        
-        # Adiciona contagens de modelos por status
-        context['models_in_review'] = AIModel.objects.filter(created_by=self.request.user, status='review').count()
-        context['approved_models'] = AIModel.objects.filter(created_by=self.request.user, status='approved').count()
-        context['rejected_models'] = AIModel.objects.filter(created_by=self.request.user, status='rejected').count()
-        context['total_models'] = AIModel.objects.filter(created_by=self.request.user).count()
+        try:
+            # Forçar sincronização de datasets ao carregar o dashboard
+            DatasetService.sync_datasets()
+            
+            # Buscar todos os datasets
+            datasets = Dataset.objects.filter(uploaded_by=self.request.user).order_by('-uploaded_at')
+            
+            # Buscar todos os modelos
+            models = AIModel.objects.filter(created_by=self.request.user).order_by('-created_at')
+            
+            # Adicionar ao contexto
+            context['datasets'] = datasets
+            context['models'] = models
+            
+            # Estatísticas para o dashboard
+            context.update({
+                'total_datasets': datasets.count(),
+                'ready_datasets': datasets.filter(status='ready').count(),
+                'mapping_datasets': datasets.filter(status='mapping').count(),
+                'total_models': models.count(),
+                'review_models': models.filter(status='review').count(),
+                'approved_models': models.filter(status='approved').count()
+            })
+            
+            # Debug info
+            logger.info(f"Usuário: {self.request.user.username}, Datasets: {datasets.count()}, Modelos: {models.count()}")
+            for dataset in datasets:
+                logger.info(f"Dataset: {dataset.id}, {dataset.name}, Status: {dataset.status}")
+            
+        except Exception as e:
+            logger.error(f"Erro ao carregar dashboard: {str(e)}")
+            messages.error(self.request, f"Erro ao carregar dados: {str(e)}")
         
         return context
 
 class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = Dataset
     form_class = DatasetUploadForm
-    template_name = 'analyst/data_upload.html'
+    template_name = 'analyst/data_upload.html'  # Note: usando data_upload.html em vez de dataset_upload.html
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
 
     def form_valid(self, form):
-        # Salva o nome do dataset antes de processar o arquivo
-        dataset_name = form.cleaned_data.get('name')
         form.instance.uploaded_by = self.request.user
-        form.instance.name = dataset_name
-        form.instance.status = 'ready'  # Inicia como ready para testes
-        
-        response = super().form_valid(form)
-        
-        try:
-            # Renomeia o arquivo para o nome escolhido pelo analista
-            original_path = self.object.file.path
-            original_name, original_ext = os.path.splitext(os.path.basename(original_path))
-            new_filename = f"{dataset_name}{original_ext}"
-            new_path = os.path.join(os.path.dirname(original_path), new_filename)
-            
-            os.rename(original_path, new_path)
-            self.object.file.name = os.path.join(os.path.dirname(self.object.file.name), new_filename)
-            
-            # Atualiza o status e salva
-            self.object.status = 'ready'
-            self.object.save()
-            
-            # Verifica se o arquivo foi salvo corretamente
-            if not self.object.file or not os.path.exists(new_path):
-                raise FileNotFoundError('Arquivo não encontrado após upload')
-                
-            messages.success(self.request, 'Dataset enviado com sucesso!')
-                
-        except Exception as e:
-            logger.error(f'Erro no upload do dataset: {str(e)}')
-            messages.error(self.request, f'Erro ao validar o dataset: {str(e)}')
-            self.object.delete()
-            return redirect(self.get_success_url())
-        
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        new_datasets = DatasetService.sync_datasets(self.request.user)
-        if new_datasets > 0:
-            messages.info(self.request, f'{new_datasets} novos datasets encontrados.')
-        context['datasets'] = Dataset.objects.filter(
-            uploaded_by=self.request.user
-        ).order_by('-uploaded_at')
-        return context
-
-class GenerateDataView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
-    form_class = GenerateDataForm
-    template_name = 'analyst/generate_data.html'
-    success_url = reverse_lazy('tenis_admin:analyst_dashboard')
-
-    def form_valid(self, form):
-        n_samples = form.cleaned_data.get('n_samples')
-        include_labels = form.cleaned_data.get('include_labels')
-        
-        try:
-            # Implementar lógica para gerar dados sintéticos
-            generated_data = self.generate_synthetic_data(n_samples, include_labels)
-            
-            # Salvar o dataset gerado
-            dataset = Dataset.objects.create(
-                name=f"synthetic_dataset_{timezone.now().strftime('%Y%m%d%H%M%S')}",
-                description="Dataset sintético gerado automaticamente.",
-                uploaded_by=self.request.user,
-                file_size=len(generated_data),  # Ajustado para refletir tamanho correto
-                file_type='csv',
-                is_processed=True
-            )
-            
-            # Salvar o arquivo gerado
-            dataset.file.save(f"{dataset.name}.csv", ContentFile(generated_data))
-            
-            messages.success(self.request, 'Dataset sintético gerado e salvo com sucesso!')
-        except Exception as e:
-            logger.error(f'Erro ao gerar dataset sintético: {str(e)}')
-            messages.error(self.request, f'Erro ao gerar dataset sintético: {str(e)}')
-            return redirect(self.get_success_url())
-        
+        messages.success(self.request, 'Dataset carregado com sucesso!')
         return super().form_valid(form)
 
-    def generate_synthetic_data(self, n_samples, include_labels):
-        # Simulação de geração de dados
-        data = {
-            'tenis_marca': [f"Marca_{i}" for i in range(n_samples)],
-            'tenis_estilo': [f"Estilo_{i%5}" for i in range(n_samples)],
-            'tenis_cores': [f"Cor_{i%3}" for i in range(n_samples)],
-            'tenis_preco': [round(50 + i * 1.5, 2) for i in range(n_samples)]
-        }
-        if include_labels:
-            data['label'] = [1 if i % 2 == 0 else 0 for i in range(n_samples)]
-        
-        df = pd.DataFrame(data)
-        csv_buffer = StringIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_file = csv_buffer.getvalue().encode('utf-8')
-        return csv_file
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
+# Dataset Preview View
 class DatasetPreviewView(LoginRequiredMixin, AnalystRequiredMixin, DetailView):
     model = Dataset
     template_name = 'analyst/dataset_preview.html'
     context_object_name = 'dataset'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            dataset = self.get_object()
+            df = pd.read_csv(dataset.file.path)
+            context['preview_data'] = df.head(10).to_html(classes='table table-striped', index=False)
+        except Exception as e:
+            logger.error(f"Erro ao visualizar dataset: {str(e)}")
+            messages.error(self.request, f'Erro ao carregar dataset: {str(e)}')
+        return context
+
+# Dataset Mapping View
 class DatasetMappingView(LoginRequiredMixin, AnalystRequiredMixin, UpdateView):
-    model = ColumnMapping
+    model = Dataset
     form_class = DatasetMappingForm
     template_name = 'analyst/dataset_mapping.html'
+    context_object_name = 'dataset'
+    
+    def get_success_url(self):
+        return reverse_lazy('tenis_admin:analyst_dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            dataset = self.get_object()
+            df = pd.read_csv(dataset.file.path)
+            context['columns'] = df.columns.tolist()
+            context['preview_data'] = df.head(5).to_html(classes='table table-striped', index=False)
+        except Exception as e:
+            logger.error(f"Erro ao carregar colunas do dataset: {str(e)}")
+            messages.error(self.request, f'Erro ao carregar dataset: {str(e)}')
+        return context
+    
+    def form_valid(self, form):
+        try:
+            # Salvar o mapeamento de colunas
+            mapping_data = form.cleaned_data.get('column_mapping', {})
+            dataset = self.get_object()
+            
+            # Criar ou atualizar o objeto ColumnMapping
+            column_mapping, created = ColumnMapping.objects.get_or_create(
+                dataset=dataset,
+                defaults={'mapping': mapping_data}
+            )
+            
+            if not created:
+                column_mapping.mapping = mapping_data
+                column_mapping.save()
+            
+            # Atualizar status do dataset
+            dataset.status = 'ready'
+            dataset.save()
+            
+            messages.success(self.request, 'Mapeamento de colunas salvo com sucesso!')
+            return super().form_valid(form)
+        except Exception as e:
+            logger.error(f"Erro ao salvar mapeamento: {str(e)}")
+            messages.error(self.request, f'Erro ao salvar mapeamento: {str(e)}')
+            return self.form_invalid(form)
+
+class GenerateDataView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
+    template_name = 'analyst/generate_data.html'
+    form_class = GenerateDataForm
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
 
-    def get_object(self, queryset=None):
-        dataset = get_object_or_404(Dataset, pk=self.kwargs['pk'])
-        mapping, created = ColumnMapping.objects.get_or_create(dataset=dataset)
-        return mapping
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        dataset = get_object_or_404(Dataset, pk=self.kwargs['pk'])
-        df = pd.read_csv(dataset.file.path)
-        kwargs['columns'] = df.columns.tolist()
-        return kwargs
+    def form_valid(self, form):
+        try:
+            synthetic_data = form.generate_synthetic_data()
+            dataset = Dataset.objects.create(
+                name=f"Synthetic Dataset {timezone.now().strftime('%Y%m%d%H%M%S')}",
+                file=ContentFile(
+                    synthetic_data.to_csv(index=False),
+                    name=f"synthetic_{timezone.now().strftime('%Y%m%d%H%M%S')}.csv"
+                ),
+                description="Dataset gerado automaticamente",
+                uploaded_by=self.request.user,
+                file_type='csv'
+            )
+            messages.success(self.request, 'Dataset sintético gerado com sucesso!')
+            return redirect(self.get_success_url())
+        except Exception as e:
+            logger.error(f"Erro na geração de dados: {str(e)}", exc_info=True)
+            messages.error(self.request, f'Erro ao gerar dados: {str(e)}')
+            return self.form_invalid(form)
 
 class ModelTrainingView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = AIModel
     form_class = ModelTrainingForm
-    template_name = 'analyst/model_creation.html'
+    template_name = 'analyst/model_training.html'
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        
-        # Sincroniza datasets antes de exibir o form
-        try:
-            new_datasets = DatasetService.sync_datasets(self.request.user)
-            if new_datasets > 0:
-                messages.info(self.request, f'{new_datasets} novos datasets encontrados.')
-        except Exception as e:
-            logger.error(f"Erro ao sincronizar datasets: {str(e)}")
-            messages.warning(self.request, f"Erro ao sincronizar datasets: {str(e)}")
-        
-        # Atualiza queryset do campo dataset
-        try:
-            datasets = Dataset.objects.filter(status='ready')
-            # Verificar quais datasets têm arquivos válidos
-            valid_datasets_ids = []
-            for dataset in datasets:
-                try:
-                    if dataset.file and os.path.exists(dataset.file.path):
-                        valid_datasets_ids.append(dataset.id)
-                except Exception as e:
-                    logger.error(f"Erro ao verificar arquivo do dataset {dataset.id}: {str(e)}")
-            
-            # Filtrar apenas datasets válidos
-            form.fields['dataset'].queryset = Dataset.objects.filter(id__in=valid_datasets_ids).order_by('-uploaded_at')
-            
-            # Verificar se há datasets disponíveis
-            if not form.fields['dataset'].queryset.exists():
-                messages.warning(self.request, 'Não há datasets válidos disponíveis para treinamento. Por favor, faça upload de um dataset primeiro.')
-        except Exception as e:
-            logger.error(f"Erro ao atualizar queryset de datasets: {str(e)}")
-            messages.error(self.request, f"Erro ao carregar datasets: {str(e)}")
-        
-        return form
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        form.instance.status = 'draft'  # Iniciar como rascunho
-        
-        # Verificar se o dataset existe e é válido
-        dataset = form.cleaned_data.get('dataset')
-        if not dataset or not dataset.file or not os.path.exists(dataset.file.path):
-            messages.error(self.request, 'O dataset selecionado não é válido ou não existe.')
+        try:
+            form.instance.created_by = self.request.user
+            form.instance.status = 'draft'
+            response = super().form_valid(form)
+            
+            # Iniciar treinamento do modelo
+            success, message = ModelTrainingService.train_model(
+                self.object.id, 
+                form.cleaned_data.get('dataset').id
+            )
+            
+            if success:
+                messages.success(self.request, 'Modelo criado e treinado com sucesso!')
+                self.object.status = 'review'
+                self.object.save()
+            else:
+                messages.error(self.request, f'Erro no treinamento: {message}')
+                
+            return response
+        except Exception as e:
+            logger.error(f"Erro no treinamento do modelo: {str(e)}")
+            messages.error(self.request, 'Erro no treinamento do modelo')
             return self.form_invalid(form)
-        
-        # Configurar campos de treinamento
-        form.instance.training_status = 'queued'
-        form.instance.training_progress = 0
-        form.instance.training_message = 'Aguardando início do treinamento...'
-        
-        # Salvar o modelo
-        response = super().form_valid(form)
-        
-        # Iniciar treinamento assíncrono
-        train_model_async(self.object.id, dataset.id)
-        
-        # Mensagem para o usuário
-        messages.success(
-            self.request, 
-            'Modelo criado com sucesso! O treinamento foi iniciado e você pode acompanhar o progresso no dashboard.'
-        )
-        
-        return response
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['models'] = AIModel.objects.filter(
-            created_by=self.request.user
-        ).order_by('-created_at')
-        
-        # Adicionar informações sobre datasets disponíveis
-        datasets = Dataset.objects.filter(uploaded_by=self.request.user)
-        valid_datasets = []
-        for dataset in datasets:
-            try:
-                if dataset.file and os.path.exists(dataset.file.path):
-                    valid_datasets.append(dataset)
-            except Exception as e:
-                logger.error(f"Erro ao verificar arquivo do dataset {dataset.id}: {str(e)}")
-        
-        context['available_datasets'] = valid_datasets
-        context['datasets_count'] = len(valid_datasets)
-        
-        return context
 
 class ModelTrainingDetailView(LoginRequiredMixin, AnalystRequiredMixin, DetailView):
     model = AIModel
     template_name = 'analyst/model_detail.html'
     context_object_name = 'model'
-
-class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateView):
-    template_name = 'manager/dashboard.html'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Obter métricas gerais
-        metrics_summary = MetricsService.get_metrics_summary()
-        context.update(metrics_summary)
-        
-        # Adicionar modelos mais recentes para os links do sidebar
-        try:
-            context['latest_model_for_review'] = AIModel.objects.filter(
-                status='review'
-            ).latest('created_at')
-        except AIModel.DoesNotExist:
-            context['latest_model_for_review'] = None
-
-        try:
-            context['latest_approved_model'] = AIModel.objects.filter(
-                status='approved'
-            ).latest('created_at')
-        except AIModel.DoesNotExist:
-            context['latest_approved_model'] = None
-            
+        model = self.get_object()
+        context['metrics'] = model.metrics or {}
         return context
 
-class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, FormView):
+def model_training_progress(request, model_id):
+    try:
+        model = get_object_or_404(AIModel, id=model_id)
+        # Simulação de progresso de treinamento
+        progress = {
+            'status': model.status,
+            'progress': 100 if model.status in ['review', 'approved'] else 50,
+            'message': 'Treinamento concluído' if model.status in ['review', 'approved'] else 'Treinamento em andamento'
+        }
+        return JsonResponse(progress)
+    except Exception as e:
+        logger.error(f"Erro ao obter progresso: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=400)
+
+# Manager Views
+class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
+    model = AIModel
+    template_name = 'manager/dashboard.html'
+    context_object_name = 'models'
+    
+    def get_queryset(self):
+        return AIModel.objects.filter(status='review').order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'total_models': AIModel.objects.count(),
+            'approved_models': AIModel.objects.filter(status='approved').count(),
+            'review_models': AIModel.objects.filter(status='review').count(),
+            'recent_approvals': AIModel.objects.filter(status='approved').order_by('-created_at')[:5]
+        })
+        return context
+
+class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
+    model = AIModel
     form_class = ModelReviewForm
     template_name = 'manager/model_review.html'
-    success_url = reverse_lazy('tenis_admin:manager_dashboard')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Get the model instance
-        model = get_object_or_404(AIModel, pk=self.kwargs['pk'])
-        context['model'] = model
-        
-        # Get model metrics
-        model_metrics = MetricsService.get_model_metrics(model.id)
-        if model_metrics:
-            # Convert metrics to percentages for display
-            for key in ['accuracy', 'precision', 'recall', 'f1_score']:
-                if key in model_metrics:
-                    model_metrics[key] = round(model_metrics[key] * 100, 2)
-            context['metrics'] = model_metrics
-        
-        return context
-
+    context_object_name = 'model'
+    
+    def get_success_url(self):
+        return reverse_lazy('tenis_admin:manager_dashboard')
+    
     def form_valid(self, form):
-        model_id = self.kwargs['pk']
-        decision = form.cleaned_data.get('decision')
-        review_notes = form.cleaned_data.get('review_notes')
-        
-        model = get_object_or_404(AIModel, pk=model_id)
-        
         try:
-            if decision == 'approved':
+            action = form.cleaned_data.get('action')
+            model = self.get_object()
+            
+            if action == 'approve':
                 model.status = 'approved'
-                messages.success(self.request, 'Modelo aprovado com sucesso! O modelo está pronto para produção.')
-            elif decision == 'rejected':
+                messages.success(self.request, 'Modelo aprovado com sucesso!')
+            elif action == 'reject':
                 model.status = 'rejected'
-                messages.warning(self.request, 'Modelo rejeitado. Um novo treinamento será necessário.')
+                messages.success(self.request, 'Modelo rejeitado!')
             
-            # Save review notes if provided
-            if review_notes:
-                model.review_notes = review_notes
-            
-            model.reviewed_at = timezone.now()
-            model.reviewed_by = self.request.user
             model.save()
-            
+            return super().form_valid(form)
         except Exception as e:
-            logger.error(f'Erro ao revisar o modelo: {str(e)}')
-            messages.error(self.request, f'Erro ao revisar o modelo: {str(e)}')
+            logger.error(f"Erro na revisão do modelo: {str(e)}")
+            messages.error(self.request, f'Erro na revisão: {str(e)}')
             return self.form_invalid(form)
-        
-        return super().form_valid(form)
-
-    def get_initial(self):
-        # Pre-populate form with existing review data if available
-        initial = super().get_initial()
-        model = get_object_or_404(AIModel, pk=self.kwargs['pk'])
-        if model.review_notes:
-            initial['review_notes'] = model.review_notes
-        return initial
 
 class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView):
     model = AIModel
     template_name = 'manager/model_performance.html'
     context_object_name = 'model'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        model_metrics = MetricsService.get_model_metrics(self.object.id)
-        if model_metrics:
-            context['metrics'] = model_metrics
+        model = self.get_object()
+        context['metrics'] = model.metrics or {}
+        
+        # Adicionar métricas detalhadas e gráficos
+        try:
+            detailed_metrics = MetricsService.get_detailed_metrics(model.id)
+            context['detailed_metrics'] = detailed_metrics
+        except Exception as e:
+            logger.error(f"Erro ao obter métricas detalhadas: {str(e)}")
+            messages.error(self.request, 'Erro ao carregar métricas detalhadas')
+        
         return context
 
 class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateView):
     template_name = 'manager/metrics_dashboard.html'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Obter métricas médias
-        model_metrics = MetricsService.calculate_average_metrics()
-        context['model_metrics'] = model_metrics
-        
-        # Obter métricas diárias
-        daily_metrics = MetricsService.get_daily_metrics()
-        context['daily_model_metrics'] = daily_metrics
-        
-        # Adicionar métricas gerais
-        metrics_summary = MetricsService.get_metrics_summary()
-        context.update(metrics_summary)
+        try:
+            # Obter métricas gerais do sistema
+            system_metrics = MetricsService.get_system_metrics()
+            context['system_metrics'] = system_metrics
+            
+            # Obter modelos de melhor desempenho
+            context['top_models'] = AIModel.objects.filter(
+                status='approved'
+            ).order_by('-metrics__accuracy')[:5]
+            
+        except Exception as e:
+            logger.error(f"Erro ao carregar dashboard de métricas: {str(e)}")
+            messages.error(self.request, 'Erro ao carregar métricas do sistema')
         
         return context

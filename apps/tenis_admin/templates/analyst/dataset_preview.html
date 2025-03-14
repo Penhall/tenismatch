@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold">Preview do Dataset - {{ dataset.name }}</h1>
+            <div class="space-x-2">
+                <a href="{% url 'tenis_admin:dataset_mapping' dataset.id %}" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                    Mapear Colunas
+                </a>
+                <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="px-4 py-2 border rounded">
+                    Voltar
+                </a>
+            </div>
+        </div>
+        
+        <div class="space-y-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p><span class="font-medium">Descrição:</span> {{ dataset.description|default:"Sem descrição" }}</p>
+                    <p><span class="font-medium">Carregado por:</span> {{ dataset.uploaded_by.username }}</p>
+                </div>
+                <div>
+                    <p><span class="font-medium">Carregado em:</span> {{ dataset.uploaded_at|date:"d/m/Y H:i" }}</p>
+                    <p><span class="font-medium">Status:</span> 
+                        <span class="px-2 py-1 text-sm rounded-full 
+                        {% if dataset.status == 'ready' %}bg-green-100 text-green-800
+                        {% elif dataset.status == 'processing' %}bg-yellow-100 text-yellow-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ dataset.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Primeiras Linhas</h2>
+            <div class="overflow-x-auto">
+                {{ preview_data|safe }}
+            </div>
+        </div>
+        
+        {% if dataset.status != 'ready' %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="ml-3">
+                    <p class="text-yellow-700">
+                        Este dataset ainda não está pronto para uso. Faça o mapeamento de colunas para utilizá-lo no treinamento de modelos.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
