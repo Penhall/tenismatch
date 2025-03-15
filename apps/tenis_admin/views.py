@@ -85,7 +85,7 @@ class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, TemplateVie
 class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = Dataset
     form_class = DatasetUploadForm
-    template_name = 'analyst/data_upload.html'  # Note: usando data_upload.html em vez de dataset_upload.html
+    template_name = 'analyst/dataset_upload.html'  # Note: usando data_upload.html em vez de dataset_upload.html
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
 
     def form_valid(self, form):
@@ -259,19 +259,30 @@ class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
         })
         return context
 
-class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
-    model = AIModel
+# Modificada de UpdateView para FormView para resolver o erro com ModelReviewForm
+class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, FormView):
     form_class = ModelReviewForm
     template_name = 'manager/model_review.html'
-    context_object_name = 'model'
     
     def get_success_url(self):
         return reverse_lazy('tenis_admin:manager_dashboard')
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Remover 'instance' se estiver presente (adicionado por UpdateView)
+        if 'instance' in kwargs:
+            del kwargs['instance']
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['model'] = get_object_or_404(AIModel, pk=self.kwargs['pk'])
+        return context
+    
     def form_valid(self, form):
         try:
             action = form.cleaned_data.get('action')
-            model = self.get_object()
+            model = get_object_or_404(AIModel, pk=self.kwargs['pk'])
             
             if action == 'approve':
                 model.status = 'approved'
