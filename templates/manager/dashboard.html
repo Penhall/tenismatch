@@ -1,0 +1,185 @@
+{% extends "base_with_sidebar.html" %}
+{% load tenis_admin_tags %}
+
+{% block sidebar %}
+<nav class="p-4">
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Gerenciamento</h3>
+        
+        <!-- Dashboard -->
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'manager_dashboard' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span>Dashboard Principal</span>
+        </a>
+
+        <!-- Métricas -->
+        <a href="{% url 'tenis_admin:metrics_dashboard' %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'metrics_dashboard' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span>Métricas e Analytics</span>
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Modelos IA</h3>
+        
+        <!-- Lista de Modelos para Revisão -->
+        <a href="{% url 'tenis_admin:model_review' latest_model_for_review.id|default:1 %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'model_review' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Revisar Modelos</span>
+            {% if models_in_review > 0 %}
+            <span class="ml-auto bg-red-100 text-red-600 py-1 px-2 rounded-full text-xs">
+                {{ models_in_review }}
+            </span>
+            {% endif %}
+        </a>
+
+        <!-- Performance dos Modelos -->
+        <a href="{% url 'tenis_admin:model_performance' latest_approved_model.id|default:1 %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'model_performance' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <span>Performance dos Modelos</span>
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Usuários</h3>
+        
+        <!-- Aprovação de Analistas -->
+        <a href="{% url 'users:approve_analysts' %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'approve_analysts' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span>Aprovar Analistas</span>
+        </a>
+
+        <!-- Gerenciar Usuários -->
+        <a href="{% url 'users:dashboard' %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'dashboard' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <span>Gerenciar Usuários</span>
+        </a>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Configurações</h3>
+        
+        <!-- Configurações do Sistema -->
+        <a href="{% url 'users:profile' %}" 
+           class="flex items-center py-2 px-4 text-gray-700 hover:bg-purple-50 rounded-lg mb-2 {% if request.resolver_match.url_name == 'profile' %}bg-purple-100 text-purple-700{% endif %}">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>Configurações</span>
+        </a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Dashboard do Gerente</h1>
+    </div>
+
+    <!-- Cards de Status dos Modelos -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Total de Modelos</h3>
+            <p class="text-3xl font-bold text-gray-800">{{ total_models }}</p>
+            <p class="text-sm text-gray-500">No sistema</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Em Análise</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ in_review }}</p>
+            <p class="text-sm text-gray-500">Aguardando revisão</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Aprovados</h3>
+            <p class="text-3xl font-bold text-green-600">{{ approved_models }}</p>
+            <p class="text-sm text-gray-500">Em produção</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Rejeitados</h3>
+            <p class="text-3xl font-bold text-red-600">{{ rejected_models }}</p>
+            <p class="text-sm text-gray-500">Não aprovados</p>
+        </div>
+    </div>
+
+    <!-- Métricas de Performance -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Performance Média dos Modelos</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h4 class="text-md font-medium mb-2">Acurácia</h4>
+                    <p class="text-2xl font-bold text-indigo-600">{{ avg_metrics.avg_accuracy|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Precisão</h4>
+                    <p class="text-2xl font-bold text-indigo-600">{{ avg_metrics.avg_precision|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Recall</h4>
+                    <p class="text-2xl font-bold text-indigo-600">{{ avg_metrics.avg_recall|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">F1-Score</h4>
+                    <p class="text-2xl font-bold text-indigo-600">{{ avg_metrics.avg_f1_score|default:0|floatformat:2 }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links Rápidos -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Ações Rápidas</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="{% url 'tenis_admin:metrics_dashboard' %}" 
+                   class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold text-purple-700">Métricas Detalhadas</h4>
+                        <p class="text-sm text-purple-600">Visualizar análise completa de performance</p>
+                    </div>
+                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                
+                <a href="{% url 'users:approve_analysts' %}" 
+                   class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                    <div class="flex-1">
+                        <h4 class="text-lg font-semibold text-green-700">Aprovar Analistas</h4>
+                        <p class="text-sm text-green-600">Gerenciar solicitações de acesso</p>
+                    </div>
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

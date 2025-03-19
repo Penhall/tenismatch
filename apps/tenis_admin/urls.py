@@ -24,4 +24,9 @@ urlpatterns = [
     path('manager/model/<int:pk>/review/', views.ModelReviewView.as_view(), name='model_review'),
     path('manager/model/<int:pk>/performance/', views.ModelPerformanceView.as_view(), name='model_performance'),
     path('manager/metrics/', views.MetricsDashboardView.as_view(), name='metrics_dashboard'),
+    path('manager/approvals/', views.ApprovalsView.as_view(), name='approvals'),
+    
+    # Model Approval Routes (para o gerente)
+    path('manager/model/<int:model_id>/approve/', views.approve_model, name='model_approve'),
+    path('manager/model/<int:model_id>/reject/', views.reject_model, name='model_reject'),
 ]

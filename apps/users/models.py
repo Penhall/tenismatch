@@ -45,4 +45,4 @@ class User(AbstractUser):
             logger.info(f"User updated: {self.username}, role: {self.role}, is_approved: {self.is_approved}")
 
     class Meta:
-        db_table = 'users'
+        db_table = 'auth_user'

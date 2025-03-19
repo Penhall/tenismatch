@@ -1,0 +1,142 @@
+{% extends "base_with_sidebar.html" %}
+{% load tenis_admin_tags %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold">Revisão do Modelo</h1>
+            <p class="text-gray-600">{{ model.name }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                Aguardando Revisão
+            </span>
+            <span class="text-gray-500">Criado em {{ model.created_at|date:"d/m/Y" }}</span>
+        </div>
+    </div>
+
+    <!-- Métricas de Performance -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Métricas de Performance</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h4 class="text-md font-medium mb-2">Acurácia</h4>
+                    <p class="text-2xl font-bold text-indigo-600">{{ metrics.accuracy|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Precisão</h4>
+                    <p class="text-2xl font-bold text-blue-600">{{ metrics.precision|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Recall</h4>
+                    <p class="text-2xl font-bold text-green-600">{{ metrics.recall|default:0|floatformat:2 }}%</p>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">F1-Score</h4>
+                    <p class="text-2xl font-bold text-purple-600">{{ metrics.f1_score|default:0|floatformat:2 }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do Modelo -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Informações do Modelo</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-medium mb-2">Detalhes Gerais</h4>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Analista:</span> {{ model.created_by.username }}</p>
+                        <p><span class="text-gray-600">Dataset:</span> {{ model.dataset.name }}</p>
+                        <p><span class="text-gray-600">Treinamento concluído em:</span> {{ model.training_completed_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Status do Treinamento</h4>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Duração:</span> 
+                            {{ model.training_completed_at|timeuntil:model.training_started_at }}
+                        </p>
+                        <p><span class="text-gray-600">Mensagem:</span> {{ model.training_message }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Revisão -->
+    <form method="post" class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        {% csrf_token %}
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Decisão de Revisão</h3>
+        </div>
+        <div class="p-6">
+            {% if form.non_field_errors %}
+            <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="space-y-6">
+                <!-- Decisão -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Decisão
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="relative flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="decision" value="approved" class="h-4 w-4 text-purple-600" required>
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">Aprovar</span>
+                                <span class="block text-sm text-gray-500">Colocar modelo em produção</span>
+                            </span>
+                        </label>
+                        <label class="relative flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="decision" value="rejected" class="h-4 w-4 text-purple-600" required>
+                            <span class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">Rejeitar</span>
+                                <span class="block text-sm text-gray-500">Solicitar novo treinamento</span>
+                            </span>
+                        </label>
+                    </div>
+                    {% if form.decision.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.decision.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label for="review_notes" class="block text-sm font-medium text-gray-700 mb-2">
+                        Observações
+                    </label>
+                    <textarea id="review_notes" name="review_notes" rows="4"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                        placeholder="Adicione observações sobre sua decisão..."></textarea>
+                    {% if form.review_notes.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.review_notes.errors }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 border-t">
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'tenis_admin:manager_dashboard' %}" 
+                   class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    Enviar Revisão
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock content %}

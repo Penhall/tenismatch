@@ -18,6 +18,32 @@ O projeto utiliza Django 5.0 como framework web principal. Outras dependências 
 *   `pandas`, `numpy`, `scikit-learn`: Bibliotecas de machine learning, reforçando a suspeita de uso de ML no aplicativo `matching`.
 *   `python-decouple`: Outra biblioteca para gestão de configurações, similar ao `django-environ`.
 *   `pillow`: Para processamento de imagens, o que pode ser relevante para funcionalidades relacionadas a tênis, como upload de fotos.
+*   `psycopg2-binary`: Driver PostgreSQL para Python
+*   `dj-database-url`: Para configuração de banco de dados via URL
+
+# Configuração do PostgreSQL
+
+## Pré-requisitos
+
+1. Instale o PostgreSQL em seu sistema
+2. Crie um banco de dados chamado `tenismatch`
+3. Crie um usuário com permissões no banco
+
+## Configuração do Ambiente
+
+1. Adicione as seguintes variáveis ao arquivo `.env`:
+
+```bash
+# Configurações do PostgreSQL
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=tenismatch
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
+DB_HOST=localhost
+DB_PORT=5432
+```
+
+2. A URL de conexão será gerada automaticamente com base nessas variáveis
 
 # Estrutura do Projeto
 
@@ -74,10 +100,17 @@ pip install -r requirements.txt
 
 4. Configure as variáveis de ambiente:
 Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
-```
+```bash
 DEBUG=True
 SECRET_KEY=sua_chave_secreta
-DATABASE_URL=sqlite:///db.sqlite3
+
+# Configurações do PostgreSQL
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=tenismatch
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
 5. Execute as migrações:

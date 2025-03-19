@@ -1,11 +1,26 @@
-from django.test import TestCase, Client
+from django.test import TransactionTestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from .models import AIModel, Dataset, ModelMetrics
 from .services import ModelTrainingService, ModelDeploymentService
 import json
+import tempfile
+import os
 
-class IntegrationTests(TestCase):
+class IntegrationTests(TransactionTestCase):
+    databases = '__all__'  # Usa todos os bancos de dados configurados
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Verificar conexão com PostgreSQL
+        from django.db import connections
+        connection = connections['default']
+        cursor = connection.cursor()
+        cursor.execute("SELECT version();")
+        version = cursor.fetchone()
+        print(f"Conectado ao PostgreSQL: {version[0]}")
+    
     def setUp(self):
         # Criar grupos e usuários
         self.analyst_group = Group.objects.create(name='Analyst')
@@ -18,16 +33,23 @@ class IntegrationTests(TestCase):
         self.manager.groups.add(self.manager_group)
         
         self.client = Client()
+        
+        # Criar arquivo temporário para testes
+        self.temp_file = tempfile.NamedTemporaryFile(suffix='.csv', delete=False)
+        self.temp_file.write(b'col1,col2\n1,2\n3,4')
+        self.temp_file.close()
+
+    def tearDown(self):
+        # Limpar arquivo temporário
+        if hasattr(self, 'temp_file') and os.path.exists(self.temp_file.name):
+            os.unlink(self.temp_file.name)
 
     def test_complete_workflow(self):
         # 1. Login como analista
         self.client.login(username='analyst', password='password')
         
         # 2. Upload de dataset
-        with open('test_data.csv', 'w') as f:
-            f.write('col1,col2\n1,2\n3,4')
-        
-        with open('test_data.csv', 'rb') as f:
+        with open(self.temp_file.name, 'rb') as f:
             response = self.client.post(reverse('admin:dataset_upload'), {
                 'name': 'Test Dataset',
                 'description': 'Test Description',

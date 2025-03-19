@@ -1,0 +1,113 @@
+<!-- # /tenismatch/apps/tenis_admin/templates/manager/metrics.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <h1 class="text-3xl font-bold mb-8">Métricas do Sistema</h1>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Total de Modelos</h3>
+            <p class="text-3xl font-bold">{{ total_models }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Taxa de Aprovação</h3>
+            <p class="text-3xl font-bold text-green-600">{{ approval_rate }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Precisão Média</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ avg_precision }}%</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Tempo Médio Review</h3>
+            <p class="text-3xl font-bold">{{ avg_review_time }}h</p>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Evolução da Precisão</h3>
+            <canvas id="accuracyChart" height="300"></canvas>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-4">Modelos por Status</h3>
+            <canvas id="statusChart" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabela de Modelos -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold">Histórico de Modelos</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Analista</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precisão</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Criado em</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for model in models %}
+                    <tr>
+                        <td class="px-6 py-4">{{ model.name }} v{{ model.version }}</td>
+                        <td class="px-6 py-4">{{ model.created_by.get_full_name }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                {% if model.status == 'approved' %}bg-green-100 text-green-800
+                                {% elif model.status == 'review' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ model.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">{{ model.metrics.precision|default:"-" }}%</td>
+                        <td class="px-6 py-4">{{ model.created_at|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Evolução da Precisão
+    new Chart(document.getElementById('accuracyChart'), {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+            datasets: [{
+                label: 'Precisão',
+                data: {{ accuracy_data|safe }},
+                borderColor: 'rgb(59, 130, 246)',
+                tension: 0.1
+            }]
+        }
+    });
+
+    // Gráfico de Status
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Aprovados', 'Em Revisão', 'Rejeitados'],
+            datasets: [{
+                data: {{ status_data|safe }},
+                backgroundColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(234, 179, 8)',
+                    'rgb(239, 68, 68)'
+                ]
+            }]
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

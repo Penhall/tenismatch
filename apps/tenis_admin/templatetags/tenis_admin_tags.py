@@ -1,12 +1,26 @@
 # /tenismatch/apps/tenis_admin/templatetags/tenis_admin_tags.py
 from django import template
+from django.template.defaultfilters import stringfilter
 
 register = template.Library()
 
 @register.filter
+@stringfilter
+def replace(value, arg):
+    """
+    Substitui uma string por outra no valor.
+    Uso: {{ value|replace:"original:new" }}
+    """
+    if len(arg.split(':')) != 2:
+        return value
+    
+    original, new = arg.split(':')
+    return value.replace(original, new)
+
+@register.filter
 def get_item(dictionary, key):
     """
-    Template filter para acessar valores de dicionário por chave
+    Obtém um item de um dicionário pelo nome da chave.
     Uso: {{ dictionary|get_item:key }}
     """
     if dictionary is None:
@@ -14,18 +28,11 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 @register.filter
-def replace(value, arg):
+def percentage(value):
     """
-    Template filter para substituir texto
-    Uso: {{ value|replace:"_:" }} - substitui _ por espaço
-    Uso: {{ value|replace:"_:!" }} - substitui _ por !
+    Formata um valor como percentual.
+    Uso: {{ value|percentage }}
     """
     if value is None:
-        return None
-    
-    try:
-        old, new = arg.split(":")
-        return value.replace(old, new)
-    except ValueError:
-        # Se não houver delimitador, substitui pelo espaço
-        return value.replace(arg, " ")
+        return "0%"
+    return f"{float(value):.1f}%"

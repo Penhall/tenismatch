@@ -1,50 +1,45 @@
-# System Patterns
+# Padrões do Sistema
 
-## Arquitetura Geral
-- **Django** como framework principal
-- Aplicações modulares (**apps/**) organizadas por responsabilidade:
-  - **Core** (configurações principais)
-  - **Matching** (sistema de recomendações com Machine Learning)
-  - **Profiles** (gestão de perfis e preferências)
-  - **Admin** (painel de administração e dashboards analíticos)
-  - **Users** (autenticação, permissões e controle de acesso RBAC)
+## Padrões de Banco de Dados
 
-## Fluxo de Chamadas do Sistema
-```mermaid
-graph TD
-    %% Módulos principais
-    Users -->|Autenticação| Auth
-    Users -->|Gerenciamento| Profiles
-    Profiles -->|Preferências| Matching
-    Matching -->|Recomendações| ML_Engine
-    ML_Engine -->|Treinamento| DatasetProcessor
-    DatasetProcessor -->|Pré-processamento| Storage
+### Estrutura de Conexão
 
-    %% Chamadas administrativas
-    Admin -->|Aprovação de modelos| ML_Engine
-    Admin -->|Gerenciamento de datasets| DatasetProcessor
+- **Singleton Connection Pool**: Uma única conexão persistente com o banco de dados PostgreSQL
+- **Connection Factory**: Padrão factory para criação de conexões
+- **Repository Pattern**: Isolamento da lógica de acesso ao banco de dados
 
-    %% Legenda
-    classDef core fill:#f96,stroke:#333,stroke-width:4px;
-    classDef internal fill:#9cf,stroke:#333,stroke-width:4px;
-    class Users,Profiles,Matching,Admin,ML_Engine,DatasetProcessor,Storage internal;
-```
+### Migrações
 
-## Padrões de Design
-- **Service Layer (services/)**
-  - **DataProcessor**: tratamento e limpeza de datasets
-  - **Recommender**: lógica de recomendação baseada em padrões de calçados
-  - **TrainingService**: pipeline de treinamento e ajuste do modelo de IA
-- **Model-View-Template (MVT)** para estruturação do Django
-- **Repository Pattern** para acesso desacoplado aos dados
-- **Observer Pattern** via signals para ações automatizadas
+- **Versioned Migrations**: Migrações versionadas e sequenciais
+- **Atomic Transactions**: Todas as migrações são executadas atomicamente
+- **Rollback Strategy**: Migrações reversíveis com rollback automático
 
-## Fluxos Principais
-1. **Coleta e processamento de dados**: extração de preferências e análise de padrões
-2. **Treinamento de modelos de IA**: aprendizado supervisionado para ajustes na recomendação
-3. **Geração de recomendações personalizadas**: sugestões baseadas em comportamento e preferências
-4. **Interação e feedback do usuário**: ajustes automáticos no modelo com base nas respostas
-5. **Aprimoramento contínuo do sistema**: ajustes dinâmicos e otimização do algoritmo de recomendação
+### Backup e Restauração
 
-O sistema é projetado para **evoluir continuamente com os dados coletados**, garantindo **melhores recomendações e experiências mais personalizadas para os usuários**.
+- **Daily Backups**: Backup diário automático
+- **Point-in-Time Recovery**: Capacidade de restaurar para qualquer ponto no tempo
+- **Encrypted Backups**: Backups criptografados com AES-256
 
+## Padrões de Segurança
+
+- **Connection Encryption**: Conexões SSL/TLS com o PostgreSQL
+- **Credential Rotation**: Rotação automática de credenciais
+- **Row-Level Security**: Controle de acesso em nível de linha
+
+## Padrões de Desempenho
+
+- **Connection Pooling**: Pool de conexões para melhor desempenho
+- **Query Optimization**: Uso de índices e otimização de queries
+- **Caching**: Cache de queries frequentes
+
+## Padrões de Monitoramento
+
+- **Query Logging**: Log de todas as queries executadas
+- **Performance Metrics**: Coleta de métricas de desempenho
+- **Alerting System**: Sistema de alertas para problemas no banco
+
+## Padrões de Testes
+
+- **Isolated Test Databases**: Banco de dados isolado para testes
+- **Fixture Loading**: Carregamento de fixtures para testes
+- **Transaction Rollback**: Rollback automático após cada teste

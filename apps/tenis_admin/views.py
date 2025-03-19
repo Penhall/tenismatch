@@ -1,3 +1,4 @@
+# /tenismatch/apps/tenis_admin/views.py
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, View, FormView, TemplateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -251,12 +252,22 @@ class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({
-            'total_models': AIModel.objects.count(),
-            'approved_models': AIModel.objects.filter(status='approved').count(),
-            'review_models': AIModel.objects.filter(status='review').count(),
-            'recent_approvals': AIModel.objects.filter(status='approved').order_by('-created_at')[:5]
-        })
+        
+        # Estatísticas básicas
+        context['total_models'] = AIModel.objects.count()
+        context['in_review'] = AIModel.objects.filter(status='review').count()
+        context['approved_models'] = AIModel.objects.filter(status='approved').count()
+        context['rejected_models'] = AIModel.objects.filter(status='rejected').count()
+        
+        # Métricas médias dos modelos - utilizando a função do MetricsService
+        metrics = MetricsService.calculate_average_metrics()
+        context['avg_metrics'] = metrics
+        
+        # Modelos recentes para links no sidebar
+        context['latest_model_for_review'] = AIModel.objects.filter(status='review').order_by('-created_at').first()
+        context['latest_approved_model'] = AIModel.objects.filter(status='approved').order_by('-created_at').first()
+        context['models_in_review'] = AIModel.objects.filter(status='review').count()
+        
         return context
 
 class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
@@ -267,6 +278,20 @@ class ModelReviewView(LoginRequiredMixin, ManagerRequiredMixin, UpdateView):
     
     def get_success_url(self):
         return reverse_lazy('tenis_admin:manager_dashboard')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model = self.get_object()
+        
+        # Adiciona métricas
+        context['metrics'] = model.metrics or {}
+        
+        # Adiciona models recentes para sidebar
+        context['latest_model_for_review'] = AIModel.objects.filter(status='review').order_by('-created_at').first()
+        context['latest_approved_model'] = AIModel.objects.filter(status='approved').order_by('-created_at').first()
+        context['models_in_review'] = AIModel.objects.filter(status='review').count()
+        
+        return context
     
     def form_valid(self, form):
         try:
@@ -295,15 +320,14 @@ class ModelPerformanceView(LoginRequiredMixin, ManagerRequiredMixin, DetailView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         model = self.get_object()
+        
+        # Adiciona métricas
         context['metrics'] = model.metrics or {}
         
-        # Adicionar métricas detalhadas e gráficos
-        try:
-            detailed_metrics = MetricsService.get_detailed_metrics(model.id)
-            context['detailed_metrics'] = detailed_metrics
-        except Exception as e:
-            logger.error(f"Erro ao obter métricas detalhadas: {str(e)}")
-            messages.error(self.request, 'Erro ao carregar métricas detalhadas')
+        # Adiciona models recentes para sidebar
+        context['latest_model_for_review'] = AIModel.objects.filter(status='review').order_by('-created_at').first()
+        context['latest_approved_model'] = AIModel.objects.filter(status='approved').order_by('-created_at').first()
+        context['models_in_review'] = AIModel.objects.filter(status='review').count()
         
         return context
 
@@ -312,18 +336,46 @@ class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            # Obter métricas gerais do sistema
-            system_metrics = MetricsService.get_system_metrics()
-            context['system_metrics'] = system_metrics
-            
-            # Obter modelos de melhor desempenho
-            context['top_models'] = AIModel.objects.filter(
-                status='approved'
-            ).order_by('-metrics__accuracy')[:5]
-            
-        except Exception as e:
-            logger.error(f"Erro ao carregar dashboard de métricas: {str(e)}")
-            messages.error(self.request, 'Erro ao carregar métricas do sistema')
+        
+        # Estatísticas básicas do sistema - usar o método existente
+        metrics_summary = MetricsService.get_metrics_summary()
+        context.update(metrics_summary)
+        
+        # Dados para os gráficos (métricas diárias)
+        daily_metrics = MetricsService.get_daily_metrics()
+        context['daily_model_metrics'] = daily_metrics
+        
+        # Adicionar modelos recentes para links no sidebar
+        context['latest_model_for_review'] = AIModel.objects.filter(status='review').order_by('-created_at').first()
+        context['latest_approved_model'] = AIModel.objects.filter(status='approved').order_by('-created_at').first()
+        context['models_in_review'] = AIModel.objects.filter(status='review').count()
         
         return context
+
+# Adicionando a view de Approvals que faltava
+class ApprovalsView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
+    model = AIModel
+    template_name = 'manager/approvals.html'
+    context_object_name = 'pending_models'
+    
+    def get_queryset(self):
+        return AIModel.objects.filter(status='review').order_by('-created_at')
+
+# Funções auxiliares para aprovação/rejeição de modelos
+def approve_model(request, model_id):
+    model = get_object_or_404(AIModel, id=model_id)
+    if request.method == 'POST':
+        review_notes = request.POST.get('review_notes', '')
+        model.status = 'approved'
+        model.save()
+        messages.success(request, f'Modelo {model.name} aprovado com sucesso!')
+    return redirect('tenis_admin:manager_dashboard')
+
+def reject_model(request, model_id):
+    model = get_object_or_404(AIModel, id=model_id)
+    if request.method == 'POST':
+        review_notes = request.POST.get('review_notes', '')
+        model.status = 'rejected'
+        model.save()
+        messages.success(request, f'Modelo {model.name} rejeitado.')
+    return redirect('tenis_admin:manager_dashboard')

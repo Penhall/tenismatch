@@ -1,0 +1,127 @@
+{% extends "base_with_sidebar.html" %}
+{% load tenis_admin_tags %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold">Performance do Modelo</h1>
+            <p class="text-gray-600">{{ model.name }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="px-3 py-1 rounded-full text-sm 
+                {% if model.status == 'approved' %}bg-green-100 text-green-800
+                {% elif model.status == 'review' %}bg-blue-100 text-blue-800
+                {% else %}bg-red-100 text-red-800{% endif %}">
+                {{ model.get_status_display }}
+            </span>
+            <span class="text-gray-500">Criado em {{ model.created_at|date:"d/m/Y" }}</span>
+        </div>
+    </div>
+
+    <!-- Métricas Principais -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Acurácia</h3>
+            <p class="text-3xl font-bold text-indigo-600">{{ metrics.accuracy|default:0|floatformat:2 }}%</p>
+            <p class="text-sm text-gray-500">Precisão geral do modelo</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Precisão</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ metrics.precision|default:0|floatformat:2 }}%</p>
+            <p class="text-sm text-gray-500">Taxa de verdadeiros positivos</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">Recall</h3>
+            <p class="text-3xl font-bold text-green-600">{{ metrics.recall|default:0|floatformat:2 }}%</p>
+            <p class="text-sm text-gray-500">Sensibilidade do modelo</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-2">F1-Score</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ metrics.f1_score|default:0|floatformat:2 }}%</p>
+            <p class="text-sm text-gray-500">Média harmônica</p>
+        </div>
+    </div>
+
+    <!-- Detalhes do Modelo -->
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Detalhes do Modelo</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-md font-medium mb-2">Informações Gerais</h4>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Criado por:</span> {{ model.created_by.username }}</p>
+                        <p><span class="text-gray-600">Dataset:</span> {{ model.dataset.name }}</p>
+                        <p><span class="text-gray-600">Última atualização:</span> {{ model.updated_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-md font-medium mb-2">Status do Treinamento</h4>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Início:</span> {{ model.training_started_at|date:"d/m/Y H:i" }}</p>
+                        <p><span class="text-gray-600">Conclusão:</span> {{ model.training_completed_at|date:"d/m/Y H:i" }}</p>
+                        <p><span class="text-gray-600">Status:</span> 
+                            <span class="px-2 py-1 rounded text-sm 
+                                {% if model.training_status == 'completed' %}bg-green-100 text-green-800
+                                {% elif model.training_status == 'processing' %}bg-blue-100 text-blue-800
+                                {% elif model.training_status == 'failed' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ model.get_training_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matriz de Confusão -->
+    {% if metrics.confusion_matrix %}
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-semibold">Matriz de Confusão</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                <div class="bg-green-100 p-4 rounded text-center">
+                    <p class="text-sm text-gray-600">Verdadeiros Positivos</p>
+                    <p class="text-2xl font-bold text-green-700">{{ metrics.confusion_matrix.tp|default:0 }}</p>
+                </div>
+                <div class="bg-red-100 p-4 rounded text-center">
+                    <p class="text-sm text-gray-600">Falsos Positivos</p>
+                    <p class="text-2xl font-bold text-red-700">{{ metrics.confusion_matrix.fp|default:0 }}</p>
+                </div>
+                <div class="bg-red-100 p-4 rounded text-center">
+                    <p class="text-sm text-gray-600">Falsos Negativos</p>
+                    <p class="text-2xl font-bold text-red-700">{{ metrics.confusion_matrix.fn|default:0 }}</p>
+                </div>
+                <div class="bg-green-100 p-4 rounded text-center">
+                    <p class="text-sm text-gray-600">Verdadeiros Negativos</p>
+                    <p class="text-2xl font-bold text-green-700">{{ metrics.confusion_matrix.tn|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ações -->
+    <div class="flex justify-end space-x-4">
+        {% if model.status == 'review' %}
+        <a href="{% url 'tenis_admin:model_review' model.id %}" 
+           class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+            Revisar Modelo
+        </a>
+        {% endif %}
+        <a href="{% url 'tenis_admin:manager_dashboard' %}" 
+           class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+            Voltar ao Dashboard
+        </a>
+    </div>
+</div>
+{% endblock content %}
