@@ -42,57 +42,92 @@ class MetricsService:
             
         return avg_metrics
 
-    @staticmethod
-    def get_daily_metrics(days=30):
-        """
-        Retorna métricas diárias dos últimos X dias.
-        """
-        end_date = timezone.now()
-        start_date = end_date - timedelta(days=days)
-        
-        models = AIModel.objects.filter(
-            created_at__range=(start_date, end_date),
-            status='approved'
-        ).order_by('created_at')
-        
-        dates = []
-        accuracies = []
-        precisions = []
-        recalls = []
-        f1_scores = []
-        
-        current_date = start_date
-        while current_date <= end_date:
-            day_models = [m for m in models if m.created_at.date() == current_date.date()]
-            
-            if day_models:
-                day_metrics = []
-                for model in day_models:
-                    if model.metrics:
-                        day_metrics.append({
-                            'accuracy': model.metrics.get('accuracy', 0),
-                            'precision': model.metrics.get('precision', 0),
-                            'recall': model.metrics.get('recall', 0),
-                            'f1_score': model.metrics.get('f1_score', 0)
-                        })
-                
-                if day_metrics:
-                    dates.append(current_date.strftime('%Y-%m-%d'))
-                    accuracies.append(np.mean([m['accuracy'] for m in day_metrics]))
-                    precisions.append(np.mean([m['precision'] for m in day_metrics]))
-                    recalls.append(np.mean([m['recall'] for m in day_metrics]))
-                    f1_scores.append(np.mean([m['f1_score'] for m in day_metrics]))
-            
-            current_date += timedelta(days=1)
-        
-        return {
-            'dates': dates,
-            'accuracies': accuracies,
-            'precisions': precisions,
-            'recalls': recalls,
-            'f1_scores': f1_scores
-        }
 
+@staticmethod
+def get_metrics_summary():
+    """
+    Retorna um resumo geral das métricas do sistema.
+    """
+    total_models = AIModel.objects.count()
+    approved_models = AIModel.objects.filter(status='approved').count()
+    rejected_models = AIModel.objects.filter(status='rejected').count()
+    in_review = AIModel.objects.filter(status='review').count()
+    
+    # Calcular taxas e percentuais
+    approval_rate = round((approved_models / total_models) * 100, 2) if total_models > 0 else 0
+    
+    # Obter métricas médias
+    avg_metrics = MetricsService.calculate_average_metrics()
+    
+    return {
+        'total_models': total_models,
+        'approved_models': approved_models,
+        'rejected_models': rejected_models,
+        'in_review': in_review,
+        'approval_rate': approval_rate,
+        'model_metrics': avg_metrics,
+        'daily_model_metrics': MetricsService.get_daily_metrics(30)  # Últimos 30 dias
+    }
+
+
+@staticmethod
+def get_daily_metrics(days=30):
+    """
+    Retorna métricas diárias dos últimos X dias.
+    """
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=days)
+    
+    models = AIModel.objects.filter(
+        created_at__range=(start_date, end_date),
+        status='approved'
+    ).order_by('created_at')
+    
+    # Agrupar modelos por data
+    metrics_by_date = {}
+    for model in models:
+        if model.metrics:
+            date_key = model.created_at.strftime('%Y-%m-%d')
+            if date_key not in metrics_by_date:
+                metrics_by_date[date_key] = {
+                    'count': 0,
+                    'accuracy': 0,
+                    'precision': 0,
+                    'recall': 0,
+                    'f1_score': 0
+                }
+            
+            metrics_by_date[date_key]['count'] += 1
+            metrics_by_date[date_key]['accuracy'] += model.metrics.get('accuracy', 0)
+            metrics_by_date[date_key]['precision'] += model.metrics.get('precision', 0)
+            metrics_by_date[date_key]['recall'] += model.metrics.get('recall', 0)
+            metrics_by_date[date_key]['f1_score'] += model.metrics.get('f1_score', 0)
+    
+    # Calcular médias e formatar dados
+    dates = []
+    accuracies = []
+    precisions = []
+    recalls = []
+    f1_scores = []
+    
+    for date_key, metrics in sorted(metrics_by_date.items()):
+        count = metrics['count']
+        if count > 0:
+            dates.append(date_key)
+            accuracies.append(metrics['accuracy'] / count)
+            precisions.append(metrics['precision'] / count)
+            recalls.append(metrics['recall'] / count)
+            f1_scores.append(metrics['f1_score'] / count)
+    
+    return {
+        'dates': dates,
+        'accuracies': accuracies,
+        'precisions': precisions,
+        'recalls': recalls,
+        'f1_scores': f1_scores
+    }
+    
+    
     @staticmethod
     def get_model_metrics(model_id):
         """
@@ -132,3 +167,38 @@ class MetricsService:
             'in_review': in_review,
             'avg_metrics': avg_metrics
         }
+
+# /tenismatch/apps/tenis_admin/services/metrics_service.py
+
+@staticmethod
+def get_metrics_summary():
+    """
+    Retorna um resumo geral das métricas do sistema.
+    """
+    total_models = AIModel.objects.count()
+    approved_models = AIModel.objects.filter(status='approved').count()
+    rejected_models = AIModel.objects.filter(status='rejected').count()
+    in_review = AIModel.objects.filter(status='review').count()
+    
+    # Calcular taxas e percentuais
+    approval_rate = round((approved_models / total_models) * 100, 2) if total_models > 0 else 0
+    
+    # Obter métricas médias
+    avg_metrics = MetricsService.calculate_average_metrics()
+    
+    # Dados para gráficos
+    daily_metrics = MetricsService.get_daily_metrics(30)  # Últimos 30 dias
+    
+    # Dados para tabela de modelos
+    recent_models = AIModel.objects.all().order_by('-created_at')[:10]
+    
+    return {
+        'total_models': total_models,
+        'approved_models': approved_models,
+        'rejected_models': rejected_models,
+        'in_review': in_review,
+        'approval_rate': approval_rate,
+        'model_metrics': avg_metrics,
+        'daily_model_metrics': daily_metrics,
+        'models': recent_models
+    }

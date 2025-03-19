@@ -76,7 +76,12 @@
                 <button class="px-3 py-1 text-sm rounded border" onclick="toggleMetric('f1')">F1-Score</button>
             </div>
         </div>
-        <canvas id="dailyMetricsChart" class="w-full" style="height: 400px;"></canvas>
+        <div id="chart-container" style="height: 400px;">
+            <canvas id="dailyMetricsChart" class="w-full h-full"></canvas>
+            <div id="no-data-message" class="hidden flex items-center justify-center h-full">
+                <p class="text-gray-500 text-lg">Não há dados suficientes para exibir o gráfico</p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -84,73 +89,110 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('dailyMetricsChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ daily_model_metrics.dates|safe }},
-            datasets: [{
-                label: 'Acurácia',
-                data: {{ daily_model_metrics.accuracies|safe }},
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }, {
-                label: 'Precisão',
-                data: {{ daily_model_metrics.precisions|safe }},
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
-            }, {
-                label: 'Recall',
-                data: {{ daily_model_metrics.recalls|safe }},
-                borderColor: 'rgb(255, 205, 86)',
-                tension: 0.1
-            }, {
-                label: 'F1-Score',
-                data: {{ daily_model_metrics.f1_scores|safe }},
-                borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 1,
-                    ticks: {
-                        callback: function(value) {
-                            return (value * 100).toFixed(0) + '%';
+    // Recuperar os dados do contexto
+    const dates = {{ daily_model_metrics.dates|safe|default:"[]" }};
+    const accuracies = {{ daily_model_metrics.accuracies|safe|default:"[]" }};
+    const precisions = {{ daily_model_metrics.precisions|safe|default:"[]" }};
+    const recalls = {{ daily_model_metrics.recalls|safe|default:"[]" }};
+    const f1_scores = {{ daily_model_metrics.f1_scores|safe|default:"[]" }};
+    
+    // Verificar se há dados disponíveis
+    if (dates.length > 0) {
+        document.getElementById('no-data-message').classList.add('hidden');
+        
+        const ctx = document.getElementById('dailyMetricsChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Acurácia',
+                    data: accuracies,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Precisão',
+                    data: precisions,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Recall',
+                    data: recalls,
+                    borderColor: 'rgb(255, 205, 86)',
+                    backgroundColor: 'rgba(255, 205, 86, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'F1-Score',
+                    data: f1_scores,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.0,
+                        ticks: {
+                            callback: function(value) {
+                                return (value * 100).toFixed(0) + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'top',
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': ' + (context.parsed.y * 100).toFixed(2) + '%';
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + (context.parsed.y * 100).toFixed(2) + '%';
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
 
-    function toggleMetric(metric) {
-        const datasetMap = {
-            'accuracy': 0,
-            'precision': 1,
-            'recall': 2,
-            'f1': 3
-        };
-        const index = datasetMap[metric];
-        const dataset = chart.data.datasets[index];
-        dataset.hidden = !dataset.hidden;
-        chart.update();
+        function toggleMetric(metric) {
+            const datasetMap = {
+                'accuracy': 0,
+                'precision': 1,
+                'recall': 2,
+                'f1': 3
+            };
+            const index = datasetMap[metric];
+            const dataset = chart.data.datasets[index];
+            dataset.hidden = !dataset.hidden;
+            chart.update();
+        }
+
+        // Tornar a função toggleMetric global
+        window.toggleMetric = toggleMetric;
+    } else {
+        // Mostrar mensagem quando não houver dados
+        document.getElementById('dailyMetricsChart').classList.add('hidden');
+        document.getElementById('no-data-message').classList.remove('hidden');
     }
 </script>
 {% endblock %}

@@ -56,21 +56,26 @@ class ModelTrainingForm(forms.ModelForm):
         return cleaned_data
 
 class ModelReviewForm(forms.Form):
-    DECISIONS = [
-        ('approved', 'Aprovar'),
-        ('rejected', 'Rejeitar')
+    DECISION_CHOICES = [
+        ('approve', 'Aprovar'),
+        ('reject', 'Rejeitar')
     ]
     
     decision = forms.ChoiceField(
-        choices=DECISIONS,
-        widget=forms.RadioSelect(attrs={'class': 'mr-2'})
+        choices=DECISION_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'h-4 w-4 text-purple-600'}),
+        required=True,
+        label="Decisão"
     )
+    
     review_notes = forms.CharField(
         widget=forms.Textarea(attrs={
-            'class': 'w-full border rounded-md p-2',
-            'rows': 3
+            'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500',
+            'rows': 4,
+            'placeholder': 'Adicione observações sobre sua decisão...'
         }),
-        required=True
+        required=False,
+        label="Observações"
     )
 
 class GenerateDataForm(forms.Form):

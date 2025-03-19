@@ -278,3 +278,47 @@ class ModelTrainingService:
         except Exception as e:
             logger.error(f'Erro ao implantar modelo: {str(e)}', exc_info=True)
             return False, f'Erro ao implantar modelo: {str(e)}'
+            
+
+    @staticmethod
+    def review_model(model_id, approved, review_notes=None):
+        """
+        Processa a revisão de um modelo, aprovando ou rejeitando
+        
+        Args:
+            model_id (int): ID do modelo a ser revisado
+            approved (bool): True para aprovar, False para rejeitar
+            review_notes (str, optional): Observações da revisão
+            
+        Returns:
+            Tuple[bool, str]: (sucesso, mensagem)
+        """
+        try:
+            model = AIModel.objects.get(id=model_id)
+            
+            # Verificar se o modelo está em estado de revisão
+            if model.status != 'review':
+                logger.error(f"Modelo {model_id} não está em estado de revisão. Status: {model.status}")
+                return False, f"Modelo não está em estado de revisão. Status: {model.status}"
+            
+            # Atualizar status baseado na decisão
+            model.status = 'approved' if approved else 'rejected'
+            
+            # Adicionar notas de revisão, se fornecidas
+            if review_notes:
+                if not model.metrics:
+                    model.metrics = {}
+                model.metrics['review_notes'] = review_notes
+            
+            model.save()
+            
+            logger.info(f"Modelo {model_id} {'aprovado' if approved else 'rejeitado'} com sucesso")
+            return True, "Modelo revisado com sucesso"
+            
+        except AIModel.DoesNotExist:
+            logger.error(f"Modelo {model_id} não encontrado")
+            return False, "Modelo não encontrado"
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar revisão do modelo {model_id}: {str(e)}")
+            return False, f"Erro ao processar revisão: {str(e)}"
