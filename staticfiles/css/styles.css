@@ -1,0 +1,11 @@
+.gradient-hero {
+    background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+}
+
+.testimonial-card {
+    transition: transform 0.2s;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
