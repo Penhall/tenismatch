@@ -14,7 +14,7 @@
             <span class="text-white text-xl font-bold">TenisMatch Admin</span>
         </div>
         <nav class="mt-5">
-            {% if request.user.groups.all.0.name == 'Analyst' %}
+            {% if request.user.role == 'ANALISTA' %}
             <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Dashboard</span>
             </a>
@@ -24,7 +24,7 @@
             <a href="{% url 'tenis_admin:model_training' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Treinamento</span>
             </a>
-            {% elif request.user.groups.all.0.name == 'Manager' %}
+            {% elif request.user.role == 'GERENTE' %}
             <a href="{% url 'tenis_admin:manager_dashboard' %}" class="flex items-center mt-4 py-2 px-6 text-gray-300 hover:bg-gray-700 hover:text-white">
                 <span class="mx-4">Dashboard</span>
             </a>

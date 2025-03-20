@@ -1,12 +1,16 @@
+# /tenismatch/core/settings.py
 from pathlib import Path
 from decouple import config
 
+# Configurações de diretório base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Configurações de segurança
 SECRET_KEY = config('SECRET_KEY', default='your-secret-key-here')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = []
 
+# Aplicações instaladas
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,6 +26,7 @@ INSTALLED_APPS = [
     'apps.tenis_admin.apps.TenisAdminConfig',
 ]
 
+# Middlewares
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -31,10 +36,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'apps.users.middleware.PremiumAccessMiddleware',
+    'apps.tenis_admin.middleware.PerformanceMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
 
+# Configurações de templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -53,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Configuração do PostgreSQL
+# Configuração do banco de dados
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -65,6 +72,7 @@ DATABASES = {
     }
 }
 
+# Configuração de autenticação
 AUTH_USER_MODEL = 'users.User'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -87,7 +95,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Autenticação
+# Configurações de autenticação
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'matching:match_list'
 LOGOUT_REDIRECT_URL = 'users:landing'
@@ -102,6 +110,14 @@ DATASET_STORAGE_PATH = BASE_DIR / 'datasets'
 # Configurações de Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@tenismatch.com'
+
+# Configurações de Cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-tenismatch',
+    }
+}
 
 # Configurações de Logging
 LOGGING = {
@@ -133,7 +149,27 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'INFO',
         },
+        'django.db.backends': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'apps.users': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.tenis_admin': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'apps.matching': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'tenismatch': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': False,

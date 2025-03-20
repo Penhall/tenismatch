@@ -5,9 +5,11 @@ import numpy as np
 from datetime import datetime, timedelta
 from django.utils import timezone
 from ..models import AIModel
+from ..utils import TimingUtil
 
 class MetricsService:
     @staticmethod
+    @TimingUtil.log_execution_time
     def calculate_average_metrics():
         """
         Calcula as métricas médias de todos os modelos aprovados.
@@ -44,33 +46,7 @@ class MetricsService:
 
 
 @staticmethod
-def get_metrics_summary():
-    """
-    Retorna um resumo geral das métricas do sistema.
-    """
-    total_models = AIModel.objects.count()
-    approved_models = AIModel.objects.filter(status='approved').count()
-    rejected_models = AIModel.objects.filter(status='rejected').count()
-    in_review = AIModel.objects.filter(status='review').count()
-    
-    # Calcular taxas e percentuais
-    approval_rate = round((approved_models / total_models) * 100, 2) if total_models > 0 else 0
-    
-    # Obter métricas médias
-    avg_metrics = MetricsService.calculate_average_metrics()
-    
-    return {
-        'total_models': total_models,
-        'approved_models': approved_models,
-        'rejected_models': rejected_models,
-        'in_review': in_review,
-        'approval_rate': approval_rate,
-        'model_metrics': avg_metrics,
-        'daily_model_metrics': MetricsService.get_daily_metrics(30)  # Últimos 30 dias
-    }
-
-
-@staticmethod
+@TimingUtil.log_execution_time
 def get_daily_metrics(days=30):
     """
     Retorna métricas diárias dos últimos X dias.
@@ -171,6 +147,7 @@ def get_daily_metrics(days=30):
 # /tenismatch/apps/tenis_admin/services/metrics_service.py
 
 @staticmethod
+@TimingUtil.log_execution_time
 def get_metrics_summary():
     """
     Retorna um resumo geral das métricas do sistema.
@@ -186,7 +163,7 @@ def get_metrics_summary():
     # Obter métricas médias
     avg_metrics = MetricsService.calculate_average_metrics()
     
-    # Dados para gráficos
+   
     daily_metrics = MetricsService.get_daily_metrics(30)  # Últimos 30 dias
     
     # Dados para tabela de modelos

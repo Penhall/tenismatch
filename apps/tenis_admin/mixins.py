@@ -1,19 +1,27 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import redirect
-from django.contrib import messages
+# /tenismatch/apps/tenis_admin/mixins.py
+import logging
+import time
+from django.contrib.auth.mixins import UserPassesTestMixin
 
-class AnalystRequiredMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.groups.filter(name='Analyst').exists()
-    
-    def handle_no_permission(self):
-        messages.error(self.request, 'Acesso restrito a Analistas.')
-        return redirect('users:login')
+logger = logging.getLogger('tenismatch')
 
 class ManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.groups.filter(name='Manager').exists()
-    
-    def handle_no_permission(self):
-        messages.error(self.request, 'Acesso restrito a Gerentes.')
-        return redirect('users:login')
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return False
+            
+        # Verificação direta do campo role - mais rápida e eficiente
+        return user.role == 'GERENTE'
+
+
+class AnalystRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return False
+            
+        # Verificação direta do campo role - mais rápida e eficiente
+        return user.role == 'ANALISTA'

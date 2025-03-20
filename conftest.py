@@ -8,7 +8,6 @@ import os
 import pytest
 import tempfile
 from django.conf import settings
-from django.contrib.auth.models import Group, User
 from django.test import Client
 
 # Marca todos os testes que usam o banco de dados
@@ -39,25 +38,29 @@ def django_db_setup(django_db_setup, django_db_blocker):
 @pytest.fixture
 def analyst_user():
     """Fixture que cria um usuário analista."""
-    analyst_group, _ = Group.objects.get_or_create(name='Analyst')
+    # Importar o modelo User do app users
+    from apps.users.models import User
+    
     user = User.objects.create_user(
         username='analyst_test',
         email='analyst_test@example.com',
-        password='password123'
+        password='password123',
+        role='ANALISTA'  # Usar role em vez de grupo
     )
-    user.groups.add(analyst_group)
     return user
 
 @pytest.fixture
 def manager_user():
     """Fixture que cria um usuário gerente."""
-    manager_group, _ = Group.objects.get_or_create(name='Manager')
+    # Importar o modelo User do app users
+    from apps.users.models import User
+    
     user = User.objects.create_user(
         username='manager_test',
         email='manager_test@example.com',
-        password='password123'
+        password='password123',
+        role='GERENTE'  # Usar role em vez de grupo
     )
-    user.groups.add(manager_group)
     return user
 
 @pytest.fixture

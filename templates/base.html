@@ -17,9 +17,9 @@
                 {% if user.is_authenticated %}
                 <div class="space-x-4 flex items-center">
                     <a href="{% url 'matching:match_list' %}" class="hover:text-gray-200">Matches</a>
-                    {% if user.groups.all.0.name == 'Analyst' %}
+                    {% if user.role == 'ANALISTA' %}
                         <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="bg-yellow-400 text-purple-600 px-3 py-1 rounded-full hover:bg-yellow-300">Área Reservada</a>
-                    {% elif user.groups.all.0.name == 'Manager' %}
+                    {% elif user.role == 'GERENTE' %}
                         <a href="{% url 'tenis_admin:manager_dashboard' %}" class="bg-green-400 text-purple-600 px-3 py-1 rounded-full hover:bg-green-300">Área Reservada</a>
                     {% endif %}
                     <a href="{% url 'users:profile' %}" class="hover:text-gray-200">Perfil</a>

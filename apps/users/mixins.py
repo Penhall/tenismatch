@@ -1,24 +1,36 @@
+# /tenismatch/apps/users/mixins.py
+import time
 import logging
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import redirect
+from django.contrib import messages
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('tenismatch')
 
 class RegularUserRequiredMixin(UserPassesTestMixin):
+    """
+    Mixin para verificar se o usuário é um usuário regular (não analista ou gerente)
+    """
     def test_func(self):
+        start_time = time.time()
         user = self.request.user
-        is_regular = user.is_authenticated and user.role not in ['ANALISTA', 'GERENTE']
-        logger.info(f"User {user.username} tested for regular user access: {'Passed' if is_regular else 'Failed'}")
-        return is_regular
-
+        
+        if not user.is_authenticated:
+            return False
+            
+        try:
+            # Verifica se o usuário NÃO é analista ou gerente
+            result = not (user.is_analyst() or user.is_manager())
+            
+            elapsed_time = time.time() - start_time
+            if elapsed_time > 0.1:
+                logger.warning(f"Verificação de usuário regular lenta: {elapsed_time:.4f}s para o usuário {user.username}")
+                
+            return result
+        except Exception as e:
+            logger.error(f"Erro ao verificar permissão de usuário regular: {str(e)}")
+            return False
+    
     def handle_no_permission(self):
-        user = self.request.user
-        if user.is_authenticated:
-            logger.warning(f"Authenticated user {user.username} with role {user.role} attempted to access regular user area")
-            if user.role == 'ANALISTA':
-                return redirect('tenis_admin:analyst_dashboard')
-            elif user.role == 'GERENTE':
-                return redirect('tenis_admin:manager_dashboard')
-        else:
-            logger.warning("Unauthenticated user attempted to access regular user area")
-        return redirect('users:login')
+        messages.error(self.request, "Acesso restrito a usuários regulares.")
+        return redirect('users:dashboard')

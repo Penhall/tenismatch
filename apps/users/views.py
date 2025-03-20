@@ -76,10 +76,12 @@ class ApproveAnalystsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     context_object_name = 'analysts'
     
     def test_func(self):
-        return self.request.user.groups.filter(name='Manager').exists()
+        # Usar role em vez de grupo
+        return self.request.user.role == 'GERENTE'
     
     def get_queryset(self):
-        return User.objects.filter(groups__name='Analyst', is_active=False)
+        # Usar role em vez de grupo
+        return User.objects.filter(role='ANALISTA', is_active=False)
     
     def post(self, request):
         analyst_id = request.POST.get('analyst_id')
