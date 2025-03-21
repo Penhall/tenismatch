@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import Group
-from .forms import UserCreationForm
+from .forms import CustomUserCreationForm
 from .models import User
 
 class ProfileView(LoginRequiredMixin, TemplateView):
@@ -28,7 +28,7 @@ class CustomLoginView(LoginView):
 
 class SignupView(CreateView):
     model = User
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm  # Alterado de UserCreationForm
     template_name = 'users/signup.html'
     success_url = reverse_lazy('users:login')
     
@@ -40,7 +40,7 @@ class SignupView(CreateView):
 # Adicionando as classes que estavam faltando
 class SignupPremiumView(CreateView):
     model = User
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     template_name = 'users/signup_premium.html'  # Ajustado para usar o template na raiz
     success_url = reverse_lazy('users:login')
     
