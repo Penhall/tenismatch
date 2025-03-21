@@ -7,6 +7,8 @@ import pandas as pd
 import logging
 from django.utils import timezone
 
+from ..models import AIModel
+
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -198,3 +200,67 @@ class DatasetService:
         except Exception as e:
             logger.error(f"Erro ao aplicar mapeamento para dataset {dataset_id}: {str(e)}")
             return False, f"Erro ao aplicar mapeamento: {str(e)}"
+            
+    @staticmethod
+    def delete_dataset(dataset_id, user=None):
+        """
+        Exclui um dataset do sistema, removendo tanto o registro no banco de dados
+        quanto o arquivo físico associado.
+        
+        Args:
+            dataset_id: ID do dataset a ser excluído
+            user: O usuário que está realizando a exclusão (para verificação de permissão)
+            
+        Returns:
+            Dicionário com o resultado da operação
+        """
+        try:
+            # Recuperar o dataset
+            dataset = Dataset.objects.get(id=dataset_id)
+            
+            # Verificar permissão (apenas o proprietário ou um gerente pode excluir)
+            if user and user != dataset.uploaded_by and not user.groups.filter(name='Manager').exists():
+                return {
+                    'success': False,
+                    'error': 'Você não tem permissão para excluir este dataset'
+                }
+            
+            # Pegar o caminho do arquivo
+            file_path = None
+            if dataset.file:
+                file_path = os.path.join(settings.MEDIA_ROOT, dataset.file.name)
+            
+            # Verificar se existem modelos usando este dataset
+            # Usando relação reversa em vez de atributo direto
+            if AIModel.objects.filter(dataset_id=dataset_id).exists():
+                return {
+                    'success': False,
+                    'error': 'Não é possível excluir este dataset pois ele está sendo usado por um ou mais modelos'
+                }
+                
+            # Excluir o arquivo físico (se existir)
+            if file_path and os.path.exists(file_path):
+                os.remove(file_path)
+                
+            # Armazenar o nome para a mensagem de retorno
+            dataset_name = dataset.name
+            
+            # Excluir o registro do banco de dados
+            dataset.delete()
+            
+            return {
+                'success': True,
+                'message': f'Dataset "{dataset_name}" excluído com sucesso'
+            }
+            
+        except Dataset.DoesNotExist:
+            return {
+                'success': False,
+                'error': f'Dataset com ID {dataset_id} não encontrado'
+            }
+        except Exception as e:
+            logger.error(f"Erro ao excluir dataset {dataset_id}: {str(e)}", exc_info=True)
+            return {
+                'success': False,
+                'error': f'Erro ao excluir dataset: {str(e)}'
+            }

@@ -71,6 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTrainingProgress();
     }
 });
+
+// Função para confirmação de exclusão
+function confirmDeleteDataset(datasetId, datasetName) {
+    if (confirm(`Tem certeza que deseja excluir o dataset "${datasetName}"? Esta ação não pode ser desfeita.`)) {
+        document.getElementById(`delete-form-${datasetId}`).submit();
+    }
+}
 </script>
 {% endblock %}
 
@@ -170,6 +177,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 Treinar Modelo
                             </a>
                             {% endif %}
+                            <span class="text-gray-300">|</span>
+                            <a href="#" onclick="confirmDeleteDataset({{ dataset.id }}, '{{ dataset.name }}')" class="text-red-600 hover:text-red-900">
+                                Excluir
+                            </a>
+                            <!-- Formulário oculto para submissão do delete -->
+                            <form id="delete-form-{{ dataset.id }}" action="{% url 'tenis_admin:dataset_delete' dataset.id %}" method="post" style="display: none;">
+                                {% csrf_token %}
+                            </form>
                         </div>
                     </td>
                 </tr>

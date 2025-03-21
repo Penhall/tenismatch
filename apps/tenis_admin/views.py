@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 import pandas as pd
+
+
 from io import StringIO
 import logging
 import os
@@ -16,6 +18,7 @@ import json
 from django.core.files.base import ContentFile
 from .services.dataset_service import DatasetService
 from .services.metrics_service import MetricsService
+from .services.data_generation_service import DataGenerationService
 
 from .utils import TimingUtil
 
@@ -163,28 +166,53 @@ class DatasetMappingView(LoginRequiredMixin, AnalystRequiredMixin, UpdateView):
             messages.error(self.request, f'Erro ao salvar mapeamento: {str(e)}')
             return self.form_invalid(form)
 
-class GenerateDataView(LoginRequiredMixin, AnalystRequiredMixin, FormView):
+class GenerateDataView(LoginRequiredMixin, FormView):
     template_name = 'analyst/generate_data.html'
     form_class = GenerateDataForm
-    success_url = reverse_lazy('tenis_admin:analyst_dashboard')
-
+    success_url = '/tenis_admin/analyst/dashboard/'
+    
     def form_valid(self, form):
         try:
-            synthetic_data = form.generate_synthetic_data()
-            dataset = Dataset.objects.create(
-                name=f"Synthetic Dataset {timezone.now().strftime('%Y%m%d%H%M%S')}",
-                file=ContentFile(
-                    synthetic_data.to_csv(index=False),
-                    name=f"synthetic_{timezone.now().strftime('%Y%m%d%H%M%S')}.csv"
-                ),
-                description="Dataset gerado automaticamente",
-                uploaded_by=self.request.user,
-                file_type='csv'
-            )
-            messages.success(self.request, 'Dataset sintético gerado com sucesso!')
-            return redirect(self.get_success_url())
+            n_samples = form.cleaned_data['n_samples']
+            include_labels = form.cleaned_data.get('include_labels', True)
+            
+            # Usar o serviço para gerar dados sintéticos
+            data = DataGenerationService.generate_synthetic_data(n_samples, include_labels)
+            
+            # Determinar se devemos salvar o dataset ou apenas retornar como download
+            save_dataset = form.cleaned_data.get('save_dataset', False)
+            
+            if save_dataset:
+                # Salvar o dataset no sistema
+                dataset_name = form.cleaned_data.get('dataset_name')
+                if not dataset_name:
+                    dataset_name = f"Dataset_Sintético_{n_samples}"
+                
+                result = DataGenerationService.save_synthetic_data(
+                    data, 
+                    self.request.user.id, 
+                    dataset_name
+                )
+                
+                if result['success']:
+                    messages.success(self.request, f'Dataset "{dataset_name}" com {n_samples} amostras criado com sucesso!')
+                    return redirect(self.success_url)
+                else:
+                    messages.error(self.request, f'Erro ao salvar dataset: {result["error"]}')
+                    return self.form_invalid(form)
+            else:
+                # Converter para CSV e retornar como download
+                df = pd.DataFrame(data)
+                
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="dataset_sintetico.csv"'
+                df.to_csv(response, index=False)
+                
+                messages.success(self.request, f'Dataset com {n_samples} amostras gerado com sucesso!')
+                return response
+            
         except Exception as e:
-            logger.error(f"Erro na geração de dados: {str(e)}", exc_info=True)
+            logger.error(f"Erro na geração de dados sintéticos: {str(e)}", exc_info=True)
             messages.error(self.request, f'Erro ao gerar dados: {str(e)}')
             return self.form_invalid(form)
 
@@ -648,3 +676,60 @@ def deploy_model(request, model_id):
         
     # Redirecionar de volta para o dashboard em qualquer caso
     return redirect('tenis_admin:manager_dashboard')
+    
+# Atualiza o progresso de avaliação das colunas do dataset
+class ModelProgressView(LoginRequiredMixin, View):
+    def get(self, request, model_id):
+        try:
+            model = get_object_or_404(AIModel, id=model_id)
+            
+            # Verificar permissão
+            if model.created_by != request.user and not request.user.groups.filter(name='Manager').exists():
+                return JsonResponse({'error': 'Permissão negada'}, status=403)
+            
+            # Calcular progresso baseado no status atual
+            progress = 0
+            if model.status == 'draft':
+                progress = 10
+            elif model.status == 'training':
+                progress = 50
+            elif model.status == 'review':
+                progress = 80
+            elif model.status in ['approved', 'rejected']:
+                progress = 100
+            
+            # Opcionalmente, poderia buscar do modelo se tivesse um campo de progresso
+            # progress = model.training_progress
+            
+            return JsonResponse({
+                'status': model.status,
+                'progress': progress,
+                'model_id': model_id
+            })
+            
+        except Exception as e:
+            logger.error(f"Erro ao obter progresso do modelo {model_id}: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+            
+class DatasetDeleteView(LoginRequiredMixin, View):
+    """
+    View para excluir um dataset. Esta view só aceita método POST
+    para evitar exclusões acidentais por meio de solicitações GET.
+    """
+    
+    def post(self, request, dataset_id):
+        try:
+            # Chamar o serviço para excluir o dataset
+            result = DatasetService.delete_dataset(dataset_id, request.user)
+            
+            if result['success']:
+                messages.success(request, result['message'])
+            else:
+                messages.error(request, result['error'])
+                
+        except Exception as e:
+            logger.error(f"Erro ao processar exclusão de dataset: {str(e)}", exc_info=True)
+            messages.error(request, f"Erro ao excluir dataset: {str(e)}")
+            
+        # Redirecionar de volta para a dashboard
+        return redirect('tenis_admin:analyst_dashboard')

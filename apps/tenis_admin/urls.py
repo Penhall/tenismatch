@@ -18,6 +18,7 @@ urlpatterns = [
     path('analyst/model/create/', views.ModelTrainingView.as_view(), name='model_create'),
     path('analyst/model/<int:pk>/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
     path('analyst/model/<int:model_id>/progress/', views.model_training_progress, name='model_progress'),
+    path('analyst/dataset/<int:dataset_id>/delete/',views.DatasetDeleteView.as_view(), name='dataset_delete'),
     
     # Área do Gerente
     path('manager/dashboard/', views.ManagerDashboardView.as_view(), name='manager_dashboard'),
@@ -32,4 +33,5 @@ urlpatterns = [
     
     # Endpoints de API
     path('api/model/<int:model_id>/metrics/', ModelMetricsAPIView.as_view(), name='model_metrics_api'),
+    path('model/<int:model_id>/progress/', views.ModelProgressView.as_view(), name='model_progress'),
 ]

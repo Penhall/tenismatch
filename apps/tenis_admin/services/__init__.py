@@ -23,3 +23,20 @@ from .metrics_service import MetricsService
 # Alias para compatibilidade com código existente
 # A funcionalidade de deploy foi incorporada no ModelTrainingService
 ModelDeploymentService = ModelTrainingService
+
+# Serviços de Processamento de datasets
+from .data_processor import DataProcessorService
+from .data_generation_service import DataGenerationService
+
+__all__ = [
+    'SneakerMatchTraining',
+    'ModelTrainingService',
+    'ModelDeploymentService',
+    'AutoTrainingService',
+    'MetricsService',
+    'DatasetService',
+    'DataGenerationService',
+    'DatasetMappingService',
+    'ModelCatalog',
+    'ModelSelector',
+]

@@ -81,9 +81,9 @@ class ModelReviewForm(forms.Form):
 class GenerateDataForm(forms.Form):
     n_samples = forms.IntegerField(
         label='Número de Amostras',
-        min_value=100,
+        min_value=10,
         max_value=10000,
-        initial=1000,
+        initial=100,
         widget=forms.NumberInput(attrs={'class': 'w-full border rounded-md p-2'}),
         help_text='Quantidade de dados sintéticos a serem gerados'
     )
@@ -95,7 +95,24 @@ class GenerateDataForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'mr-2'}),
         help_text='Incluir labels para treinamento supervisionado'
     )
-
+    
+    save_dataset = forms.BooleanField(
+        label='Salvar Dataset',
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'class': 'mr-2'}),
+        help_text='Salvar o dataset no sistema para uso posterior'
+    )
+    
+    dataset_name = forms.CharField(
+        label='Nome do Dataset',
+        required=False,
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
+        help_text='Nome do dataset (opcional, apenas se salvar)'
+    )
+    
+    
 class DatasetMappingForm(forms.ModelForm):
     """
     Formulário para mapeamento de colunas do dataset.
