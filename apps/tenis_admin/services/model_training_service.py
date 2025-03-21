@@ -6,6 +6,7 @@ import numpy as np
 import joblib
 import threading
 import time
+import re
 from typing import Tuple
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -36,7 +37,7 @@ class ModelTrainingService:
         try:
             # Verificar se o modelo e o dataset existem
             model = AIModel.objects.get(id=model_id)
-            dataset = Dataset.objects.exists(id=dataset_id)
+            dataset = Dataset.objects.get(id=dataset_id)
             
             if not dataset:
                 return False, "Dataset não encontrado"
@@ -158,10 +159,19 @@ class ModelTrainingService:
             if success and isinstance(result, dict):
                 # Atualizar métricas do modelo
                 model.metrics = result
-                # Salvar referência ao arquivo do modelo (se gerado pelo trainer)
-                model_file = f'models/model_{dataset.name.replace(" ", "_")}.joblib'
-                if os.path.exists(os.path.join(settings.MEDIA_ROOT, model_file)):
-                    model.model_file = model_file
+                
+                # Criar nome de arquivo seguro para Windows
+                # Extrair apenas o nome do arquivo do caminho completo
+                base_filename = os.path.basename(dataset.file.path)
+                
+                # Limpar o nome do arquivo para garantir compatibilidade com sistemas de arquivos
+                safe_filename = re.sub(r'[\\/*?:"<>|]', "_", base_filename)
+                model_filename = f'model_{safe_filename}.joblib'
+                model_file_path = f'models/{model_filename}'
+                
+                # Salvar referência ao arquivo do modelo
+                if os.path.exists(os.path.join(settings.MEDIA_ROOT, 'models', model_filename)):
+                    model.model_file = model_file_path
                 
                 # Atualizar status para revisão
                 model.status = 'review'

@@ -54,6 +54,8 @@ class AIModel(models.Model):
         ('rejected', 'Rejeitado')
     ])
     metrics = models.JSONField(null=True, blank=True)
+    # Adicionar o campo model_file que está faltando
+    model_file = models.FileField(upload_to='models/', null=True, blank=True)
     
     # Campos para rastreamento de progresso
     TRAINING_STATUS_CHOICES = [

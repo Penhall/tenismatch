@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 import logging
 import os
 import joblib
+import re
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -99,11 +100,23 @@ class SneakerMatchTraining:
                 'f1_score': float(f1_score(y_test, y_pred, zero_division=0))
             }
             
+            # Criar nome de arquivo seguro para Windows
+            # Extrair apenas o nome do arquivo do caminho completo
+            base_filename = os.path.basename(dataset_path)
+            
+            # Limpar o nome do arquivo para garantir compatibilidade com sistemas de arquivos
+            safe_filename = re.sub(r'[\\/*?:"<>|]', "_", base_filename)
+            model_filename = f'model_{safe_filename}.joblib'
+            
             # Salvar o modelo treinado
-            model_file = os.path.join(settings.MEDIA_ROOT, 'models', f'model_{dataset_path.split("/")[-1]}.joblib')
-            os.makedirs(os.path.dirname(model_file), exist_ok=True)
+            model_dir = os.path.join(settings.MEDIA_ROOT, 'models')
+            os.makedirs(model_dir, exist_ok=True)
+            model_file = os.path.join(model_dir, model_filename)
+            
+            # Salvar o modelo
             joblib.dump(self.model, model_file)
             
+            logger.info(f"Modelo salvo em: {model_file}")
             logger.info(f"Modelo treinado com sucesso. Métricas: {metrics}")
             return True, metrics
             
