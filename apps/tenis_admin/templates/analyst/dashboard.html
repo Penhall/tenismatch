@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 {% empty %}
                 <tr>
                     <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                        Nenhum modelo criado ainda. <a href="{% url 'tenis_admin:model_create' %}" class="text-blue-600 hover:underline">Crie um modelo</a> para começar.
+                        Nenhum modelo criado ainda. <a href="{% url 'tenis_admin:train_model' %}" class="text-blue-600 hover:underline">Crie um modelo</a> para começar.
                     </td>
                 </tr>
                 {% endfor %}

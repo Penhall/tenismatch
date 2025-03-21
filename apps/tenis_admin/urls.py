@@ -1,32 +1,35 @@
 # /tenismatch/apps/tenis_admin/urls.py
 from django.urls import path
 from . import views
+from .views import ModelMetricsAPIView
 
 app_name = 'tenis_admin'
 
 urlpatterns = [
-    # Analyst URLs
-    path('analyst/dashboard/', views.AnalystDashboardView.as_view(), name='analyst_dashboard'),
+    # Páginas Iniciais
+    path('', views.ManagerDashboardView.as_view(), name='index'),
     
-    # Dataset Management
-    path('analyst/dataset/generate/', views.GenerateDataView.as_view(), name='generate_data'),
+    # Área do Analista
+    path('analyst/dashboard/', views.AnalystDashboardView.as_view(), name='analyst_dashboard'),
     path('analyst/dataset/upload/', views.DatasetUploadView.as_view(), name='dataset_upload'),
     path('analyst/dataset/<int:pk>/preview/', views.DatasetPreviewView.as_view(), name='dataset_preview'),
     path('analyst/dataset/<int:pk>/mapping/', views.DatasetMappingView.as_view(), name='dataset_mapping'),
-        
-    # Model Training and Management
+    path('analyst/dataset/generate/', views.GenerateDataView.as_view(), name='generate_data'),
     path('analyst/model/create/', views.ModelTrainingView.as_view(), name='model_create'),
-    path('analyst/model/<int:pk>/detail/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
-    path('model/<int:model_id>/progress/', views.model_training_progress, name='model_progress'),
+    path('analyst/model/<int:pk>/', views.ModelTrainingDetailView.as_view(), name='model_detail'),
+    path('analyst/model/<int:model_id>/progress/', views.model_training_progress, name='model_progress'),
     
-    # Manager URLs
+    # Área do Gerente
     path('manager/dashboard/', views.ManagerDashboardView.as_view(), name='manager_dashboard'),
-    path('manager/model/<int:pk>/review/', views.ModelReviewView.as_view(), name='model_review'),
-    path('manager/model/<int:pk>/performance/', views.ModelPerformanceView.as_view(), name='model_performance'),
     path('manager/metrics/', views.MetricsDashboardView.as_view(), name='metrics_dashboard'),
     path('manager/approvals/', views.ApprovalsView.as_view(), name='approvals'),
+    path('manager/model/<int:pk>/review/', views.ModelReviewView.as_view(), name='model_review'),
+    path('manager/model/<int:pk>/performance/', views.ModelPerformanceView.as_view(), name='model_performance'),
     
-    # Model Approval Routes (para o gerente)
-    path('manager/model/<int:model_id>/approve/', views.approve_model, name='model_approve'),
-    path('manager/model/<int:model_id>/reject/', views.reject_model, name='model_reject'),
+    # Endpoints de ação direta (novas rotas)
+    path('model/<int:model_id>/review/', views.review_model, name='review_model'),
+    path('model/<int:model_id>/deploy/', views.deploy_model, name='deploy_model'),
+    
+    # Endpoints de API
+    path('api/model/<int:model_id>/metrics/', ModelMetricsAPIView.as_view(), name='model_metrics_api'),
 ]

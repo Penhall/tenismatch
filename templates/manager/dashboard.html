@@ -96,6 +96,15 @@
         <h1 class="text-2xl font-bold">Dashboard do Gerente</h1>
     </div>
 
+    <!-- Mensagens de alerta -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <!-- Cards de Status dos Modelos -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow">
@@ -106,7 +115,7 @@
         
         <div class="bg-white p-6 rounded-lg shadow">
             <h3 class="text-lg font-semibold mb-2">Em Análise</h3>
-            <p class="text-3xl font-bold text-blue-600">{{ in_review }}</p>
+            <p class="text-3xl font-bold text-blue-600">{{ review_models|default:in_review }}</p>
             <p class="text-sm text-gray-500">Aguardando revisão</p>
         </div>
         
@@ -150,6 +159,175 @@
         </div>
     </div>
 
+    <!-- NOVA SEÇÃO: Modelos Pendentes de Aprovação -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            <span class="bg-orange-100 text-orange-800 py-1 px-3 rounded-full text-sm mr-3">Pendentes</span>
+            Modelos Aguardando Revisão
+        </h2>
+        
+        {% if pending_models %}
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado por</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Métricas</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for model in pending_models %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="text-sm font-medium text-gray-900">{{ model.name }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.dataset.name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.created_by.username }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.created_at|date:"d/m/Y H:i" }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if model.metrics %}
+                                        <button class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs view-metrics" data-model-id="{{ model.id }}">
+                                            Ver Métricas
+                                        </button>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Não disponível</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <a href="{% url 'tenis_admin:model_review' model.id %}" class="text-blue-600 hover:text-blue-900">
+                                            Detalhes
+                                        </a>
+                                        
+                                        <form method="post" action="{% url 'tenis_admin:review_model' model.id %}" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="decision" value="approve">
+                                            <button type="submit" class="text-green-600 hover:text-green-900">Aprovar</button>
+                                        </form>
+                                        
+                                        <form method="post" action="{% url 'tenis_admin:review_model' model.id %}" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="decision" value="reject">
+                                            <button type="submit" class="text-red-600 hover:text-red-900">Rejeitar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="bg-yellow-50 p-4 rounded-md border border-yellow-200">
+                <p class="text-yellow-700">Não há modelos pendentes de aprovação no momento.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- NOVA SEÇÃO: Modelos Já Revisados -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+            <span class="bg-green-100 text-green-800 py-1 px-3 rounded-full text-sm mr-3">Revisados</span>
+            Modelos Aprovados/Rejeitados
+        </h2>
+        
+        {% if reviewed_models %}
+            <div class="bg-white rounded-lg shadow overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dataset</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado por</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revisado em</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Métricas</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for model in reviewed_models %}
+                            <tr class="hover:bg-gray-50 {% if model.status == 'approved' %}bg-green-50{% elif model.status == 'rejected' %}bg-red-50{% endif %}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="text-sm font-medium text-gray-900">{{ model.name }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.dataset.name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if model.status == 'approved' %}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            Aprovado
+                                        </span>
+                                    {% elif model.status == 'rejected' %}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                            Rejeitado
+                                        </span>
+                                    {% elif model.status == 'deployed' %}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Implantado
+                                        </span>
+                                    {% else %}
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ model.get_status_display }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.created_by.username }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ model.updated_at|date:"d/m/Y H:i" }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if model.metrics %}
+                                        <button class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs view-metrics" data-model-id="{{ model.id }}">
+                                            Ver Métricas
+                                        </button>
+                                    {% else %}
+                                        <span class="text-sm text-gray-500">Não disponível</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <a href="{% url 'tenis_admin:model_performance' model.id %}" class="text-blue-600 hover:text-blue-900">
+                                            Detalhes
+                                        </a>
+                                        
+                                        {% if model.status == 'approved' %}
+                                            <form method="post" action="{% url 'tenis_admin:deploy_model' model.id %}" class="inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-purple-600 hover:text-purple-900">Implantar</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                <p class="text-gray-700">Nenhum modelo foi revisado ainda.</p>
+            </div>
+        {% endif %}
+    </div>
+
     <!-- Links Rápidos -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="px-6 py-4 border-b">
@@ -181,5 +359,114 @@
             </div>
         </div>
     </div>
+
+   <!-- Modal de Métricas -->
+   <div id="metrics-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Métricas do Modelo</h3>
+                <button id="close-metrics-modal" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="metrics-content" class="space-y-4">
+                <div class="flex justify-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500"></div>
+                </div>
+                <p class="text-center text-gray-500">Carregando métricas...</p>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manipulação do modal de métricas
+    const metricsModal = document.getElementById('metrics-modal');
+    const metricsContent = document.getElementById('metrics-content');
+    const closeMetricsModal = document.getElementById('close-metrics-modal');
+    const viewMetricsButtons = document.querySelectorAll('.view-metrics');
+
+    // Abrir modal e carregar métricas
+    viewMetricsButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modelId = this.getAttribute('data-model-id');
+            metricsModal.classList.remove('hidden');
+            
+            // Loading state
+            metricsContent.innerHTML = `
+                <div class="flex justify-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-500"></div>
+                </div>
+                <p class="text-center text-gray-500">Carregando métricas...</p>
+            `;
+            
+            // Fetch metrics
+            fetch(`/tenis_admin/api/model/${modelId}/metrics/`)
+                .then(response => response.json())
+                .then(data => {
+                    let metricsHtml = '';
+                    
+                    if (data.accuracy) {
+                        metricsHtml += `
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-50 p-4 rounded">
+                                    <h4 class="text-sm font-medium text-gray-500">Acurácia</h4>
+                                    <p class="text-2xl font-bold text-purple-600">${(data.accuracy * 100).toFixed(2)}%</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded">
+                                    <h4 class="text-sm font-medium text-gray-500">Precisão</h4>
+                                    <p class="text-2xl font-bold text-purple-600">${(data.precision * 100).toFixed(2)}%</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded">
+                                    <h4 class="text-sm font-medium text-gray-500">Recall</h4>
+                                    <p class="text-2xl font-bold text-purple-600">${(data.recall * 100).toFixed(2)}%</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded">
+                                    <h4 class="text-sm font-medium text-gray-500">F1 Score</h4>
+                                    <p class="text-2xl font-bold text-purple-600">${(data.f1_score * 100).toFixed(2)}%</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        metricsHtml += `
+                            <div class="bg-yellow-50 p-4 rounded text-center">
+                                <p class="text-yellow-700">Métricas detalhadas não disponíveis para este modelo.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    metricsContent.innerHTML = metricsHtml;
+                })
+                .catch(error => {
+                    metricsContent.innerHTML = `
+                        <div class="bg-red-50 p-4 rounded text-center">
+                            <p class="text-red-700">Erro ao carregar métricas. Tente novamente mais tarde.</p>
+                        </div>
+                    `;
+                    console.error('Error fetching metrics:', error);
+                });
+        });
+    });
+
+    // Fechar modal
+    closeMetricsModal.addEventListener('click', function() {
+        metricsModal.classList.add('hidden');
+    });
+
+    // Fechar modal clicando fora dele
+    metricsModal.addEventListener('click', function(e) {
+        if (e.target === metricsModal) {
+            metricsModal.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}
+
 {% endblock content %}

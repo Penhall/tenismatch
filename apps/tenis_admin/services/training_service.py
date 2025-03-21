@@ -1,17 +1,18 @@
+# /tenismatch/apps/tenis_admin/services/training_service.py
 import numpy as np
-import pandas as pd  # Adicionando importação de pandas
+import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from django.db import transaction
-from apps.tenis_admin.models import AIModel, Dataset
-from django.contrib.auth import get_user_model
 from django.conf import settings
-import logging  # Adicionando importação de logging
+from django.contrib.auth import get_user_model
+import logging
+import os
+import joblib
 
 logger = logging.getLogger(__name__)
-
 User = get_user_model()
 
 class SneakerMatchTraining:
@@ -98,91 +99,97 @@ class SneakerMatchTraining:
                 'f1_score': float(f1_score(y_test, y_pred, zero_division=0))
             }
             
+            # Salvar o modelo treinado
+            model_file = os.path.join(settings.MEDIA_ROOT, 'models', f'model_{dataset_path.split("/")[-1]}.joblib')
+            os.makedirs(os.path.dirname(model_file), exist_ok=True)
+            joblib.dump(self.model, model_file)
+            
             logger.info(f"Modelo treinado com sucesso. Métricas: {metrics}")
             return True, metrics
             
         except Exception as e:
             logger.error(f"Erro ao treinar modelo: {str(e)}")
             return False, str(e)
-
-class ModelTrainingService:
-    def __init__(self):
-        self.training = SneakerMatchTraining()
-
-    @staticmethod
-    def train_model(model_id, dataset_id):
+    
+    def extract_features(self, sneaker_data):
         """
-        Treina um modelo de IA usando o dataset especificado
+        Extrai características relevantes de um tênis
         """
-        try:
-            model = AIModel.objects.get(id=model_id)
-            dataset = Dataset.objects.get(id=dataset_id)
-            
-            if dataset.status != 'ready':
-                logger.error(f"Dataset {dataset_id} não está pronto para treinamento. Status: {dataset.status}")
-                return False, f"Dataset não está pronto para treinamento. Status: {dataset.status}"
-            
-            # Verificar se o arquivo do dataset existe
-            if not dataset.file or not dataset.file.path:
-                logger.error(f"Arquivo do dataset {dataset_id} não encontrado")
-                return False, "Arquivo do dataset não encontrado"
-            
-            # Verificar se o modelo está em estado válido
-            if model.status not in ['draft']:
-                logger.error(f"Modelo {model_id} não está em estado válido para treinamento. Status: {model.status}")
-                return False, f"Modelo não está em estado válido para treinamento. Status: {model.status}"
-            
-            # Treinar o modelo
-            trainer = SneakerMatchTraining()
-            success, result = trainer.train(dataset.file.path)
-            
-            if success:
-                # Se o resultado for um dicionário de métricas, salvar no modelo
-                if isinstance(result, dict):
-                    model.metrics = result
-                
-                model.status = 'review'
-                model.save()
-                logger.info(f"Modelo {model_id} treinado com sucesso e enviado para revisão")
-                return True, "Modelo treinado com sucesso e enviado para revisão"
-            else:
-                logger.error(f"Falha ao treinar modelo {model_id}: {result}")
-                return False, result
-            
-        except Dataset.DoesNotExist:
-            logger.error(f"Dataset {dataset_id} não encontrado")
-            return False, "Dataset não encontrado"
-            
-        except AIModel.DoesNotExist:
-            logger.error(f"Modelo {model_id} não encontrado")
-            return False, "Modelo não encontrado"
-            
-        except Exception as e:
-            logger.error(f"Erro ao treinar modelo {model_id}: {str(e)}")
-            return False, str(e)
-
-    @staticmethod
-    def review_model(model_id, approved, review_notes=None):
+        features = {
+            'marca_score': self._get_brand_score(sneaker_data.get('tenis_marca')),
+            'estilo_score': self._get_style_score(sneaker_data.get('tenis_estilo')),
+            'cores_score': self._get_color_score(sneaker_data.get('tenis_cores')),
+            'preco_score': self._get_price_score(sneaker_data.get('tenis_preco'))
+        }
+        return features
+    
+    def _get_style_score(self, style):
         """
-        Processa a revisão de um modelo, aprovando ou rejeitando
+        Calcula pontuação baseada no estilo do tênis
         """
-        try:
-            model = AIModel.objects.get(id=model_id)
-            
-            if model.status != 'review':
-                logger.error(f"Modelo {model_id} não está em estado de revisão. Status: {model.status}")
-                return False, f"Modelo não está em estado de revisão. Status: {model.status}"
-            
-            model.status = 'approved' if approved else 'rejected'
-            model.save()
-            
-            logger.info(f"Modelo {model_id} {'aprovado' if approved else 'rejeitado'}")
-            return True, "Revisão processada com sucesso"
-            
-        except AIModel.DoesNotExist:
-            logger.error(f"Modelo {model_id} não encontrado")
-            return False, "Modelo não encontrado"
-            
-        except Exception as e:
-            logger.error(f"Erro ao processar revisão do modelo {model_id}: {str(e)}")
-            return False, str(e)
+        if not style:
+            return 0.5
+        
+        # Mapeamento de estilo para pontuação de 0 a 1
+        style_mapping = {
+            'ESP': 0.8,  # Esportivo
+            'CAS': 0.6,  # Casual
+            'VIN': 0.4,  # Vintage
+            'SOC': 0.3,  # Social
+            'FAS': 0.7,  # Fashion
+        }
+        
+        return style_mapping.get(style[:3].upper(), 0.5)
+    
+    def _get_brand_score(self, brand):
+        """
+        Calcula pontuação baseada na marca do tênis
+        """
+        if not brand:
+            return 0.5
+        
+        # Pontuação de popularidade das marcas
+        brand_mapping = {
+            'Nike': 0.9,
+            'Adidas': 0.85,
+            'Puma': 0.7,
+            'Reebok': 0.65,
+            'New Balance': 0.6,
+            'Converse': 0.55,
+            'Vans': 0.5,
+            'Asics': 0.45
+        }
+        
+        return brand_mapping.get(brand, 0.4)
+    
+    def _get_color_score(self, color):
+        """
+        Calcula pontuação baseada na cor do tênis
+        """
+        if not color:
+            return 0.5
+        
+        # Pontuação de versatilidade das cores
+        color_mapping = {
+            'Preto': 0.9,
+            'Branco': 0.85,
+            'Cinza': 0.8,
+            'Azul': 0.7,
+            'Vermelho': 0.6,
+            'Verde': 0.5,
+            'Amarelo': 0.4,
+            'Rosa': 0.3
+        }
+        
+        return color_mapping.get(color, 0.5)
+    
+    def _get_price_score(self, price):
+        """
+        Calcula pontuação baseada no preço do tênis
+        """
+        if not price or not isinstance(price, (int, float)):
+            return 0.5
+        
+        # Normalizar preço entre 0 e 1 (assumindo range de 0 a 2000)
+        normalized = min(1.0, max(0.0, price / 2000))
+        return normalized

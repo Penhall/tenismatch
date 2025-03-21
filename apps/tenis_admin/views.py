@@ -12,6 +12,7 @@ import logging
 import os
 import time
 import threading
+import json
 from django.core.files.base import ContentFile
 from .services.dataset_service import DatasetService
 from .services.metrics_service import MetricsService
@@ -244,8 +245,6 @@ def model_training_progress(request, model_id):
         return JsonResponse({'error': str(e)}, status=400)
 
 # Manager Views
-# /tenismatch/apps/tenis_admin/views.py (modificação apenas no ManagerDashboardView)
-
 class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateView):
     template_name = 'manager/dashboard.html'
     
@@ -267,52 +266,138 @@ class ManagerDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
         parent_time = time.time() - parent_start
         logger.info(f"Tempo parent get_context_data: {parent_time:.4f}s")
         
-        # Log tempo para carregar modelos em revisão
-        review_start = time.time()
+        # Estatísticas - mantendo contagens existentes
+        counts_start = time.time()
         try:
-            context['models_for_review'] = AIModel.objects.filter(
-                status='review'
-            ).order_by('-created_at')
-            review_time = time.time() - review_start
-            logger.info(f"Tempo consulta modelos em revisão: {review_time:.4f}s, Count: {context['models_for_review'].count()}")
-        except Exception as e:
-            logger.error(f"Erro ao carregar modelos em revisão: {str(e)}")
-            context['models_for_review'] = []
-        
-        # Log tempo para carregar modelos aprovados
-        approved_start = time.time()
-        try:
-            context['approved_models'] = AIModel.objects.filter(
-                status='approved'
-            ).order_by('-created_at')[:5]
-            approved_time = time.time() - approved_start
-            logger.info(f"Tempo consulta modelos aprovados: {approved_time:.4f}s")
-        except Exception as e:
-            logger.error(f"Erro ao carregar modelos aprovados: {str(e)}")
-            context['approved_models'] = []
-        
-        # Log tempo para métricas resumidas
-        metrics_start = time.time()
-        try:
-            # Consultas individuais para cada contagem
-            counts_start = time.time()
             total_count = AIModel.objects.count()
             approved_count = AIModel.objects.filter(status='approved').count()
             review_count = AIModel.objects.filter(status='review').count()
+            rejected_count = AIModel.objects.filter(status='rejected').count()
+            
+            context.update({
+                'total_models': total_count,
+                'approved_models_count': approved_count,  # Original
+                'approved_models': approved_count,        # Nova convenção
+                'review_models_count': review_count,      # Original
+                'review_models': review_count,            # Nova convenção
+                'in_review': review_count,                # Compatibilidade com template atual
+                'rejected_models': rejected_count,        # Nova convenção
+                'models_in_review': review_count,         # Para sidebar
+            })
+            
             counts_time = time.time() - counts_start
             logger.info(f"Tempo consultas de contagem: {counts_time:.4f}s")
-            
-            context['total_models'] = total_count
-            context['approved_models_count'] = approved_count
-            context['review_models_count'] = review_count
         except Exception as e:
             logger.error(f"Erro ao carregar contagens: {str(e)}")
-            context['total_models'] = 0
-            context['approved_models_count'] = 0
-            context['review_models_count'] = 0
+            context.update({
+                'total_models': 0,
+                'approved_models_count': 0,
+                'approved_models': 0,
+                'review_models_count': 0,
+                'review_models': 0,
+                'in_review': 0,
+                'rejected_models': 0,
+                'models_in_review': 0,
+            })
         
-        metrics_time = time.time() - metrics_start
-        logger.info(f"Tempo total métricas resumidas: {metrics_time:.4f}s")
+        # Métricas médias dos modelos aprovados
+        metrics_start = time.time()
+        try:
+            approved_models = AIModel.objects.filter(status='approved')
+            avg_metrics = {
+                'avg_accuracy': 0,
+                'avg_precision': 0,
+                'avg_recall': 0,
+                'avg_f1_score': 0
+            }
+            
+            if approved_models.exists():
+                metrics_count = 0
+                for model in approved_models:
+                    if model.metrics:
+                        metrics_count += 1
+                        avg_metrics['avg_accuracy'] += model.metrics.get('accuracy', 0) * 100
+                        avg_metrics['avg_precision'] += model.metrics.get('precision', 0) * 100
+                        avg_metrics['avg_recall'] += model.metrics.get('recall', 0) * 100
+                        avg_metrics['avg_f1_score'] += model.metrics.get('f1_score', 0) * 100
+                
+                if metrics_count > 0:
+                    avg_metrics['avg_accuracy'] /= metrics_count
+                    avg_metrics['avg_precision'] /= metrics_count
+                    avg_metrics['avg_recall'] /= metrics_count
+                    avg_metrics['avg_f1_score'] /= metrics_count
+            
+            context['avg_metrics'] = avg_metrics
+            metrics_time = time.time() - metrics_start
+            logger.info(f"Tempo cálculo de métricas médias: {metrics_time:.4f}s")
+        except Exception as e:
+            logger.error(f"Erro ao calcular métricas médias: {str(e)}")
+            context['avg_metrics'] = {
+                'avg_accuracy': 0,
+                'avg_precision': 0,
+                'avg_recall': 0,
+                'avg_f1_score': 0
+            }
+        
+        # Modelos para revisão - compatibilidade com código existente
+        review_start = time.time()
+        try:
+            models_for_review = AIModel.objects.filter(
+                status='review'
+            ).select_related('dataset', 'created_by').order_by('-created_at')
+            
+            context['models_for_review'] = models_for_review
+            context['pending_models'] = models_for_review  # Nova convenção
+            
+            review_time = time.time() - review_start
+            logger.info(f"Tempo consulta modelos em revisão: {review_time:.4f}s, Count: {models_for_review.count()}")
+        except Exception as e:
+            logger.error(f"Erro ao carregar modelos em revisão: {str(e)}")
+            context['models_for_review'] = []
+            context['pending_models'] = []
+        
+        # Modelos já aprovados/rejeitados - novo no sistema
+        approved_start = time.time()
+        try:
+            # Nova consulta para modelos já processados (aprovados/rejeitados/implantados)
+            reviewed_models = AIModel.objects.filter(
+                status__in=['approved', 'rejected', 'deployed']
+            ).select_related('dataset', 'created_by').order_by('-updated_at')[:20]  # Limitando aos 20 mais recentes
+            
+            context['reviewed_models'] = reviewed_models
+            
+            # Manter compatibilidade com código existente
+            context['approved_models_list'] = AIModel.objects.filter(
+                status='approved'
+            ).order_by('-created_at')[:5]
+            
+            approved_time = time.time() - approved_start
+            logger.info(f"Tempo consulta modelos revisados: {approved_time:.4f}s, Count: {reviewed_models.count()}")
+        except Exception as e:
+            logger.error(f"Erro ao carregar modelos revisados: {str(e)}")
+            context['reviewed_models'] = []
+            context['approved_models_list'] = []
+        
+        # Para sidebar - compatibilidade com template atual
+        sidebar_start = time.time()
+        try:
+            context['latest_model_for_review'] = (
+                AIModel.objects.filter(status='review')
+                .order_by('-created_at')
+                .first()
+            )
+            
+            context['latest_approved_model'] = (
+                AIModel.objects.filter(status='approved')
+                .order_by('-updated_at')
+                .first()
+            )
+            
+            sidebar_time = time.time() - sidebar_start
+            logger.info(f"Tempo consulta modelos para sidebar: {sidebar_time:.4f}s")
+        except Exception as e:
+            logger.error(f"Erro ao carregar modelos para sidebar: {str(e)}")
+            # Não definimos valores default para manter compatibilidade com template
         
         # Adicionar o tempo total
         total_time = time.time() - start_time
@@ -443,6 +528,33 @@ class MetricsDashboardView(LoginRequiredMixin, ManagerRequiredMixin, TemplateVie
         
         return context
 
+# Nova view para API de métricas
+class ModelMetricsAPIView(LoginRequiredMixin, ManagerRequiredMixin, View):
+    """
+    Endpoint de API para fornecer métricas de modelos para o frontend.
+    Retorna as métricas em formato JSON para exibição no modal.
+    """
+    def get(self, request, model_id):
+        model = get_object_or_404(AIModel, id=model_id)
+        
+        # Validação de permissão
+        # Apenas gerentes podem ver métricas (garantido pelo ManagerRequiredMixin)
+        
+        # Se não tiver métricas, retorna objeto vazio
+        if not model.metrics:
+            return JsonResponse({})
+        
+        # Retornando as métricas do modelo
+        try:
+            # As métricas já estão em formato JSON no banco
+            return JsonResponse(model.metrics)
+        except (TypeError, json.JSONDecodeError):
+            # Fallback caso as métricas não estejam em formato válido
+            return JsonResponse({
+                'error': 'Formato de métrica inválido',
+                'message': 'As métricas deste modelo estão em um formato não suportado.'
+            })
+
 # Adicionando a view de Approvals que faltava
 class ApprovalsView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
     model = AIModel
@@ -451,6 +563,48 @@ class ApprovalsView(LoginRequiredMixin, ManagerRequiredMixin, ListView):
     
     def get_queryset(self):
         return AIModel.objects.filter(status='review').order_by('-created_at')
+
+# Nova função review_model para integrar com o dashboard atualizado
+def review_model(request, model_id):
+    """
+    View de função para aprovação/rejeição rápida via dashboard.
+    Esta função permite o processamento direto de modelos sem ir para a página detalhada.
+    """
+    try:
+        model = get_object_or_404(AIModel, id=model_id)
+        
+        if request.method == 'POST':
+            # Identificar a ação (approve ou reject)
+            decision = request.POST.get('decision')
+            
+            if decision == 'approve' or decision == 'true':
+                success, message = ModelTrainingService.review_model(
+                    model.id, True, request.POST.get('review_notes', '')
+                )
+                if success:
+                    messages.success(request, f'Modelo {model.name} aprovado com sucesso!')
+                else:
+                    messages.error(request, f'Erro na aprovação: {message}')
+                    
+            elif decision == 'reject' or decision == 'false':
+                success, message = ModelTrainingService.review_model(
+                    model.id, False, request.POST.get('review_notes', '')
+                )
+                if success:
+                    messages.success(request, f'Modelo {model.name} rejeitado.')
+                else:
+                    messages.error(request, f'Erro na rejeição: {message}')
+            else:
+                messages.error(request, 'Decisão inválida. Escolha aprovar ou rejeitar.')
+        else:
+            messages.error(request, 'Método não permitido. Use POST para esta ação.')
+            
+    except Exception as e:
+        logger.error(f"Erro ao processar revisão do modelo {model_id}: {str(e)}")
+        messages.error(request, f'Erro ao processar revisão: {str(e)}')
+        
+    # Redirecionar de volta para o dashboard em qualquer caso
+    return redirect('tenis_admin:manager_dashboard')
 
 # Funções auxiliares para aprovação/rejeição de modelos
 def approve_model(request, model_id):
@@ -469,4 +623,28 @@ def reject_model(request, model_id):
         model.status = 'rejected'
         model.save()
         messages.success(request, f'Modelo {model.name} rejeitado.')
+    return redirect('tenis_admin:manager_dashboard')
+
+# Nova função para deploy de modelos
+def deploy_model(request, model_id):
+    """
+    View de função para implantar um modelo aprovado.
+    """
+    try:
+        if request.method == 'POST':
+            # Usar o serviço existente ModelDeploymentService para deploy
+            success, message = ModelDeploymentService.deploy_model(model_id)
+            
+            if success:
+                messages.success(request, f'Modelo implantado com sucesso!')
+            else:
+                messages.error(request, f'Erro na implantação: {message}')
+        else:
+            messages.error(request, 'Método não permitido. Use POST para esta ação.')
+            
+    except Exception as e:
+        logger.error(f"Erro ao implantar modelo {model_id}: {str(e)}")
+        messages.error(request, f'Erro ao implantar modelo: {str(e)}')
+        
+    # Redirecionar de volta para o dashboard em qualquer caso
     return redirect('tenis_admin:manager_dashboard')

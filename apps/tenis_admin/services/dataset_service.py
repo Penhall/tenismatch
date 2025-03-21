@@ -2,7 +2,7 @@
 import os
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from ..models import Dataset
+from ..models import Dataset, ColumnMapping
 import pandas as pd
 import logging
 from django.utils import timezone
@@ -152,3 +152,49 @@ class DatasetService:
         except Exception as e:
             logger.error(f'Erro ao processar dataset {dataset_id}: {str(e)}')
             return False
+            
+    @staticmethod
+    def apply_mapping(dataset_id, mapping):
+        """
+        Aplica o mapeamento de colunas ao dataset
+        """
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            
+            if not dataset.file:
+                logger.error(f"Dataset {dataset_id} não possui arquivo associado")
+                return False, "Dataset não possui arquivo associado"
+                
+            # Verifica se o arquivo existe
+            file_path = dataset.file.path
+            if not os.path.exists(file_path):
+                logger.error(f"Arquivo não encontrado para dataset {dataset_id}: {file_path}")
+                return False, "Arquivo não encontrado"
+            
+            # Verifica se o mapeamento tem todas as colunas necessárias
+            required_columns = ['tenis_marca', 'tenis_estilo', 'tenis_cores', 'tenis_preco']
+            for col in required_columns:
+                if col not in mapping:
+                    return False, f"Mapeamento não contém a coluna '{col}'"
+            
+            # Salva o mapeamento
+            column_mapping, created = ColumnMapping.objects.get_or_create(dataset=dataset)
+            column_mapping.mapping = mapping
+            column_mapping.is_mapped = True
+            column_mapping.save()
+            
+            # Atualiza o status do dataset
+            dataset.status = 'ready'
+            dataset.is_processed = True
+            dataset.save()
+            
+            logger.info(f"Mapeamento aplicado com sucesso para dataset {dataset_id}")
+            return True, "Mapeamento aplicado com sucesso"
+            
+        except Dataset.DoesNotExist:
+            logger.error(f"Dataset {dataset_id} não encontrado")
+            return False, "Dataset não encontrado"
+            
+        except Exception as e:
+            logger.error(f"Erro ao aplicar mapeamento para dataset {dataset_id}: {str(e)}")
+            return False, f"Erro ao aplicar mapeamento: {str(e)}"

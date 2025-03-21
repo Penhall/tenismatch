@@ -1,6 +1,6 @@
+# /tenismatch/apps/matching/forms.py
 from django import forms
-from .models import SneakerProfile
-from .models import MatchFeedback
+from .models import SneakerProfile, MatchFeedback
 
 class SneakerProfileForm(forms.ModelForm):
     class Meta:

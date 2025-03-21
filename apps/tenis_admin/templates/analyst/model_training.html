@@ -1,4 +1,4 @@
-<!--# /tenismatch/apps/tenis_admin/templates/analyst/model_creation.html -->
+<!--# /tenismatch/apps/tenis_admin/templates/analyst/model_training.html -->
 {% extends 'base_with_sidebar.html' %}
 
 {% block title %}Criar Novo Modelo - TenisMatch{% endblock %}
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modelNameDisplay.textContent = nameInput.value;
         modelVersionDisplay.textContent = versionInput.value;
         modelDatasetDisplay.textContent = datasetSelect.options[datasetSelect.selectedIndex].text;
-        modelTypeDisplay.textContent = typeSelect.options[typeSelect.selectedIndex].text;
+        modelTypeDisplay.textContent = typeSelect ? typeSelect.options[typeSelect.selectedIndex].text : 'N/A';
         
         // Mostrar o modal
         modal.classList.remove('hidden');
