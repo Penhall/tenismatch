@@ -4,18 +4,25 @@ from .models import Dataset, AIModel, ColumnMapping
 from .services.model_catalog import ModelCatalog
 from .services.model_selector import ModelSelector
 
+
 class DatasetUploadForm(forms.ModelForm):
     class Meta:
         model = Dataset
-        fields = ['name', 'description', 'file', 'file_type']
+        fields = ['name', 'description', 'file']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'w-full border rounded-md p-2'}),
-            'description': forms.Textarea(attrs={
+            'name': forms.TextInput(attrs={
                 'class': 'w-full border rounded-md p-2',
-                'rows': 3
+                'placeholder': 'Nome do dataset'
             }),
-            'file': forms.FileInput(attrs={'class': 'w-full border rounded-md p-2'}),
-            'file_type': forms.Select(attrs={'class': 'w-full border rounded-md p-2'}),
+            'description': forms.Textarea(attrs={
+                'class': 'w-full border rounded-md p-2', 
+                'rows': 4,
+                'placeholder': 'Descrição do dataset'
+            }),
+            'file': forms.FileInput(attrs={
+                'class': 'border p-2 w-full',
+                'accept': '.csv,.json,.xlsx'
+            })
         }
 
 class ModelTrainingForm(forms.ModelForm):

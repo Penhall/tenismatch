@@ -92,13 +92,39 @@ class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, TemplateVie
 class DatasetUploadView(LoginRequiredMixin, AnalystRequiredMixin, CreateView):
     model = Dataset
     form_class = DatasetUploadForm
-    template_name = 'analyst/data_upload.html'  # Note: usando data_upload.html em vez de dataset_upload.html
+    template_name = 'analyst/upload_dataset.html'  # Caminho corrigido para o template
     success_url = reverse_lazy('tenis_admin:analyst_dashboard')
-
+    
     def form_valid(self, form):
-        form.instance.uploaded_by = self.request.user
-        messages.success(self.request, 'Dataset carregado com sucesso!')
-        return super().form_valid(form)
+        try:
+            # Associar o usuário logado ao dataset
+            form.instance.uploaded_by = self.request.user
+            
+            # Salvar o formulário para criar o objeto no banco
+            response = super().form_valid(form)
+            
+            # Processar o dataset após o upload
+            file_path = self.object.file.path
+            file_size = os.path.getsize(file_path)
+            
+            # Atualizar o tamanho do arquivo
+            self.object.file_size = file_size
+            
+            # Definir o status como 'ready' por enquanto (poderia ser 'mapping' se precisar mapeamento)
+            self.object.status = 'ready'
+            self.object.save()
+            
+            messages.success(self.request, f'Dataset "{self.object.name}" enviado com sucesso!')
+            return response
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar upload de dataset: {str(e)}", exc_info=True)
+            messages.error(self.request, f'Erro ao processar o dataset: {str(e)}')
+            return self.form_invalid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Por favor, corrija os erros abaixo.')
+        return super().form_invalid(form)
 
 # Dataset Preview View
 class DatasetPreviewView(LoginRequiredMixin, AnalystRequiredMixin, DetailView):

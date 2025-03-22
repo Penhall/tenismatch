@@ -1,0 +1,161 @@
+tenis_marca,tenis_estilo,tenis_cores,tenis_preco,idade,genero,estado_civil,compatibilidade
+Puma,Streetwear,"[""Cinza""]",908.7,32,M,Divorciado,0.58
+Adidas,Esportivo,"[""Roxo"", ""Verde""]",1141.74,36,M,Casado,0.56
+Converse,Casual,"[""Laranja"", ""Roxo""]",446.95,25,F,Divorciado,0.52
+Converse,Running,"[""Azul""]",117.36,40,M,Viúvo,0.6
+Adidas,Esportivo,"[""Laranja""]",1176.26,24,M,Viúvo,0.64
+Asics,Skate,"[""Rosa"", ""Roxo""]",651.57,42,F,Solteiro,0.4
+Nike,Skate,"[""Verde"", ""Branco""]",859.81,30,F,Divorciado,0.72
+Nike,Skate,"[""Preto""]",362.32,44,M,Viúvo,0.69
+Asics,Vintage,"[""Azul""]",490.2,29,Outro,Divorciado,0.34
+Asics,Skate,"[""Cinza"", ""Rosa""]",406.29,35,F,Casado,0.5
+Converse,Esportivo,"[""Vermelho""]",1197.93,38,F,Viúvo,0.6
+New Balance,Casual,"[""Rosa""]",330.48,32,M,Casado,0.36
+Reebok,Running,"[""Verde"", ""Amarelo""]",520.68,36,F,Solteiro,0.75
+Asics,Vintage,"[""Verde""]",301.12,40,M,Solteiro,0.2
+Adidas,Running,"[""Preto""]",814.1,36,Outro,Divorciado,0.71
+Puma,Esportivo,"[""Laranja"", ""Branco""]",540.71,57,F,Divorciado,0.74
+Adidas,Social,"[""Vermelho""]",731.25,55,F,Divorciado,0.57
+Asics,Running,"[""Vermelho"", ""Verde""]",662.51,53,M,Divorciado,0.58
+New Balance,Basketball,"[""Laranja""]",1101.05,39,F,Solteiro,0.56
+Adidas,Running,"[""Cinza"", ""Branco""]",191.66,24,M,Solteiro,0.46
+Vans,Social,"[""Cinza"", ""Rosa""]",295.52,54,F,Divorciado,0.39
+Converse,Vintage,"[""Cinza""]",235.51,55,F,Solteiro,0.44
+New Balance,Basketball,"[""Amarelo""]",169.12,53,F,Casado,0.23
+Adidas,Running,"[""Preto""]",657.75,19,F,Viúvo,0.64
+Adidas,Esportivo,"[""Preto""]",294.75,49,M,Casado,0.72
+Converse,Basketball,"[""Laranja""]",851.39,35,F,Solteiro,0.54
+Vans,Social,"[""Vermelho"", ""Cinza""]",338.24,52,M,Viúvo,0.2
+Puma,Basketball,"[""Vermelho""]",1156.07,53,F,Viúvo,0.61
+Asics,Streetwear,"[""Branco""]",470.49,23,F,Solteiro,0.57
+Vans,Esportivo,"[""Cinza"", ""Cinza""]",410.55,22,F,Solteiro,0.48
+Adidas,Social,"[""Amarelo""]",370.17,29,M,Solteiro,0.78
+Adidas,Esportivo,"[""Laranja"", ""Vermelho""]",252.59,42,M,Solteiro,0.7
+Adidas,Running,"[""Vermelho""]",784.69,40,M,Viúvo,0.79
+Converse,Skate,"[""Preto"", ""Cinza""]",703.11,58,M,Viúvo,0.66
+Converse,Streetwear,"[""Azul"", ""Laranja""]",708.97,56,F,Casado,0.75
+Asics,Running,"[""Vermelho""]",216.65,28,M,Divorciado,0.55
+Adidas,Basketball,"[""Verde"", ""Amarelo""]",534.31,25,M,Casado,0.81
+Adidas,Esportivo,"[""Roxo"", ""Preto""]",364.02,43,F,Divorciado,0.83
+Nike,Social,"[""Rosa"", ""Laranja""]",979.39,48,F,Viúvo,0.7
+New Balance,Vintage,"[""Branco""]",293.74,57,F,Divorciado,0.28
+Nike,Esportivo,"[""Vermelho"", ""Cinza""]",944.36,20,F,Divorciado,0.88
+Asics,Vintage,"[""Branco""]",440.25,54,M,Viúvo,0.59
+New Balance,Skate,"[""Rosa"", ""Rosa""]",340.78,23,Outro,Viúvo,0.36
+Asics,Social,"[""Verde"", ""Laranja""]",666.2,48,M,Solteiro,0.33
+Reebok,Casual,"[""Amarelo""]",1051.02,18,Outro,Casado,0.67
+Reebok,Casual,"[""Vermelho"", ""Vermelho""]",741.66,37,M,Casado,0.89
+Asics,Streetwear,"[""Verde""]",641.65,39,M,Casado,0.73
+Adidas,Social,"[""Cinza""]",598.47,58,F,Casado,0.82
+Nike,Social,"[""Rosa"", ""Rosa""]",290.81,31,M,Solteiro,0.7
+Converse,Vintage,"[""Laranja"", ""Azul""]",1180.39,34,M,Solteiro,0.5
+Converse,Casual,"[""Rosa""]",301.82,55,M,Solteiro,0.55
+New Balance,Streetwear,"[""Vermelho""]",184.85,57,M,Solteiro,0.54
+Adidas,Running,"[""Azul""]",569.58,45,F,Viúvo,0.76
+Vans,Casual,"[""Laranja""]",872.72,58,F,Viúvo,0.54
+Reebok,Vintage,"[""Rosa"", ""Laranja""]",481.8,24,F,Divorciado,0.41
+Converse,Running,"[""Verde"", ""Cinza""]",577.87,29,Outro,Divorciado,0.45
+Nike,Streetwear,"[""Preto"", ""Branco""]",678.71,49,F,Divorciado,0.63
+Converse,Streetwear,"[""Rosa"", ""Preto""]",561.16,47,F,Casado,0.7
+New Balance,Running,"[""Amarelo""]",994.34,45,M,Casado,0.43
+Adidas,Casual,"[""Rosa"", ""Amarelo""]",678.11,29,F,Solteiro,0.7
+Vans,Skate,"[""Roxo""]",378.28,58,M,Solteiro,0.57
+Converse,Running,"[""Laranja"", ""Branco""]",249.42,35,Outro,Viúvo,0.43
+Reebok,Running,"[""Azul""]",1148.86,18,F,Divorciado,0.51
+Puma,Social,"[""Azul""]",1104.19,38,M,Viúvo,0.78
+Adidas,Social,"[""Rosa"", ""Vermelho""]",600.72,58,M,Casado,0.63
+Vans,Social,"[""Azul"", ""Azul""]",228.93,47,F,Divorciado,0.45
+Puma,Streetwear,"[""Verde""]",880.1,45,F,Divorciado,0.87
+Asics,Streetwear,"[""Branco"", ""Amarelo""]",1177.22,46,Outro,Solteiro,0.45
+Asics,Esportivo,"[""Rosa"", ""Verde""]",1157.03,52,M,Divorciado,0.62
+Converse,Running,"[""Azul""]",380.42,35,F,Solteiro,0.4
+Puma,Streetwear,"[""Cinza"", ""Branco""]",431.26,47,F,Viúvo,0.46
+Adidas,Basketball,"[""Rosa""]",1146.62,44,Outro,Casado,0.54
+Nike,Streetwear,"[""Azul"", ""Vermelho""]",844.5,50,M,Divorciado,0.91
+New Balance,Skate,"[""Roxo""]",607.04,48,F,Solteiro,0.38
+New Balance,Skate,"[""Branco""]",679.02,44,F,Divorciado,0.41
+Adidas,Social,"[""Preto"", ""Verde""]",229.63,31,F,Casado,0.45
+Vans,Esportivo,"[""Cinza"", ""Roxo""]",752.87,57,M,Viúvo,0.49
+Puma,Basketball,"[""Cinza""]",672.83,20,F,Divorciado,0.45
+Adidas,Skate,"[""Rosa"", ""Rosa""]",1180.43,32,F,Casado,0.64
+Puma,Skate,"[""Vermelho"", ""Amarelo""]",178.62,19,F,Divorciado,0.63
+Converse,Casual,"[""Branco""]",947.11,28,M,Solteiro,0.74
+Puma,Basketball,"[""Verde"", ""Laranja""]",604.25,39,F,Divorciado,0.56
+New Balance,Social,"[""Azul"", ""Verde""]",658.41,55,M,Viúvo,0.34
+New Balance,Running,"[""Cinza"", ""Amarelo""]",179.21,54,M,Solteiro,0.29
+Asics,Running,"[""Laranja""]",1020.64,37,M,Casado,0.36
+Asics,Basketball,"[""Rosa""]",962.73,42,F,Viúvo,0.54
+Converse,Social,"[""Verde""]",1046.16,44,F,Casado,0.6
+Vans,Social,"[""Cinza""]",800.5,55,F,Divorciado,0.44
+New Balance,Vintage,"[""Vermelho""]",114.55,23,M,Casado,0.49
+Reebok,Basketball,"[""Azul""]",1083.92,22,F,Casado,0.78
+Vans,Basketball,"[""Roxo"", ""Rosa""]",1026.03,39,F,Divorciado,0.57
+Puma,Basketball,"[""Vermelho""]",1129.33,50,F,Casado,0.55
+Vans,Basketball,"[""Cinza"", ""Azul""]",319.18,31,M,Solteiro,0.29
+Vans,Casual,"[""Preto""]",929.98,29,M,Divorciado,0.79
+Asics,Streetwear,"[""Roxo"", ""Roxo""]",185.18,45,F,Viúvo,0.59
+New Balance,Esportivo,"[""Laranja"", ""Cinza""]",1126.34,33,M,Divorciado,0.38
+Asics,Casual,"[""Preto""]",1106.79,23,M,Solteiro,0.46
+Vans,Basketball,"[""Roxo""]",1148.47,27,M,Solteiro,0.62
+Adidas,Running,"[""Vermelho"", ""Preto""]",345.79,25,F,Viúvo,0.6
+Nike,Running,"[""Cinza""]",172.38,25,M,Casado,0.48
+Puma,Casual,"[""Azul"", ""Preto""]",839.03,59,F,Solteiro,0.9
+New Balance,Esportivo,"[""Branco""]",864.14,31,M,Casado,0.5
+Converse,Streetwear,"[""Preto""]",167.11,43,F,Viúvo,0.6
+Puma,Streetwear,"[""Azul"", ""Cinza""]",451.21,59,F,Divorciado,0.56
+Reebok,Running,"[""Amarelo""]",272.21,41,M,Solteiro,0.49
+Adidas,Streetwear,"[""Amarelo""]",617.98,40,F,Viúvo,0.86
+Nike,Skate,"[""Rosa""]",376.34,40,M,Divorciado,0.5
+Adidas,Casual,"[""Azul"", ""Preto""]",689.78,56,M,Casado,0.96
+Asics,Esportivo,"[""Amarelo"", ""Preto""]",291.5,55,F,Solteiro,0.44
+Converse,Vintage,"[""Rosa""]",594.14,58,F,Solteiro,0.45
+New Balance,Running,"[""Amarelo"", ""Branco""]",862.18,26,F,Divorciado,0.65
+Converse,Basketball,"[""Cinza""]",502.25,59,M,Casado,0.66
+Puma,Skate,"[""Amarelo""]",798.35,42,F,Viúvo,0.6
+Converse,Vintage,"[""Preto""]",818.74,42,Outro,Solteiro,0.65
+Nike,Social,"[""Rosa""]",281.61,47,M,Casado,0.7
+Asics,Vintage,"[""Branco""]",260.8,24,M,Viúvo,0.53
+New Balance,Social,"[""Rosa"", ""Roxo""]",382.02,59,M,Solteiro,0.54
+Adidas,Casual,"[""Preto""]",815.2,33,Outro,Solteiro,0.61
+Reebok,Basketball,"[""Azul""]",355.46,20,M,Solteiro,0.63
+Puma,Casual,"[""Laranja""]",255.91,59,F,Viúvo,0.78
+Adidas,Skate,"[""Amarelo"", ""Cinza""]",233.97,42,F,Viúvo,0.46
+Puma,Esportivo,"[""Cinza"", ""Roxo""]",164.31,23,F,Solteiro,0.53
+Asics,Basketball,"[""Preto""]",1062.52,40,F,Casado,0.46
+New Balance,Basketball,"[""Laranja"", ""Cinza""]",1043.54,47,F,Solteiro,0.39
+Reebok,Casual,"[""Amarelo""]",449.93,24,M,Viúvo,0.68
+Reebok,Esportivo,"[""Laranja""]",171.9,59,M,Divorciado,0.38
+Vans,Casual,"[""Verde"", ""Laranja""]",369.23,21,F,Solteiro,0.34
+Reebok,Running,"[""Roxo"", ""Vermelho""]",419.62,58,M,Viúvo,0.56
+Vans,Streetwear,"[""Azul"", ""Cinza""]",962.62,18,M,Solteiro,0.52
+Nike,Esportivo,"[""Laranja""]",716.38,35,Outro,Divorciado,0.76
+Adidas,Basketball,"[""Roxo""]",753.26,42,M,Viúvo,0.55
+Nike,Casual,"[""Cinza"", ""Verde""]",673.57,19,F,Casado,0.79
+Reebok,Vintage,"[""Verde""]",921.33,56,M,Casado,0.71
+Asics,Casual,"[""Verde""]",497.72,34,M,Divorciado,0.32
+Asics,Streetwear,"[""Roxo"", ""Preto""]",1175.6,52,F,Viúvo,0.5
+Converse,Skate,"[""Vermelho""]",1034.64,53,M,Viúvo,0.45
+Nike,Streetwear,"[""Branco""]",1127.02,32,Outro,Viúvo,0.99
+Puma,Streetwear,"[""Preto""]",166.4,23,Outro,Casado,0.42
+Converse,Casual,"[""Branco"", ""Verde""]",1148.12,19,M,Solteiro,0.63
+Reebok,Streetwear,"[""Cinza"", ""Azul""]",810.94,33,M,Solteiro,0.55
+New Balance,Running,"[""Cinza""]",743.58,32,F,Solteiro,0.62
+Puma,Streetwear,"[""Rosa"", ""Roxo""]",112.99,41,M,Solteiro,0.56
+New Balance,Running,"[""Preto"", ""Azul""]",937.67,31,M,Viúvo,0.57
+Vans,Streetwear,"[""Cinza""]",1101.13,44,M,Solteiro,0.6
+Nike,Streetwear,"[""Preto"", ""Rosa""]",578.62,58,M,Casado,0.63
+Adidas,Esportivo,"[""Vermelho"", ""Laranja""]",543.54,45,M,Casado,0.7
+Adidas,Running,"[""Laranja""]",186.96,55,F,Viúvo,0.61
+Vans,Esportivo,"[""Branco"", ""Rosa""]",688.15,26,M,Divorciado,0.65
+Nike,Skate,"[""Amarelo"", ""Branco""]",1107.03,20,F,Divorciado,0.61
+Reebok,Esportivo,"[""Azul"", ""Rosa""]",452.91,50,M,Solteiro,0.54
+Adidas,Vintage,"[""Azul""]",932.7,29,M,Casado,0.82
+Nike,Casual,"[""Preto""]",602.81,49,F,Viúvo,0.65
+Vans,Skate,"[""Rosa"", ""Laranja""]",148.92,52,F,Viúvo,0.21
+New Balance,Vintage,"[""Cinza""]",515.78,59,F,Viúvo,0.68
+Puma,Skate,"[""Preto"", ""Cinza""]",1004.31,39,F,Casado,0.59
+Asics,Social,"[""Cinza"", ""Laranja""]",184.16,41,F,Solteiro,0.51
+Asics,Esportivo,"[""Branco"", ""Preto""]",596.85,57,M,Divorciado,0.71
+Vans,Streetwear,"[""Branco""]",517.37,46,F,Viúvo,0.42
+Reebok,Streetwear,"[""Rosa""]",100.28,47,M,Viúvo,0.74
+Vans,Esportivo,"[""Laranja"", ""Rosa""]",987.16,53,M,Divorciado,0.64
