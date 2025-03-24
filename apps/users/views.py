@@ -7,11 +7,23 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.models import Group
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UserUpdateForm
 from .models import User
+from apps.profiles.models import UserProfile
+from apps.matching.models import SneakerProfile
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserUpdateForm
     template_name = 'users/profile.html'
+    success_url = reverse_lazy('users:profile')
+    
+    def get_object(self, queryset=None):
+        return self.request.user
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Perfil atualizado com sucesso!')
+        return super().form_valid(form)
 
 class LandingView(TemplateView):
     template_name = 'landing.html'
@@ -53,7 +65,40 @@ class SignupPremiumView(CreateView):
         return super().form_valid(form)
 
 class DashboardView(LoginRequiredMixin, TemplateView):
+    """
+    View para o dashboard principal do usuário.
+    Exibe informações da conta, perfil, preferências de tênis e ações disponíveis.
+    """
     template_name = 'users/dashboard.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Obter perfil de usuário, se existir
+        try:
+            context['user_profile'] = UserProfile.objects.get(user=self.request.user)
+        except UserProfile.DoesNotExist:
+            context['user_profile'] = None
+            
+        # Obter perfil de tênis, se existir
+        try:
+            context['sneaker_profile'] = SneakerProfile.objects.get(user=self.request.user)
+        except SneakerProfile.DoesNotExist:
+            context['sneaker_profile'] = None
+        
+        # Adicionar estatísticas e dados adicionais
+        from apps.matching.models import Match
+        context['matches_count'] = Match.objects.filter(user_a=self.request.user).count()
+        context['mutual_matches_count'] = Match.objects.filter(
+            user_a=self.request.user, 
+            is_mutual=True
+        ).count()
+        
+        # Verificar se o usuário é premium e quando expira (se aplicável)
+        if self.request.user.is_premium and self.request.user.premium_until:
+            context['premium_days_left'] = (self.request.user.premium_until - timezone.now()).days
+        
+        return context
 
 class UpgradePremiumView(LoginRequiredMixin, View):
     def get(self, request):

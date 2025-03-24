@@ -34,7 +34,7 @@ class SneakerProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'sneaker_profiles'
+        db_table = 'matching_sneakerprofile'  # Corrigido para o nome real da tabela no banco
     
     def __str__(self):
         return f"{self.user.username} - {self.get_style_display()} {self.brand}"
@@ -72,7 +72,7 @@ class Match(models.Model):
     matched_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        db_table = 'matches'
+        db_table = 'matching_match'  # Corrigido para o nome real da tabela no banco
         unique_together = ('user_a', 'user_b')
     
     def __str__(self):
@@ -105,6 +105,7 @@ class MatchFeedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        db_table = 'matching_matchfeedback'  # Corrigido para o nome real da tabela no banco
         unique_together = ('user', 'match')
     
     @property
@@ -126,6 +127,7 @@ class DailyRecommendation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        db_table = 'matching_dailyrecommendation'  # Adicionado nome da tabela correspondente
         unique_together = ('user', 'recommended_profile', 'created_at')
     
     def __str__(self):

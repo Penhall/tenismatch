@@ -32,6 +32,13 @@ class UserProfile(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         
+        # Garantir que preferred_brands e style_preferences não sejam None
+        if self.preferred_brands is None:
+            self.preferred_brands = []
+            
+        if self.style_preferences is None:
+            self.style_preferences = {}
+            
         # Incrementar a versão do perfil quando atualizado
         if not is_new:
             self.profile_version += 1

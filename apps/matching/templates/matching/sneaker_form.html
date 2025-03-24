@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preferências de Tênis{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold mb-6 text-center">Minhas Preferências de Tênis</h1>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                <strong class="font-bold">Erro!</strong>
+                <span class="block sm:inline">Por favor, corrija os erros abaixo.</span>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Marca -->
+                <div>
+                    <label for="{{ form.brand.id_for_label }}" class="block text-gray-700 font-medium mb-2">Marca Favorita</label>
+                    {{ form.brand }}
+                    {% if form.brand.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.brand.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Estilo -->
+                <div>
+                    <label for="{{ form.style.id_for_label }}" class="block text-gray-700 font-medium mb-2">Estilo Preferido</label>
+                    {{ form.style }}
+                    {% if form.style.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.style.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Cor -->
+                <div>
+                    <label for="{{ form.color.id_for_label }}" class="block text-gray-700 font-medium mb-2">Cor Preferida</label>
+                    {{ form.color }}
+                    {% if form.color.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.color.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Faixa de Preço -->
+                <div>
+                    <label for="{{ form.price_range.id_for_label }}" class="block text-gray-700 font-medium mb-2">Faixa de Preço (R$)</label>
+                    {{ form.price_range }}
+                    {% if form.price_range.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.price_range.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Ocasião -->
+                <div class="md:col-span-2">
+                    <label for="{{ form.occasion.id_for_label }}" class="block text-gray-700 font-medium mb-2">Ocasião de Uso</label>
+                    {{ form.occasion }}
+                    {% if form.occasion.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.occasion.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">Ex: Casual, Esporte, Trabalho, Eventos</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition duration-300">
+                    Salvar Preferências
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

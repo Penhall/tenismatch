@@ -16,4 +16,5 @@ urlpatterns = [
     path('daily/', views.DailyMatchesView.as_view(), name='daily_matches'),
     path('statistics/', views.MatchStatisticsView.as_view(), name='statistics'),
     path('api/matches/', views.api_get_matches, name='api_matches'),
+    
 ]

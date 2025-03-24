@@ -74,24 +74,50 @@
                     <a href="{% url 'users:dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
                         Dashboard
                     </a>
-                    {% if user.role == 'ANALISTA' %}
-                        <div class="mb-4">
-                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Datasets</h4>
-                            <a href="{% url 'tenis_admin:dataset_upload' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Upload</a>
-                            <a href="{% url 'tenis_admin:generate_data' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Gerar Dataset</a>
-                        </div>
-                        <div class="mb-4">
-                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Modelos</h4>
-                            <a href="{% url 'tenis_admin:model_create' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Criar Modelo</a>
-                        </div>
-                    {% elif user.role == 'GERENTE' %}
-                        <div class="mb-4">
-                            <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Gestão</h4>
-                            <a href="{% url 'tenis_admin:metrics_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Métricas</a>
-                            <a href="{% url 'users:approve_analysts' %}" class="block px-4 py-2 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Aprovar Analistas</a>
-                        </div>
-                    {% endif %}
+                    <a href="{% url 'matching:match_list' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+                        Matches
+                    </a>
                 </div>
+                
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">PERFIL</h3>
+                    <a href="{% url 'profiles:edit' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+                        Editar Perfil
+                    </a>
+                    <a href="{% url 'profiles:preferences' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+                        Preferências
+                    </a>
+                </div>
+
+                {% if user.role == 'ANALISTA' %}
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">ÁREA RESERVADA</h3>
+                    <a href="{% url 'tenis_admin:analyst_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+                        Dashboard do Analista
+                    </a>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Datasets</h4>
+                        <a href="{% url 'tenis_admin:dataset_upload' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Upload</a>
+                        <a href="{% url 'tenis_admin:generate_data' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Gerar Dataset</a>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Modelos</h4>
+                        <a href="{% url 'tenis_admin:model_create' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Criar Modelo</a>
+                    </div>
+                </div>
+                {% elif user.role == 'GERENTE' %}
+                <div class="mb-4">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">ÁREA RESERVADA</h3>
+                    <a href="{% url 'tenis_admin:manager_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">
+                        Dashboard do Gerente
+                    </a>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Gestão</h4>
+                        <a href="{% url 'tenis_admin:metrics_dashboard' %}" class="block py-2 px-4 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Métricas</a>
+                        <a href="{% url 'users:approve_analysts' %}" class="block px-4 py-2 text-gray-800 hover:bg-purple-50 rounded-lg mb-1">Aprovar Analistas</a>
+                    </div>
+                </div>
+                {% endif %}
             </nav>
             {% endblock %}
         </aside>

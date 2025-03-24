@@ -11,6 +11,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('GERENTE', 'Gerente'),
         ('ANALISTA', 'Analista'),
+        ('USUARIO', 'Usuário Regular'),  # Adicionando papel para usuários comuns
     )
     is_premium = models.BooleanField(default=False)
     premium_until = models.DateTimeField(null=True, blank=True)
@@ -18,7 +19,7 @@ class User(AbstractUser):
     location = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False, db_index=True)  # Adicionado índice
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='ANALISTA', db_index=True)  # Adicionado índice
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='USUARIO', db_index=True)  # Alterado para 'USUARIO'
     
     def has_premium_access(self):
         if not self.is_premium:

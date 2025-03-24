@@ -45,7 +45,7 @@ class AnalystRequiredMixin(UserPassesTestMixin):
 
 class ManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
-        return True  # Permitir acesso a qualquer usuário temporariamente
+        return self.request.user.role == 'GERENTE'
         
 # Dashboard Views
 class AnalystDashboardView(LoginRequiredMixin, AnalystRequiredMixin, TemplateView):

@@ -1,0 +1,107 @@
+{# /tenismatch/templates/matching/match_list.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Matches{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Seus Matches</h1>
+    
+    {% if messages %}
+    <div class="max-w-3xl mx-auto mb-6">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% elif message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% elif message.tags == 'warning' %}bg-yellow-100 border-yellow-400 text-yellow-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} px-4 py-3 mb-3 rounded-lg border">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if recommendations %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for rec in recommendations %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4">
+                <h2 class="text-xl font-bold">{{ rec.profile.user.username }}</h2>
+                <div class="flex items-center mt-1">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                        <div class="bg-white rounded-full h-2" style="width: {{ rec.compatibility|floatformat:0 }}%;"></div>
+                    </div>
+                    <span class="ml-2 text-sm font-medium">{{ rec.compatibility|floatformat:0 }}%</span>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-4">
+                <!-- Sneaker Info -->
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600">Marca:</span>
+                        <span class="font-medium">{{ rec.profile.brand }}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600">Estilo:</span>
+                        <span class="font-medium">{{ rec.profile.get_style_display }}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-600">Cor:</span>
+                        <span class="font-medium">{{ rec.profile.get_color_display }}</span>
+                    </div>
+                </div>
+                
+                <!-- Compatibility Reasons -->
+                {% if rec.reasons %}
+                <div class="border-t pt-3 mt-3">
+                    <h3 class="text-sm font-medium mb-2">Por que vocês combinam:</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        {% for reason in rec.reasons %}
+                        <li class="flex items-start">
+                            <svg class="h-4 w-4 text-green-500 mr-1 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            {{ reason }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Actions -->
+                <div class="flex space-x-2 mt-4">
+                    <a href="{% url 'matching:update_match_status' rec.profile.id 'liked' %}" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg hover:bg-green-600 transition">
+                        <svg class="w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </a>
+                    <a href="{% url 'matching:update_match_status' rec.profile.id 'rejected' %}" class="flex-1 bg-red-500 text-white text-center py-2 rounded-lg hover:bg-red-600 transition">
+                        <svg class="w-5 h-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+        <h2 class="text-2xl font-bold mb-4">Nenhum match encontrado</h2>
+        <p class="text-gray-600 mb-6">Atualize suas preferências para encontrar novos matches.</p>
+        <a href="{% url 'matching:sneaker_form' %}" class="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition">
+            Atualizar Preferências
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="flex justify-center mt-8 space-x-4">
+        <a href="{% url 'matching:sneaker_form' %}" class="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition">
+            Atualizar Preferências
+        </a>
+        <a href="#" class="bg-yellow-500 text-white py-2 px-6 rounded-lg hover:bg-yellow-600 transition">
+            Upgrade para Premium
+        </a>
+    </div>
+</div>
+{% endblock %}

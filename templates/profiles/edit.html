@@ -1,4 +1,5 @@
 {% extends 'base_with_sidebar.html' %}
+{% load static %}
 
 {% block title %}Editar Perfil - TenisMatch{% endblock %}
 
@@ -77,7 +78,7 @@
                             {% if profile.avatar %}
                             <img src="{{ profile.avatar.url }}" alt="Avatar" class="w-full h-full object-cover">
                             {% else %}
-                            <img src="/static/img/default-avatar.png" alt="Avatar padrão" class="w-full h-full object-cover">
+                            <img src="{% static 'img/default-avatar.png' %}" alt="Avatar padrão" class="w-full h-full object-cover">
                             {% endif %}
                         </div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Alterar foto</label>

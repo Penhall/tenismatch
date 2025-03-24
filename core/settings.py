@@ -35,8 +35,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.users.middleware.PremiumAccessMiddleware',
     'apps.tenis_admin.middleware.PerformanceMiddleware',
+    'apps.users.middleware.UserRoleMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -53,6 +53,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.users.context_processors.user_roles',
             ],
         },
     },

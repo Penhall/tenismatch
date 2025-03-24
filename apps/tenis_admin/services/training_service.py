@@ -94,10 +94,10 @@ class SneakerMatchTraining:
             # Avaliação
             y_pred = self.model.predict(X_test)
             metrics = {
-                'accuracy': float(accuracy_score(y_test, y_pred)),
-                'precision': float(precision_score(y_test, y_pred, zero_division=0)),
-                'recall': float(recall_score(y_test, y_pred, zero_division=0)),
-                'f1_score': float(f1_score(y_test, y_pred, zero_division=0))
+                'accuracy': float(accuracy_score(y_test, y_pred) * 100),
+                'precision': float(precision_score(y_test, y_pred, zero_division=0) * 100),
+                'recall': float(recall_score(y_test, y_pred, zero_division=0) * 100),
+                'f1_score': float(f1_score(y_test, y_pred, zero_division=0) * 100)
             }
             
             # Criar nome de arquivo seguro para Windows
